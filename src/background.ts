@@ -1,10 +1,9 @@
 export {}
 
-console.log(
-  "Live now; make now always the most precious time. Now will never come again."
-)
+const LOCAL_URL = "http://localhost:3000/api/embed/html"
+const REMOTE_URL = "https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed/html"
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log(
     sender.tab
       ? "from a content script:" + sender.tab.url
@@ -12,13 +11,22 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   )
   console.log(request)
 
-  fetch("https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed", {
-    method: "POST",
-    body: JSON.stringify(request.payload),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-
-  if (request.greeting === "hello") sendResponse({ farewell: "goodbye 123" })
+  callEmbeddingEndpoint(request.payload, sendResponse)
+  return true
 })
+
+async function callEmbeddingEndpoint(payload, sendResponse) {
+  try {
+    const result = await fetch(LOCAL_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    sendResponse({ farewell: "goodbye 123" })
+    console.log(await result.json())
+  } catch (e) {
+    console.log(e)
+  }
+}

@@ -6,13 +6,23 @@ export const CountButton = () => {
   const handleClick = async () => {
     increase()
     console.log(123, document)
-    const dom = document.documentElement.outerHTML
+    const html = document.documentElement.outerHTML
+    const pageTitle = document.title
+    const metaDescription = // @ts-ignore
+      document.querySelector('meta[name="description"]')?.content
+
+    const url = window.location.href
+    const hostName = window.location.hostname
+
     const payload = {
-      type: "dom",
-      url: window.location.href,
-      dom
+      html,
+      url,
+      storageMetadata: {
+        pageTitle,
+        metaDescription,
+        hostName
+      }
     }
-    console.log(payload)
 
     const response = await chrome.runtime.sendMessage({
       greeting: "hello",
