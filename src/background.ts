@@ -3,6 +3,10 @@ export {}
 const LOCAL_URL = "http://localhost:3000/api/embed/html"
 const REMOTE_URL = "https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed/html"
 
+const NODE_ENV = process.env.NODE_ENV
+
+const EMBEDDING_URL = NODE_ENV === "development" ? LOCAL_URL : REMOTE_URL
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log(
     sender.tab
@@ -17,7 +21,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function callEmbeddingEndpoint(payload, sendResponse) {
   try {
-    const result = await fetch(LOCAL_URL, {
+    const result = await fetch(EMBEDDING_URL, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
