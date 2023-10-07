@@ -3,9 +3,28 @@ import { useReducer } from "react"
 export const CountButton = () => {
   const [count, increase] = useReducer((c) => c + 1, 0)
 
+  const handleClick = async () => {
+    increase()
+    console.log(123, document)
+    const dom = document.documentElement.outerHTML
+    const payload = {
+      type: "dom",
+      url: window.location.href,
+      dom
+    }
+    console.log(payload)
+
+    const response = await chrome.runtime.sendMessage({
+      greeting: "hello",
+      payload
+    })
+    // do something with response here, not outside the function
+    console.log(response)
+  }
+
   return (
     <button
-      onClick={() => increase()}
+      onClick={handleClick}
       type="button"
       className="plasmo-flex plasmo-flex-row plasmo-items-center plasmo-px-4 plasmo-py-2 plasmo-text-sm plasmo-rounded-lg plasmo-transition-all plasmo-border-none
       plasmo-shadow-lg hover:plasmo-shadow-md
