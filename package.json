@@ -30,6 +30,11 @@
     "host_permissions": [
       "https://*/*",
       "http://*/*"
+    ],
+    "permissions": [
+      "pageCapture",
+      "activeTab",
+      "scripting"
     ]
   }
 }
