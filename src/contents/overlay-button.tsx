@@ -3,10 +3,11 @@ import type { PlasmoCSConfig } from "plasmo"
 import { useReducer } from "react"
 
 import { StoreButton } from "~features/store-button"
+import { MESSAGES } from "~utils/constants"
+import { getPageData } from "~utils/page-data"
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://*/*"],
-  all_frames: true
+  matches: ["https://*/*"]
 }
 
 export const getStyle = () => {
@@ -21,26 +22,10 @@ const PlasmoOverlay = () => {
   const handleClick = async () => {
     toggleLoading()
 
-    const html = document.documentElement.outerHTML
-    const pageTitle = document.title
-    const metaDescription = // @ts-ignore
-      document.querySelector('meta[name="description"]')?.content
-
-    const url = window.location.href
-    const hostName = window.location.hostname
-
-    const payload = {
-      html,
-      url,
-      storageMetadata: {
-        pageTitle,
-        metaDescription,
-        hostName
-      }
-    }
+    const payload = getPageData()
 
     const response = await chrome.runtime.sendMessage({
-      greeting: "hello",
+      message: MESSAGES.USER_TRIGGERED_SAVE,
       payload
     })
     toggleLoading()
@@ -49,7 +34,7 @@ const PlasmoOverlay = () => {
   }
 
   return (
-    <div className="plasmo-z-50 plasmo-flex plasmo-fixed plasmo-top-24 plasmo-right-[-4px] plasmo-shadow-md">
+    <div className="plasmo-z-50 plasmo-flex plasmo-fixed plasmo-top-20 plasmo-right-[-4px] plasmo-shadow-md">
       <StoreButton handleClick={handleClick} loading={loading} />
     </div>
   )
