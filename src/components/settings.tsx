@@ -1,41 +1,36 @@
-import { Cross1Icon, GlobeIcon } from "@radix-ui/react-icons"
-import { useState } from "react"
-import type { KeyboardEvent } from "react"
+import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
+import { useState } from 'react'
+import type { KeyboardEvent } from 'react'
 
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { ScrollArea } from "~/components/ui/scroll-area"
-import { Switch } from "~/components/ui/switch"
-
-const defaultExludedList = [
-  "https://mail.google.com",
-  "https://docs.google.com",
-  "https://drive.google.com"
-]
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
+import { ScrollArea } from '~/components/ui/scroll-area'
+import { Switch } from '~/components/ui/switch'
+import { DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
 
 const URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
 
 export function Settings() {
   const [autoSave, setAutoSave] = useState(true)
-  const [excludedList, setExcludedList] = useState(defaultExludedList)
+  const [excludeList, setExcludeList] = useState(DEFAULT_EXCLUDE_LIST)
 
   const handleFileDelete = (url: string) => {
-    const newList = excludedList.filter((item) => item !== url)
-    setExcludedList(newList)
+    const newList = excludeList.filter((item) => item !== url)
+    setExcludeList(newList)
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       const url = event.currentTarget.value
-      console.log("url", URL_REGEX.test(url))
+      console.log('url', URL_REGEX.test(url))
       if (!url || !URL_REGEX.test(url)) {
-        console.log("invalid url", url)
+        console.log('invalid url', url)
         return
       }
-      const newList = [...excludedList, url]
-      setExcludedList(newList)
+      const newList = [...excludeList, url]
+      setExcludeList(newList)
     }
   }
 
@@ -44,13 +39,22 @@ export function Settings() {
       <div className="flex flex-col gap-3 px-2 py-4 rounded-md">
         <div className="flex justify-between">
           <div className="flex flex-col">
-            <Label htmlFor="airplane-mode">Auto Save</Label>
+            <Label htmlFor="track-bookmarks">Track Bookmarks</Label>
+            <span className="text-slate-500">
+              Browser, Twitter, Linkeding, etc.
+            </span>
+          </div>
+          <Switch defaultChecked={true} id="track-bookmarks" />
+        </div>
+        <div className="flex justify-between">
+          <div className="flex flex-col">
+            <Label htmlFor="auto-save">Auto Save</Label>
             <span className="text-slate-500">
               Auto saves the pages you visit
             </span>
           </div>
           <Switch
-            id="airplane-mode"
+            id="auto-save"
             checked={autoSave}
             onCheckedChange={() => {
               setAutoSave(!autoSave)
@@ -73,7 +77,7 @@ export function Settings() {
             />
             <ScrollArea className="flex-1 relative flex flex-col max-h-[75vh] rounded-md border py-2 px-2">
               <ul className="flex flex-col gap-1 text-sm text-slate-500">
-                {excludedList.map((item, key) => (
+                {excludeList.map((item, key) => (
                   <li
                     key={key}
                     className="flex items-center justify-between group">
