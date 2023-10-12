@@ -4,20 +4,10 @@ import "~style.css"
 
 import { useEffect, useState } from "react"
 
-import { Label } from "~/components/ui/label"
-import { Switch } from "~/components/ui/switch"
+import { Settings } from "~/components/settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 
-function SwitchDemo() {
-  return (
-    <div className="flex items-center space-x-2">
-      <Switch id="airplane-mode" />
-      <Label htmlFor="airplane-mode">Airplane Mode</Label>
-    </div>
-  )
-}
-
-const defaultTab = "search"
+const defaultTab = "settings"
 
 function getPageContentSource() {
   return document.documentElement.outerHTML
@@ -33,13 +23,9 @@ function IndexPopup() {
           <TabsTrigger value="search">History</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value="files">
-          <div className="flex flex-col gap-4 mt-4">
-            Helo <SwitchDemo />
-          </div>
-        </TabsContent>
+        <TabsContent value="files" className="px-4 py-4"></TabsContent>
         <TabsContent value="settings">
-          <div className="flex flex-col gap-4 mt-4">Settings</div>
+          <Settings />
         </TabsContent>
       </Tabs>
     </div>
