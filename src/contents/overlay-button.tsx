@@ -3,8 +3,8 @@ import type { PlasmoCSConfig } from "plasmo"
 import { useReducer } from "react"
 
 import { StoreButton } from "~features/store-button"
-import { MESSAGES } from "~utils/constants"
-import { getPageData } from "~utils/page-data"
+import { MESSAGES } from "~lib/constants"
+import { getPageData } from "~lib/page-data"
 
 export const config: PlasmoCSConfig = {
   matches: ["https://*/*"]
@@ -34,7 +34,7 @@ const PlasmoOverlay = () => {
   }
 
   return (
-    <div className="plasmo-z-50 plasmo-flex plasmo-fixed plasmo-top-20 plasmo-right-[-4px] plasmo-shadow-md">
+    <div className="z-50 flex fixed top-20 right-[-4px] shadow-md">
       <StoreButton handleClick={handleClick} loading={loading} />
     </div>
   )

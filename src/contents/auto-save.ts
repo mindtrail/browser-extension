@@ -1,7 +1,7 @@
 import type { PlasmoCSConfig } from "plasmo"
 
-import { MESSAGES } from "~utils/constants"
-import { getPageData } from "~utils/page-data"
+import { MESSAGES } from "~lib/constants"
+import { getPageData } from "~lib/page-data"
 
 export const config: PlasmoCSConfig = {
   matches: ["https://*/*"]

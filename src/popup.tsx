@@ -2,6 +2,18 @@
 
 import "~style.css"
 
+import { Label } from "~/components/ui/label"
+import { Switch } from "~/components/ui/switch"
+
+function SwitchDemo() {
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch id="airplane-mode" />
+      <Label htmlFor="airplane-mode">Airplane Mode</Label>
+    </div>
+  )
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   // This code runs when the popup is shown
 
@@ -33,8 +45,8 @@ function getPageContentSource() {
 
 function IndexPopup() {
   return (
-    <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-h-96 plasmo-w-80">
-      Helo
+    <div className="flex items-center justify-center h-96 w-80">
+      Helo <SwitchDemo />
     </div>
   )
 }

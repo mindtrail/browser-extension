@@ -1,4 +1,4 @@
-import { MESSAGES } from "~utils/constants"
+import { MESSAGES } from "~lib/constants"
 
 const LOCAL_URL = "http://localhost:3000/api/embed/html"
 const REMOTE_URL = "https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed/html"
