@@ -1,5 +1,6 @@
 import { Cross1Icon, GlobeIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
+import type { KeyboardEvent } from "react"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -13,6 +14,9 @@ const defaultExludedList = [
   "https://drive.google.com"
 ]
 
+const URL_REGEX =
+  /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
+
 export function Settings() {
   const [autoSave, setAutoSave] = useState(true)
   const [excludedList, setExcludedList] = useState(defaultExludedList)
@@ -21,7 +25,19 @@ export function Settings() {
     const newList = excludedList.filter((item) => item !== url)
     setExcludedList(newList)
   }
-  // Save settings to local storage
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      const url = event.currentTarget.value
+      console.log("url", URL_REGEX.test(url))
+      if (!url || !URL_REGEX.test(url)) {
+        console.log("invalid url", url)
+        return
+      }
+      const newList = [...excludedList, url]
+      setExcludedList(newList)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4 px-2">
@@ -49,10 +65,11 @@ export function Settings() {
               </Label>
               <Input id="auto-save-time" placeholder="60 seconds" />
             </div>
-            <Label htmlFor="include-list">Exclude List</Label>
+            <Label htmlFor="exclude-list">Exclude List</Label>
             <Input
-              id="include-list"
+              id="exclude-list"
               placeholder="Website that should not be saved"
+              onKeyDown={handleKeyDown}
             />
             <ScrollArea className="flex-1 relative flex flex-col max-h-[75vh] rounded-md border py-2 px-2">
               <ul className="flex flex-col gap-1 text-sm text-slate-500">
