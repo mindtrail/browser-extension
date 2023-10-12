@@ -4,7 +4,7 @@ import { MESSAGES } from "~lib/constants"
 import { getPageData } from "~lib/page-data"
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://*/*"]
+  matches: ["https://*/*", "http://*/*"]
 }
 
 let scrolledToBottom = false

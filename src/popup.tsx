@@ -4,14 +4,11 @@ import "~style.css"
 
 import { useEffect, useState } from "react"
 
+import { Search } from "~/components/search"
 import { Settings } from "~/components/settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 
-const defaultTab = "settings"
-
-function getPageContentSource() {
-  return document.documentElement.outerHTML
-}
+const defaultTab = "search"
 
 function IndexPopup() {
   useEffect(() => {}, [])
@@ -23,7 +20,9 @@ function IndexPopup() {
           <TabsTrigger value="search">History</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value="files" className="px-4 py-4"></TabsContent>
+        <TabsContent value="files">
+          <Search />
+        </TabsContent>
         <TabsContent value="settings">
           <Settings />
         </TabsContent>

@@ -36,7 +36,7 @@ async function callEmbeddingEndpoint(payload, sendResponse) {
         "Content-Type": "application/json"
       }
     })
-    sendResponse({ farewell: "goodbye 123" })
+    sendResponse({ result })
     console.log(await result.json())
   } catch (e) {
     console.error(e)

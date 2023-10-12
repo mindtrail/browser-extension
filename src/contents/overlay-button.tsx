@@ -6,22 +6,24 @@ import { StoreButton } from "~features/store-button"
 import { MESSAGES } from "~lib/constants"
 import { getPageData } from "~lib/page-data"
 
-export const config: PlasmoCSConfig = {
-  matches: ["https://*/*"]
-}
-
+// Needed to inject the CSS into the page
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
   return style
 }
 
+export const config: PlasmoCSConfig = {
+  matches: ["https://*/*", "http://*/*"]
+}
+
 const PlasmoOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
 
+  console.log(222)
   const handleClick = async () => {
     toggleLoading()
-
+    console.log(444)
     const payload = getPageData()
 
     const response = await chrome.runtime.sendMessage({
