@@ -1,19 +1,19 @@
-import { MESSAGES } from "~lib/constants"
+import { MESSAGES } from '~lib/constants'
 
-const LOCAL_URL = "http://localhost:3000/api/embed/html"
-const REMOTE_URL = "https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed/html"
+const LOCAL_URL = 'http://localhost:3000/api/embed/html'
+const REMOTE_URL = 'https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed/html'
 
 const NODE_ENV = process.env.NODE_ENV
 
-const EMBEDDING_URL = NODE_ENV === "development" ? LOCAL_URL : REMOTE_URL
+const EMBEDDING_URL = NODE_ENV === 'development' ? LOCAL_URL : REMOTE_URL
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { message, payload } = request
 
   console.log(
     sender.tab
-      ? "from a content script:" + sender.tab.url
-      : "from the extension"
+      ? 'from a content script:' + sender.tab.url
+      : 'from the extension'
   )
 
   if (message === MESSAGES.USER_TRIGGERED_SAVE) {
@@ -30,11 +30,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function callEmbeddingEndpoint(payload, sendResponse) {
   try {
     const result = await fetch(EMBEDDING_URL, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(payload),
       headers: {
-        "Content-Type": "application/json"
-      }
+        'Content-Type': 'application/json',
+      },
     })
     sendResponse({ result })
     console.log(await result.json())

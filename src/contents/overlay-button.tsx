@@ -2,7 +2,7 @@ import cssText from "data-text:~style.css"
 import type { PlasmoCSConfig } from "plasmo"
 import { useReducer } from "react"
 
-import { StoreButton } from "~features/store-button"
+import { StoreButton } from "~components/store-button"
 import { MESSAGES } from "~lib/constants"
 import { getPageData } from "~lib/page-data"
 

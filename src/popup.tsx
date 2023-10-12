@@ -1,14 +1,14 @@
 // import { CountButton } from "~features/store-button"
 
-import "~style.css"
+import '~style.css'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 
-import { Search } from "~/components/search"
-import { Settings } from "~/components/settings"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import { Search } from '~/components/search'
+import { Settings } from '~/components/settings'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 
-const defaultTab = "settings"
+const defaultTab = 'search'
 
 function IndexPopup() {
   useEffect(() => {}, [])
@@ -17,10 +17,10 @@ function IndexPopup() {
     <div className="flex h-[500px] w-80">
       <Tabs defaultValue={defaultTab} className="flex flex-col w-full text-">
         <TabsList className="flex w-full relative justify-between border-b bg-inherit rounded-none">
-          <TabsTrigger value="search">History</TabsTrigger>
+          <TabsTrigger value="search">Search</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value="files">
+        <TabsContent value="search">
           <Search />
         </TabsContent>
         <TabsContent value="settings">
