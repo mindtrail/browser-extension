@@ -1,34 +1,32 @@
-import cssText from "data-text:~style.css"
-import type { PlasmoCSConfig } from "plasmo"
-import { useReducer } from "react"
+import cssText from 'data-text:~style.css'
+import type { PlasmoCSConfig } from 'plasmo'
+import { useReducer } from 'react'
 
-import { StoreButton } from "~components/store-button"
-import { MESSAGES } from "~lib/constants"
-import { getPageData } from "~lib/page-data"
+import { StoreButton } from '~components/store-button'
+import { MESSAGES } from '~lib/constants'
+import { getPageData } from '~lib/page-data'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
-  const style = document.createElement("style")
+  const style = document.createElement('style')
   style.textContent = cssText
   return style
 }
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://*/*", "http://*/*"]
+  matches: ['https://*/*', 'http://*/*'],
 }
 
 const PlasmoOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
 
-  console.log(222)
   const handleClick = async () => {
     toggleLoading()
-    console.log(444)
     const payload = getPageData()
 
     const response = await chrome.runtime.sendMessage({
       message: MESSAGES.USER_TRIGGERED_SAVE,
-      payload
+      payload,
     })
     toggleLoading()
     // do something with response here, not outside the function

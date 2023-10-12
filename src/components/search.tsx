@@ -8,6 +8,7 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
+import { MESSAGES } from '~lib/constants'
 
 // type SearchResult = Document['metadata'] & {
 // image: string
@@ -21,12 +22,6 @@ type SearchResult = {
   summary: string
 }
 
-const getRouteWithoutProtocol = (url: string) => {
-  const match = url.match(/^https?:\/\/([^:]+)([^?]+)?/)
-  return match ? match[1] + (match[2] || '') : ''
-}
-
-const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
 export function Search() {
   const [searchQuery, setSearchQuery] = useState('')
   const [processing, setProcessing] = useState(false)
@@ -44,24 +39,18 @@ export function Search() {
     event.preventDefault()
     setProcessing(true)
 
-    try {
-      const result = await fetch('/api/history', {
-        method: 'POST',
-        body: JSON.stringify({
-          userId: TEST_USER,
-          searchQuery: searchQuery.trim(),
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const websites = await result.json()
-      setProcessing(false)
-      setFoundWebsite(websites)
-    } catch (e) {
-      console.log('error', e)
-      setProcessing(false)
+    const payload = {
+      searchQuery: searchQuery.trim(),
     }
+    const websites = await chrome.runtime.sendMessage({
+      message: MESSAGES.SEARCH_HISTORY,
+      payload,
+    })
+
+    setProcessing(false)
+    setFoundWebsite(websites)
+    // do something with response here, not outside the function
+    console.log(23333, websites)
   }
 
   return (
@@ -98,7 +87,7 @@ export function Search() {
               <Typography variant="h5" className="text-gray-600 capitalize">
                 {foundWebsite?.hostName}
               </Typography>
-              <Typography variant="p" className="text-gray-600">
+              <Typography variant="p" className="text-gray-600 leading-5">
                 {foundWebsite?.summary}
               </Typography>
               <img
