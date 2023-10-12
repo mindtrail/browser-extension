@@ -8,13 +8,13 @@ import { Search } from "~/components/search"
 import { Settings } from "~/components/settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 
-const defaultTab = "search"
+const defaultTab = "settings"
 
 function IndexPopup() {
   useEffect(() => {}, [])
 
   return (
-    <div className="flex h-96 w-80">
+    <div className="flex h-[500px] w-80">
       <Tabs defaultValue={defaultTab} className="flex flex-col w-full text-">
         <TabsList className="flex w-full relative justify-between border-b bg-inherit rounded-none">
           <TabsTrigger value="search">History</TabsTrigger>
