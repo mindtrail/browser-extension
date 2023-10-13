@@ -22,6 +22,13 @@ type SearchResult = {
   summary: string
 }
 
+const addHttpsIfMissing = (url: string) => {
+  if (!/^https?:\/\//i.test(url)) {
+    return 'https://' + url
+  }
+  return url
+}
+
 export function Search() {
   const [searchQuery, setSearchQuery] = useState('')
   const [processing, setProcessing] = useState(false)
@@ -77,19 +84,24 @@ export function Search() {
         <div className="w-full max-w-2xl flex flex-col flex-1">
           {foundWebsite ? (
             <ScrollArea className="flex-1 flex flex-col max-h-[70vh] rounded-md border py-2 px-2">
-              <div className="flex flex-1 flex-col gap-2">
+              <a
+                href={addHttpsIfMissing(foundWebsite?.hostName)}
+                target="_blank"
+                className="flex flex-1 flex-col gap-2">
                 <Typography variant="h5" className="text-gray-600 capitalize">
                   {foundWebsite?.hostName}
                 </Typography>
                 <Typography variant="p" className="text-gray-600 leading-5">
-                  {foundWebsite?.summary}
+                  {foundWebsite?.summary
+                    ? foundWebsite?.summary
+                    : foundWebsite?.metaDescription}
                 </Typography>
                 <img
                   width={500}
                   alt={foundWebsite?.metaDescription}
                   src={foundWebsite?.image}
                 />
-              </div>
+              </a>
             </ScrollArea>
           ) : null}
         </div>
