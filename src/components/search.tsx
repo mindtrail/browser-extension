@@ -67,35 +67,30 @@ export function Search() {
           {/* <Label htmlFor="flowiseURL">History search:</Label> */}
           <Button
             onClick={handleSearch}
-            disabled={!searchQuery}
+            disabled={!searchQuery || processing}
             size="sm"
             className="w-full">
             {processing && <IconSpinner className="mr-2" />}
             Search
           </Button>
         </div>
-        <div className="w-full max-w-2xl flex flex-col flex-1 gap-6 pt-6">
-          {processing && (
-            <div className="flex gap-4 items-center">
-              <IconSpinner className="mr-2" />
-              Searching for a match...
-            </div>
-          )}
-
+        <div className="w-full max-w-2xl flex flex-col flex-1">
           {foundWebsite ? (
-            <div className="flex flex-col gap-2">
-              <Typography variant="h5" className="text-gray-600 capitalize">
-                {foundWebsite?.hostName}
-              </Typography>
-              <Typography variant="p" className="text-gray-600 leading-5">
-                {foundWebsite?.summary}
-              </Typography>
-              <img
-                width={500}
-                alt={foundWebsite?.metaDescription}
-                src={foundWebsite?.image}
-              />
-            </div>
+            <ScrollArea className="flex-1 flex flex-col max-h-[70vh] rounded-md border py-2 px-2">
+              <div className="flex flex-1 flex-col gap-2">
+                <Typography variant="h5" className="text-gray-600 capitalize">
+                  {foundWebsite?.hostName}
+                </Typography>
+                <Typography variant="p" className="text-gray-600 leading-5">
+                  {foundWebsite?.summary}
+                </Typography>
+                <img
+                  width={500}
+                  alt={foundWebsite?.metaDescription}
+                  src={foundWebsite?.image}
+                />
+              </div>
+            </ScrollArea>
           ) : null}
         </div>
       </div>
