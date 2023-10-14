@@ -4,13 +4,14 @@ import { MESSAGES } from '~lib/constants'
 import { getPageData } from '~lib/page-data'
 
 export const config: PlasmoCSConfig = {
+  // matches: ['https://*/*', 'http://*/*', 'file://*/*'],
   matches: ['file://*/*'],
-  // exclude_matches: [
-  //   'http://localhost:*/*',
-  //   'https://*.google.com/*',
-  //   'https://slack.com/*',
-  //   'https://*.slack.com/*',
-  // ],
+  exclude_matches: [
+    'http://localhost:*/*',
+    'https://*.google.com/*',
+    'https://slack.com/*',
+    'https://*.slack.com/*',
+  ],
 }
 
 let scrolledToBottom = false

@@ -15,6 +15,7 @@ const URL_REGEX =
 export function Settings() {
   const [autoSave, setAutoSave] = useState(true)
   const [excludeList, setExcludeList] = useState(DEFAULT_EXCLUDE_LIST)
+  const [inputValue, setInputValue] = useState('')
 
   const handleFileDelete = (url: string) => {
     const newList = excludeList.filter((item) => item !== url)
@@ -29,15 +30,16 @@ export function Settings() {
         console.log('invalid url', url)
         return
       }
-      const newList = [...excludeList, url]
+      const newList = [...excludeList, 'https://' + url]
       setExcludeList(newList)
+      setInputValue('')
     }
   }
 
   return (
     <div className="flex flex-col gap-4 px-2">
       <div className="flex flex-col gap-3 px-2 py-4 rounded-md">
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between">
           <div className="flex flex-col">
             <Label htmlFor="track-bookmarks">Track Bookmarks</Label>
             <span className="text-slate-500">
@@ -45,7 +47,7 @@ export function Settings() {
             </span>
           </div>
           <Switch defaultChecked={true} id="track-bookmarks" />
-        </div>
+        </div> */}
         <div className="flex justify-between">
           <div className="flex flex-col">
             <Label htmlFor="auto-save">Auto Save</Label>
@@ -72,6 +74,8 @@ export function Settings() {
             <Label htmlFor="exclude-list">Exclude List</Label>
             <Input
               id="exclude-list"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
               placeholder="Website that should not be saved"
               onKeyDown={handleKeyDown}
             />

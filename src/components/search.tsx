@@ -20,6 +20,7 @@ type SearchResult = {
   image: string
   metaDescription: string
   summary: string
+  fileName: string
 }
 
 const addHttpsIfMissing = (url: string) => {
@@ -57,7 +58,8 @@ export function Search() {
     setProcessing(false)
     setFoundWebsite(websites)
     // do something with response here, not outside the function
-    console.log(23333, websites)
+
+    console.log(foundWebsite)
   }
 
   return (
@@ -85,10 +87,10 @@ export function Search() {
           {foundWebsite ? (
             <ScrollArea className="flex-1 flex flex-col max-h-[70vh] rounded-md border py-2 px-2">
               <a
-                href={addHttpsIfMissing(foundWebsite?.hostName)}
+                href={addHttpsIfMissing(foundWebsite?.fileName)}
                 target="_blank"
                 className="flex flex-1 flex-col gap-2">
-                <Typography variant="h5" className="text-gray-600 capitalize">
+                <Typography variant="h5" className="text-gray-600">
                   {foundWebsite?.hostName}
                 </Typography>
                 <Typography variant="p" className="text-gray-600 leading-5">
