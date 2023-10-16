@@ -1,12 +1,10 @@
-import { GlobeIcon } from '@radix-ui/react-icons'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 
 import { IconSpinner } from '~/components/icon-spinner'
 import Typography from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { MESSAGES } from '~lib/constants'
 
