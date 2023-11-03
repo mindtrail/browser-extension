@@ -7,6 +7,7 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
+import { MESSAGES } from '~/lib/constants'
 
 const URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
@@ -50,10 +51,15 @@ export function Settings(props: SettingsProps) {
     }
   }
 
-  const updateAutoSave = useCallback(() => {
+  const updateAutoSave = useCallback(async () => {
+    const autoSaveStatus = !autoSave
     updateSettings({
-      autoSave: !autoSave,
+      autoSave: autoSaveStatus,
       excludeList,
+    })
+
+    chrome.runtime.sendMessage({
+      message: MESSAGES.UPDATE_ICON,
     })
   }, [autoSave])
 

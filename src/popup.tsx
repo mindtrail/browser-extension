@@ -2,8 +2,6 @@
 
 import '~style.css'
 
-import { useEffect, useState } from 'react'
-
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
@@ -37,7 +35,7 @@ function IndexPopup() {
           <Search />
         </TabsContent>
         <TabsContent value="settings">
-          <Settings {...settings} updateSettings={setSettings}/>
+          <Settings {...settings} updateSettings={setSettings} />
         </TabsContent>
       </Tabs>
     </div>

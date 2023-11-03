@@ -4,6 +4,7 @@ export const MESSAGES = {
   AUTO_SAVE: 'auto-save',
   USER_TRIGGERED_SAVE: 'user-triggered-save',
   SEARCH_HISTORY: 'search-history',
+  UPDATE_ICON: 'update-icon',
 }
 
 export const DEFAULT_EXCLUDE_LIST = [

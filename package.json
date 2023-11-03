@@ -6,7 +6,7 @@
   "author": "Indie AI",
   "scripts": {
     "dev": "plasmo dev",
-    "dev-vb": "plasmo dev --verbose",
+    "dev-verbouse": "plasmo dev --verbose",
     "build": "plasmo build",
     "package": "plasmo package"
   },

@@ -6,12 +6,7 @@ import Typography from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { ScrollArea } from '~/components/ui/scroll-area'
-import { MESSAGES } from '~lib/constants'
-
-// type SearchResult = Document['metadata'] & {
-// image: string
-// summary: string
-// }
+import { MESSAGES } from '~/lib/constants'
 
 type SearchResult = {
   hostName: string
@@ -48,6 +43,7 @@ export function Search() {
     const payload = {
       searchQuery: searchQuery.trim(),
     }
+
     const websites = await chrome.runtime.sendMessage({
       message: MESSAGES.SEARCH_HISTORY,
       payload,
