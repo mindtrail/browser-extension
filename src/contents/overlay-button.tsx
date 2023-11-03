@@ -2,8 +2,12 @@ import cssText from 'data-text:~style.css'
 import type { PlasmoCSConfig } from 'plasmo'
 import { useReducer } from 'react'
 
-import { StoreButton } from '~components/store-button'
-import { MESSAGES } from '~lib/constants'
+import { StoreButton } from '~/components/store-button'
+import {
+  CONTENT_SCRIPT_EXCLUDE,
+  CONTENT_SCRIPT_MATCH,
+  MESSAGES,
+} from '~/lib/constants'
 import { getPageData } from '~lib/page-data'
 
 // Needed to inject the CSS into the page
@@ -13,8 +17,11 @@ export const getStyle = () => {
   return style
 }
 
+console.log(CONTENT_SCRIPT_MATCH)
+
 export const config: PlasmoCSConfig = {
-  matches: ['https://*/*', 'http://*/*'],
+  // matches: CONTENT_SCRIPT_MATCH,
+  // exclude_matches: CONTENT_SCRIPT_EXCLUDE,
 }
 
 const PlasmoOverlay = () => {

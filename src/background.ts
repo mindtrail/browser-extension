@@ -1,4 +1,4 @@
-import { MESSAGES } from '~lib/constants'
+import { MESSAGES } from '~/lib/constants'
 
 const SEARCH_URL = 'http://localhost:3000/api/history'
 const LOCAL_URL = 'http://localhost:3000/api/embed/html'

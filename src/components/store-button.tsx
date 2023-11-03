@@ -1,6 +1,6 @@
-import Brain from "react:~/assets/brain.svg"
+import Brain from 'react:~/assets/brain.svg'
 
-import { IconSpinner } from "./icon-spinner"
+import { IconSpinner } from './icon-spinner'
 
 interface StoreButtonProps {
   handleClick: () => void

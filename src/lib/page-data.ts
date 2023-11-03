@@ -13,7 +13,7 @@ export const getPageData = () => {
     storageMetadata: {
       pageTitle,
       metaDescription,
-      hostName
-    }
+      hostName,
+    },
   }
 }
