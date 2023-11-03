@@ -4,18 +4,45 @@ import '~style.css'
 
 import { useEffect, useState } from 'react'
 
+import { Storage } from '@plasmohq/storage'
+
 import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import { DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
 
-const defaultTab = 'search'
+const DEFAULT_TAB = 'search'
 
+type StorageData = {
+  autoSave: boolean
+  excludeList: string[]
+}
+
+const storage = new Storage()
 function IndexPopup() {
-  useEffect(() => {}, [])
+  const [settings, setSettings] = useState<StorageData>()
+
+  useEffect(() => {
+    const getSetings = async () => {
+      const settings = (await storage.get('settings')) as StorageData
+      console.log('settings', settings)
+
+      if (!settings) {
+        return setSettings({
+          autoSave: true,
+          excludeList: DEFAULT_EXCLUDE_LIST,
+        })
+      }
+
+      setSettings(settings)
+    }
+
+    getSetings()
+  }, [])
 
   return (
     <div className="flex h-[500px] w-80">
-      <Tabs defaultValue={defaultTab} className="flex flex-col w-full text-">
+      <Tabs defaultValue={DEFAULT_TAB} className="flex flex-col w-full text-">
         <TabsList className="flex w-full relative justify-between border-b bg-inherit rounded-none">
           <TabsTrigger value="search">Search</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -24,7 +51,7 @@ function IndexPopup() {
           <Search />
         </TabsContent>
         <TabsContent value="settings">
-          <Settings />
+          <Settings {...settings} />
         </TabsContent>
       </Tabs>
     </div>

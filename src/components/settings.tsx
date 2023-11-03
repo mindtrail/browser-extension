@@ -7,14 +7,20 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
-import { DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
 
 const URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
 
-export function Settings() {
-  const [autoSave, setAutoSave] = useState(true)
-  const [excludeList, setExcludeList] = useState(DEFAULT_EXCLUDE_LIST)
+type StorageData = {
+  autoSave: boolean
+  excludeList: string[]
+}
+
+export function Settings(props: StorageData) {
+  const { autoSave: autoSaveProp, excludeList: excludeListProp } = props
+
+  const [autoSave, setAutoSave] = useState(autoSaveProp)
+  const [excludeList, setExcludeList] = useState(excludeListProp)
   const [inputValue, setInputValue] = useState('')
 
   const handleFileDelete = (url: string) => {
