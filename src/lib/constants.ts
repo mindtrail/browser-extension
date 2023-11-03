@@ -17,9 +17,10 @@ export const CONTENT_SCRIPT_MATCH = ['https://*/*', 'http://*/*', 'file://*/*']
 export const CONTENT_SCRIPT_EXCLUDE = [
   'http://localhost:*/*',
   'https://*.google.com/*',
-  'https://slack.com/*',
   'https://*.slack.com/*',
   'https://*.zoom.us/*',
   'https://*.youtube.com/*',
   'https://*.openai.com/*',
+  'https://*.github.com/*',
+  'https://*.gmail.com/*',
 ]

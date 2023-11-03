@@ -3,14 +3,14 @@ import type { PlasmoCSConfig } from 'plasmo'
 import {
   AUTO_SAVE_INTERVAL,
   CONTENT_SCRIPT_EXCLUDE,
-  CONTENT_SCRIPT_MATCH,
   MESSAGES,
-} from '~lib/constants'
-import { getPageData } from '~lib/page-data'
+} from '~/lib/constants'
+import { getPageData } from '~/lib/page-data'
 
+// IMPORTANT: Config does not accept array references, so we create a new one
 export const config: PlasmoCSConfig = {
-  // matches: CONTENT_SCRIPT_MATCH,
-  // exclude_matches: CONTENT_SCRIPT_EXCLUDE,
+  matches: ['https://*/*', 'http://*/*', 'file://*/*'],
+  exclude_matches: [...CONTENT_SCRIPT_EXCLUDE],
 }
 
 let minuteTimeout = null

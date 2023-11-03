@@ -3,12 +3,8 @@ import type { PlasmoCSConfig } from 'plasmo'
 import { useReducer } from 'react'
 
 import { StoreButton } from '~/components/store-button'
-import {
-  CONTENT_SCRIPT_EXCLUDE,
-  CONTENT_SCRIPT_MATCH,
-  MESSAGES,
-} from '~/lib/constants'
-import { getPageData } from '~lib/page-data'
+import { CONTENT_SCRIPT_EXCLUDE, MESSAGES } from '~/lib/constants'
+import { getPageData } from '~/lib/page-data'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
@@ -17,11 +13,10 @@ export const getStyle = () => {
   return style
 }
 
-console.log(CONTENT_SCRIPT_MATCH)
-
+// IMPORTANT: Config does not accept array references, so we create a new one
 export const config: PlasmoCSConfig = {
-  // matches: CONTENT_SCRIPT_MATCH,
-  // exclude_matches: CONTENT_SCRIPT_EXCLUDE,
+  matches: ['https://*/*', 'http://*/*', 'file://*/*'],
+  exclude_matches: [...CONTENT_SCRIPT_EXCLUDE],
 }
 
 const PlasmoOverlay = () => {
