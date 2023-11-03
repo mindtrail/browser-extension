@@ -23,7 +23,6 @@ type SettingsProps = StorageData & {
 export function Settings(props: SettingsProps) {
   const { autoSave, excludeList, updateSettings } = props
 
-  console.log(props)
   const [inputValue, setInputValue] = useState('')
 
   const removeDomainFromExcludeList = (url: string) => {
@@ -39,7 +38,7 @@ export function Settings(props: SettingsProps) {
       const url = event.currentTarget.value
 
       if (!url || !URL_REGEX.test(url)) {
-        console.log('invalid url', url)
+        console.error('invalid url', url)
         return
       }
       const updatedExcludeList = [...excludeList, 'https://' + url]
