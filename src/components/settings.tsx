@@ -1,5 +1,5 @@
 import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 
 import { Button } from '~/components/ui/button'
@@ -16,31 +16,47 @@ type StorageData = {
   excludeList: string[]
 }
 
-export function Settings(props: StorageData) {
-  const { autoSave: autoSaveProp, excludeList: excludeListProp } = props
+type SettingsProps = StorageData & {
+  updateSettings: (settings: StorageData) => void
+}
 
-  const [autoSave, setAutoSave] = useState(autoSaveProp)
-  const [excludeList, setExcludeList] = useState(excludeListProp)
+export function Settings(props: SettingsProps) {
+  const { autoSave, excludeList, updateSettings } = props
+
+  console.log(props)
   const [inputValue, setInputValue] = useState('')
 
-  const handleFileDelete = (url: string) => {
-    const newList = excludeList.filter((item) => item !== url)
-    setExcludeList(newList)
+  const removeDomainFromExcludeList = (url: string) => {
+    const updatedExcludeList = excludeList.filter((item) => item !== url)
+    updateSettings({
+      autoSave,
+      excludeList: updatedExcludeList,
+    })
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       const url = event.currentTarget.value
-      console.log('url', URL_REGEX.test(url))
+
       if (!url || !URL_REGEX.test(url)) {
         console.log('invalid url', url)
         return
       }
-      const newList = [...excludeList, 'https://' + url]
-      setExcludeList(newList)
+      const updatedExcludeList = [...excludeList, 'https://' + url]
+      updateSettings({
+        autoSave,
+        excludeList: updatedExcludeList,
+      })
       setInputValue('')
     }
   }
+
+  const updateAutoSave = useCallback(() => {
+    updateSettings({
+      autoSave: !autoSave,
+      excludeList,
+    })
+  }, [autoSave])
 
   return (
     <div className="flex flex-col gap-4 px-2">
@@ -64,9 +80,7 @@ export function Settings(props: StorageData) {
           <Switch
             id="auto-save"
             checked={autoSave}
-            onCheckedChange={() => {
-              setAutoSave(!autoSave)
-            }}
+            onCheckedChange={updateAutoSave}
           />
         </div>
         {autoSave && (
@@ -99,7 +113,7 @@ export function Settings(props: StorageData) {
                       variant="ghost"
                       size="sm"
                       className="invisible group-hover:visible"
-                      onClick={() => handleFileDelete(item)}>
+                      onClick={() => removeDomainFromExcludeList(item)}>
                       <Cross1Icon />
                     </Button>
                   </li>

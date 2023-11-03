@@ -4,7 +4,7 @@ import '~style.css'
 
 import { useEffect, useState } from 'react'
 
-import { Storage } from '@plasmohq/storage'
+import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
@@ -18,27 +18,13 @@ type StorageData = {
   excludeList: string[]
 }
 
-const storage = new Storage()
+const defaultSettings: StorageData = {
+  autoSave: true,
+  excludeList: DEFAULT_EXCLUDE_LIST,
+}
+
 function IndexPopup() {
-  const [settings, setSettings] = useState<StorageData>()
-
-  useEffect(() => {
-    const getSetings = async () => {
-      const settings = (await storage.get('settings')) as StorageData
-      console.log('settings', settings)
-
-      if (!settings) {
-        return setSettings({
-          autoSave: true,
-          excludeList: DEFAULT_EXCLUDE_LIST,
-        })
-      }
-
-      setSettings(settings)
-    }
-
-    getSetings()
-  }, [])
+  const [settings, setSettings] = useStorage('settings', defaultSettings)
 
   return (
     <div className="flex h-[500px] w-80">
@@ -51,7 +37,7 @@ function IndexPopup() {
           <Search />
         </TabsContent>
         <TabsContent value="settings">
-          <Settings {...settings} />
+          <Settings {...settings} updateSettings={setSettings}/>
         </TabsContent>
       </Tabs>
     </div>
