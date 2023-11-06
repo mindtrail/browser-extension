@@ -24,7 +24,7 @@ const PlasmoOverlay = () => {
 
   const handleClick = async () => {
     toggleLoading()
-    const payload = getPageData()
+    const payload = getPageData(false)
 
     const response = await chrome.runtime.sendMessage({
       message: MESSAGES.USER_TRIGGERED_SAVE,
@@ -36,7 +36,7 @@ const PlasmoOverlay = () => {
   }
 
   return (
-    <div className="z-50 flex fixed top-20 right-[-4px] shadow-md">
+    <div className="z-50 flex fixed top-28 right-[-4px] shadow-md">
       <StoreButton handleClick={handleClick} loading={loading} />
     </div>
   )

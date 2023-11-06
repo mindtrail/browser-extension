@@ -1,4 +1,4 @@
-export const getPageData = () => {
+export const getPageData = (autoSave: boolean = true) => {
   const html = document.documentElement.outerHTML
   const pageTitle = document.title
   const metaDescription = // @ts-ignore
@@ -14,6 +14,7 @@ export const getPageData = () => {
       pageTitle,
       metaDescription,
       hostName,
+      autoSave,
     },
   }
 }
