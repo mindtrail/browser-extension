@@ -2,11 +2,7 @@ import type { PlasmoCSConfig } from 'plasmo'
 
 import { Storage } from '@plasmohq/storage'
 
-import {
-  AUTO_SAVE_DELAY,
-  CONTENT_SCRIPT_EXCLUDE,
-  MESSAGES,
-} from '~/lib/constants'
+import { CONTENT_SCRIPT_EXCLUDE, MESSAGES } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 
 // IMPORTANT: Config does not accept array references, so we create a new one
@@ -21,19 +17,6 @@ let minuteTimeout = null
 let lastFocusTime = 0
 let timeSpent = 0
 let contentSaved = false
-
-function savePageContent() {
-  // Set flag to prevent further calls
-  contentSaved = true
-  // Extract page data and send to background script or save directly
-  const payload = getPageData()
-
-  console.log('Saving page content', payload)
-  chrome.runtime.sendMessage({
-    message: MESSAGES.AUTO_SAVE,
-    payload,
-  })
-}
 
 // Function to start or resume the timer
 function startTimer() {
@@ -60,9 +43,30 @@ function pauseTimer() {
   console.log('Timer paused', timeSpent)
 }
 
+function savePageContent() {
+  // Set flag to prevent further calls
+  contentSaved = true
+  // Extract page data and send to background script or save directly
+  const payload = getPageData()
+
+  console.log('Saving page content', payload)
+  chrome.runtime.sendMessage({
+    message: MESSAGES.AUTO_SAVE,
+    payload,
+  })
+}
+
 // Set up event listeners
 window.addEventListener('focus', startTimer)
 window.addEventListener('blur', pauseTimer)
 
-// Start the timer initially
-startTimer()
+async function initAutoSave() {
+  const settings = await storage.get('settings')
+  console.log(settings)
+  // @ts-ignore
+  if (settings?.settings?.autoSave) {
+    startTimer()
+  }
+}
+
+initAutoSave()

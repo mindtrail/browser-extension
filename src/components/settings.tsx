@@ -1,5 +1,5 @@
 import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import type { KeyboardEvent } from 'react'
 
 import { Button } from '~/components/ui/button'
@@ -78,6 +78,7 @@ export function Settings(props: SettingsProps) {
       updateSettings({
         saveDelay,
       })
+      event.currentTarget.value = ''
     }
   }, [])
 
