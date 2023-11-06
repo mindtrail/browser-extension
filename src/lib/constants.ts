@@ -1,4 +1,4 @@
-export const AUTO_SAVE_INTERVAL = 60 // seconds
+export const AUTO_SAVE_DELAY = 60 // seconds
 
 export const MESSAGES = {
   AUTO_SAVE: 'auto-save',
@@ -18,6 +18,7 @@ export const CONTENT_SCRIPT_MATCH = ['https://*/*', 'http://*/*', 'file://*/*']
 export const CONTENT_SCRIPT_EXCLUDE = [
   'http://localhost:*/*',
   'https://*.google.com/*',
+  'https://www.google.com/*',
   'https://*.slack.com/*',
   'https://*.zoom.us/*',
   'https://*.youtube.com/*',

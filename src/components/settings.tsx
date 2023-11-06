@@ -12,24 +12,31 @@ import { MESSAGES } from '~/lib/constants'
 const URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
 
-type StorageData = {
+const addHttpsIfMissing = (url: string) => {
+  if (!/^https?:\/\//i.test(url)) {
+    return 'https://' + url
+  }
+  return url
+}
+
+export type StorageData = {
   autoSave: boolean
+  saveDelay: number
   excludeList: string[]
 }
 
 type SettingsProps = StorageData & {
-  updateSettings: (settings: StorageData) => void
+  updateSettings: (settings: Partial<StorageData>) => void
 }
 
 export function Settings(props: SettingsProps) {
-  const { autoSave, excludeList, updateSettings } = props
+  const { autoSave, excludeList, saveDelay, updateSettings } = props
 
   const [inputValue, setInputValue] = useState('')
 
   const removeDomainFromExcludeList = (url: string) => {
     const updatedExcludeList = excludeList.filter((item) => item !== url)
     updateSettings({
-      autoSave,
       excludeList: updatedExcludeList,
     })
   }
@@ -42,7 +49,7 @@ export function Settings(props: SettingsProps) {
         console.error('invalid url', url)
         return
       }
-      const updatedExcludeList = [...excludeList, 'https://' + url]
+      const updatedExcludeList = [...excludeList, addHttpsIfMissing(url)]
       updateSettings({
         autoSave,
         excludeList: updatedExcludeList,
@@ -55,7 +62,6 @@ export function Settings(props: SettingsProps) {
     const autoSaveStatus = !autoSave
     updateSettings({
       autoSave: autoSaveStatus,
-      excludeList,
     })
 
     chrome.runtime.sendMessage({
@@ -92,7 +98,7 @@ export function Settings(props: SettingsProps) {
           <div className="mt-2 flex flex-col gap-4">
             <div className="flex gap-4 items-center">
               <Label className="shrink-0" htmlFor="auto-save-time">
-                Time on page
+                Save After
               </Label>
               <Input id="auto-save-time" placeholder="60 seconds" />
             </div>

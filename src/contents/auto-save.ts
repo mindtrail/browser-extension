@@ -1,7 +1,9 @@
 import type { PlasmoCSConfig } from 'plasmo'
 
+import { Storage } from '@plasmohq/storage'
+
 import {
-  AUTO_SAVE_INTERVAL,
+  AUTO_SAVE_DELAY,
   CONTENT_SCRIPT_EXCLUDE,
   MESSAGES,
 } from '~/lib/constants'
@@ -12,6 +14,8 @@ export const config: PlasmoCSConfig = {
   matches: ['https://*/*', 'http://*/*', 'file://*/*'],
   exclude_matches: [...CONTENT_SCRIPT_EXCLUDE],
 }
+
+const storage = new Storage()
 
 let minuteTimeout = null
 let lastFocusTime = 0
@@ -38,10 +42,10 @@ function startTimer() {
   }
 
   lastFocusTime = Date.now()
-  console.log('Timer remaining', AUTO_SAVE_INTERVAL - timeSpent)
+  console.log('Timer remaining', AUTO_SAVE_DELAY - timeSpent)
   minuteTimeout = setTimeout(
     savePageContent,
-    (AUTO_SAVE_INTERVAL - timeSpent) * 1000
+    (AUTO_SAVE_DELAY - timeSpent) * 1000
   )
 }
 

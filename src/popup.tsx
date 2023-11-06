@@ -2,27 +2,29 @@
 
 import '~style.css'
 
+import { useCallback } from 'react'
+
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
-import { Settings } from '~/components/settings'
+import { Settings, type StorageData } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
 
 const DEFAULT_TAB = 'search'
 
-type StorageData = {
-  autoSave: boolean
-  excludeList: string[]
-}
-
 const defaultSettings: StorageData = {
   autoSave: true,
+  saveDelay: AUTO_SAVE_DELAY,
   excludeList: DEFAULT_EXCLUDE_LIST,
 }
 
 function IndexPopup() {
   const [settings, setSettings] = useStorage('settings', defaultSettings)
+
+  const updatedSettings = useCallback((newSettings: Partial<StorageData>) => {
+    setSettings((prev) => ({ ...prev, ...newSettings }))
+  }, [])
 
   return (
     <div className="flex h-[500px] w-80">
@@ -35,7 +37,7 @@ function IndexPopup() {
           <Search />
         </TabsContent>
         <TabsContent value="settings">
-          <Settings {...settings} updateSettings={setSettings} />
+          <Settings {...settings} updateSettings={updatedSettings} />
         </TabsContent>
       </Tabs>
     </div>
