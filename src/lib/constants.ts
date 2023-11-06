@@ -1,3 +1,5 @@
+import type { PlasmoCSConfig } from 'plasmo'
+
 export const AUTO_SAVE_DELAY = 60 // seconds
 
 export const MESSAGES = {
@@ -25,4 +27,10 @@ export const CONTENT_SCRIPT_EXCLUDE = [
   'https://*.openai.com/*',
   'https://*.github.com/*',
   'https://*.gmail.com/*',
+  'https://*.plasmo.com/*',
 ]
+
+export const PLASMO_CONFIG: PlasmoCSConfig = {
+  matches: CONTENT_SCRIPT_MATCH,
+  exclude_matches: CONTENT_SCRIPT_EXCLUDE,
+}

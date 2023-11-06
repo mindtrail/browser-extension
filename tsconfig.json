@@ -7,7 +7,7 @@
       "~*": ["./src/*"],
       "~/utils": ["./src/lib/utils"]
     },
-
+    "typeRoots": ["./node_modules/@types", "./types", "~/types/*"],
     "baseUrl": "."
   }
 }

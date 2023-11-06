@@ -7,7 +7,7 @@ import { useCallback } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
-import { Settings, type StorageData } from '~/components/settings'
+import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
 
@@ -27,7 +27,7 @@ function IndexPopup() {
   }, [])
 
   return (
-    <div className="flex h-[500px] w-80">
+    <div className="flex h-[500px] w-96">
       <Tabs defaultValue={DEFAULT_TAB} className="flex flex-col w-full text-">
         <TabsList className="flex w-full relative justify-between border-b bg-inherit rounded-none">
           <TabsTrigger value="search">Search</TabsTrigger>

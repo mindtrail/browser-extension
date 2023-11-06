@@ -1,14 +1,28 @@
-import type { PlasmoCSConfig } from 'plasmo'
+import { type PlasmoCSConfig } from 'plasmo'
 
 import { Storage } from '@plasmohq/storage'
 
-import { CONTENT_SCRIPT_EXCLUDE, MESSAGES } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, MESSAGES } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 
-// IMPORTANT: Config does not accept array references, so we create a new one
-export const config: PlasmoCSConfig = {
-  matches: ['https://*/*', 'http://*/*', 'file://*/*'],
-  exclude_matches: [...CONTENT_SCRIPT_EXCLUDE],
+export const CONTENT_SCRIPT_MATCH = ['https://*/*', 'http://*/*', 'file://*/*']
+
+export const CONTENT_SCRIPT_EXCLUDE = [
+  'http://localhost:*/*',
+  'https://*.google.com/*',
+  'https://www.google.com/*',
+  'https://*.slack.com/*',
+  'https://*.zoom.us/*',
+  'https://*.youtube.com/*',
+  'https://*.openai.com/*',
+  'https://*.github.com/*',
+  'https://*.gmail.com/*',
+  'https://*.plasmo.com/*',
+]
+
+export const PLASMO_CONFIG: PlasmoCSConfig = {
+  matches: CONTENT_SCRIPT_MATCH,
+  exclude_matches: CONTENT_SCRIPT_EXCLUDE,
 }
 
 const storage = new Storage()
@@ -17,6 +31,7 @@ let minuteTimeout = null
 let lastFocusTime = 0
 let timeSpent = 0
 let contentSaved = false
+let autoSaveDelay = AUTO_SAVE_DELAY
 
 // Function to start or resume the timer
 function startTimer() {
@@ -25,10 +40,10 @@ function startTimer() {
   }
 
   lastFocusTime = Date.now()
-  console.log('Timer remaining', AUTO_SAVE_DELAY - timeSpent)
+  console.log('Timer remaining', autoSaveDelay - timeSpent)
   minuteTimeout = setTimeout(
     savePageContent,
-    (AUTO_SAVE_DELAY - timeSpent) * 1000
+    (autoSaveDelay - timeSpent) * 1000
   )
 }
 
@@ -61,10 +76,10 @@ window.addEventListener('focus', startTimer)
 window.addEventListener('blur', pauseTimer)
 
 async function initAutoSave() {
-  const settings = await storage.get('settings')
-  console.log(settings)
-  // @ts-ignore
-  if (settings?.settings?.autoSave) {
+  const settings = (await storage.get('settings')) as StorageData
+
+  if (settings?.autoSave) {
+    autoSaveDelay = settings.saveDelay
     startTimer()
   }
 }

@@ -19,12 +19,6 @@ const addHttpsIfMissing = (url: string) => {
   return url
 }
 
-export type StorageData = {
-  autoSave: boolean
-  saveDelay: number
-  excludeList: string[]
-}
-
 type SettingsProps = StorageData & {
   updateSettings: (settings: Partial<StorageData>) => void
 }
@@ -47,7 +41,16 @@ export function Settings(props: SettingsProps) {
         console.error('invalid url', url)
         return
       }
-      const updatedExcludeList = [...excludeList, addHttpsIfMissing(url)]
+      const newUrl = addHttpsIfMissing(url)
+
+      if (excludeList.includes(newUrl)) {
+        console.info('url already exists', url)
+
+        event.currentTarget.value = ''
+        return
+      }
+
+      const updatedExcludeList = [...excludeList, newUrl]
       updateSettings({
         excludeList: updatedExcludeList,
       })
@@ -70,7 +73,6 @@ export function Settings(props: SettingsProps) {
     if (event.key === 'Enter') {
       const saveDelay = parseInt(event.currentTarget.value)
 
-      console.log(saveDelay)
       if (isNaN(saveDelay)) {
         return
       }
@@ -125,20 +127,20 @@ export function Settings(props: SettingsProps) {
               placeholder="Website that should not be saved"
               onKeyDown={excludeListKeyDown}
             />
-            <ScrollArea className="flex-1 relative flex flex-col max-h-[75vh] rounded-md border py-2 px-2">
+            <ScrollArea className="flex-1 relative flex flex-col max-h-[50vh] rounded-md border py-2 px-2">
               <ul className="flex flex-col gap-1 text-sm text-slate-500">
                 {excludeList.map((item, key) => (
                   <li
                     key={key}
                     className="flex items-center justify-between group">
-                    <span className="flex gap-2 items-center">
+                    <span className="flex gap-2 items-center flex-1">
                       <GlobeIcon />
                       {item}
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="invisible group-hover:visible"
+                      className=" group-hover:visible shrink-0"
                       onClick={() => removeDomainFromExcludeList(item)}>
                       <Cross1Icon />
                     </Button>

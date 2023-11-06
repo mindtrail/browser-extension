@@ -1,9 +1,11 @@
 import cssText from 'data-text:~style.css'
-import type { PlasmoCSConfig } from 'plasmo'
-import { useReducer } from 'react'
+import { minimatch } from 'minimatch'
+import { useMemo, useReducer, useState } from 'react'
+
+import { Storage } from '@plasmohq/storage'
 
 import { StoreButton } from '~/components/store-button'
-import { CONTENT_SCRIPT_EXCLUDE, MESSAGES } from '~/lib/constants'
+import { MESSAGES } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 
 // Needed to inject the CSS into the page
@@ -13,33 +15,44 @@ export const getStyle = () => {
   return style
 }
 
-// IMPORTANT: Config does not accept array references, so we create a new one
-export const config: PlasmoCSConfig = {
-  matches: ['https://*/*', 'http://*/*', 'file://*/*'],
-  exclude_matches: [...CONTENT_SCRIPT_EXCLUDE],
-}
-
 const PlasmoOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
+  const [overlayVisible, setOverlayVisible] = useState(false)
 
   const handleClick = async () => {
     toggleLoading()
     const payload = getPageData(false)
 
-    const response = await chrome.runtime.sendMessage({
+    await chrome.runtime.sendMessage({
       message: MESSAGES.USER_TRIGGERED_SAVE,
       payload,
     })
     toggleLoading()
-    // do something with response here, not outside the function
-    console.log(response)
   }
 
+  useMemo(async () => {
+    const overlayVisibility = await shouldAddOverlay()
+    setOverlayVisible(overlayVisibility)
+  }, [])
+
+  // const addOverlay = await shouldAddOverlay()
+
   return (
-    <div className="z-50 flex fixed top-28 right-[-4px] shadow-md">
-      <StoreButton handleClick={handleClick} loading={loading} />
-    </div>
+    overlayVisible && (
+      <div className="z-50 flex fixed top-28 right-[-4px] shadow-md">
+        <StoreButton handleClick={handleClick} loading={loading} />
+      </div>
+    )
   )
+}
+
+async function shouldAddOverlay() {
+  const hostName = window.location.hostname
+  const storage = new Storage()
+  const settings = (await storage.get('settings')) as StorageData
+  const { excludeList } = settings
+
+  return !excludeList.some((pattern) => minimatch(hostName, pattern))
 }
 
 export default PlasmoOverlay
