@@ -32,8 +32,6 @@ type SettingsProps = StorageData & {
 export function Settings(props: SettingsProps) {
   const { autoSave, excludeList, saveDelay, updateSettings } = props
 
-  const [inputValue, setInputValue] = useState('')
-
   const removeDomainFromExcludeList = (url: string) => {
     const updatedExcludeList = excludeList.filter((item) => item !== url)
     updateSettings({
@@ -41,7 +39,7 @@ export function Settings(props: SettingsProps) {
     })
   }
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const excludeListKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       const url = event.currentTarget.value
 
@@ -51,10 +49,9 @@ export function Settings(props: SettingsProps) {
       }
       const updatedExcludeList = [...excludeList, addHttpsIfMissing(url)]
       updateSettings({
-        autoSave,
         excludeList: updatedExcludeList,
       })
-      setInputValue('')
+      event.currentTarget.value = ''
     }
   }
 
@@ -68,6 +65,21 @@ export function Settings(props: SettingsProps) {
       message: MESSAGES.UPDATE_ICON,
     })
   }, [autoSave])
+
+  const saveDelayKeyDown = useCallback((event) => {
+    if (event.key === 'Enter') {
+      const saveDelay = parseInt(event.currentTarget.value)
+
+      console.log(saveDelay)
+      if (isNaN(saveDelay)) {
+        return
+      }
+
+      updateSettings({
+        saveDelay,
+      })
+    }
+  }, [])
 
   return (
     <div className="flex flex-col gap-4 px-2">
@@ -100,15 +112,17 @@ export function Settings(props: SettingsProps) {
               <Label className="shrink-0" htmlFor="auto-save-time">
                 Save After
               </Label>
-              <Input id="auto-save-time" placeholder="60 seconds" />
+              <Input
+                id="auto-save-time"
+                placeholder={saveDelay + ' seconds'}
+                onKeyDown={saveDelayKeyDown}
+              />
             </div>
             <Label htmlFor="exclude-list">Exclude List</Label>
             <Input
               id="exclude-list"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
               placeholder="Website that should not be saved"
-              onKeyDown={handleKeyDown}
+              onKeyDown={excludeListKeyDown}
             />
             <ScrollArea className="flex-1 relative flex flex-col max-h-[75vh] rounded-md border py-2 px-2">
               <ul className="flex flex-col gap-1 text-sm text-slate-500">
