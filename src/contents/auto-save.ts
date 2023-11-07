@@ -71,16 +71,16 @@ function savePageContent() {
   })
 }
 
-// Set up event listeners
-window.addEventListener('focus', startTimer)
-window.addEventListener('blur', pauseTimer)
-
 async function initAutoSave() {
   const settings = (await storage.get('settings')) as StorageData
 
   if (settings?.autoSave) {
     autoSaveDelay = settings.saveDelay
     startTimer()
+
+    // Set up event listeners
+    window.addEventListener('focus', startTimer)
+    window.addEventListener('blur', pauseTimer)
   }
 }
 
