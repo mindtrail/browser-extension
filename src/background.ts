@@ -7,8 +7,9 @@ import { Storage } from '@plasmohq/storage'
 import { MESSAGES } from '~/lib/constants'
 
 const SEARCH_URL = 'http://localhost:3000/api/history'
-const LOCAL_URL = 'http://localhost:3000/api/embed/html'
-const REMOTE_URL = 'https://app-chat-jgnk6lxbhq-ey.a.run.app/api/embed/html'
+const LOCAL_URL = 'http://localhost:3000/api/data-source/html'
+const REMOTE_URL =
+  'https://app-chat-jgnk6lxbhq-ey.a.run.app/api/data-source/html'
 const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
 
 const NODE_ENV = process.env.NODE_ENV
