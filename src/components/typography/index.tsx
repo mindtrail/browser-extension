@@ -6,7 +6,7 @@ type TypographyProps = {
   variant: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'p' | 'small'
 } & React.HTMLAttributes<HTMLElement>
 
-const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(
+export const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(
   function Typography({ variant, className, ...props }, ref) {
     const Component = variant
     return (
@@ -33,5 +33,3 @@ const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(
     )
   }
 )
-
-export default Typography
