@@ -7,13 +7,13 @@ import { Storage } from '@plasmohq/storage'
 import { MESSAGES } from '~/lib/constants'
 
 const SEARCH_URL = 'http://localhost:3000/api/history'
-const LOCAL_URL = 'http://localhost:3000/api/data-source/html'
+const LOCAL_URL = 'http://localhost:3000/api/data-source/browser-extension'
 const REMOTE_URL =
-  'https://app-chat-jgnk6lxbhq-ey.a.run.app/api/data-source/html'
+  'https://app-chat-jgnk6lxbhq-ey.a.run.app/api/data-source/browser-extension'
 const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
 
 const NODE_ENV = process.env.NODE_ENV
-const EMBEDDING_URL = NODE_ENV === 'development' ? LOCAL_URL : REMOTE_URL
+const CREATE_DATA_SOURCE = NODE_ENV === 'development' ? LOCAL_URL : REMOTE_URL
 
 updateExtensionIcon()
 
@@ -27,11 +27,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   )
 
   if (message === MESSAGES.USER_TRIGGERED_SAVE) {
-    callEmbeddingEndpoint(payload, sendResponse)
+    saveData(payload, sendResponse)
   }
 
   if (message === MESSAGES.AUTO_SAVE) {
-    callEmbeddingEndpoint(payload, sendResponse)
+    saveData(payload, sendResponse)
   }
 
   if (message === MESSAGES.SEARCH_HISTORY) {
@@ -68,10 +68,11 @@ async function searchHistorySemantic(payload, sendResponse) {
   }
 }
 
-async function callEmbeddingEndpoint(payload, sendResponse) {
-  console.log(payload)
+async function saveData(payload, sendResponse) {
+  console.log('SAVE Data --- ', payload)
+
   try {
-    const result = await fetch(EMBEDDING_URL, {
+    const result = await fetch(CREATE_DATA_SOURCE, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
