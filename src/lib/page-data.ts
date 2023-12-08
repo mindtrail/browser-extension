@@ -5,19 +5,14 @@ export const getPageData = (autoSave: boolean = true) => {
     document.querySelector('meta[name="description"]')?.content
   // @ts-ignore
   const image = document.querySelector('meta[property="og:image"]').content
-
   const url = window.location.href
-  const hostName = window.location.hostname
 
   return {
-    html,
     url,
-    storageMetadata: {
-      title,
-      description,
-      hostName,
-      image,
-      autoSave,
-    },
+    title,
+    description,
+    content: html,
+    image,
+    autoSave,
   }
 }
