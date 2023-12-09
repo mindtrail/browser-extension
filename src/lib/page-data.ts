@@ -11,7 +11,7 @@ export const getPageData = (autoSave: boolean = true) => {
     url,
     title,
     description,
-    content: html,
+    html,
     image,
     autoSave,
   }
