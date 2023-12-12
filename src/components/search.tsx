@@ -7,6 +7,7 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { MESSAGES } from '~/lib/constants'
+import { addHttpsIfMissing } from '~/lib/utils'
 
 type SearchResult = {
   hostName: string
@@ -14,13 +15,6 @@ type SearchResult = {
   metaDescription: string
   summary: string
   fileName: string
-}
-
-const addHttpsIfMissing = (url: string) => {
-  if (!/^https?:\/\//i.test(url)) {
-    return 'https://' + url
-  }
-  return url
 }
 
 export function Search() {

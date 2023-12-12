@@ -8,16 +8,10 @@ import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
 import { MESSAGES } from '~/lib/constants'
+import { addHttpsIfMissing } from '~/lib/utils'
 
 const URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
-
-const addHttpsIfMissing = (url: string) => {
-  if (!/^https?:\/\//i.test(url)) {
-    return 'https://' + url
-  }
-  return url
-}
 
 type SettingsProps = StorageData & {
   updateSettings: (settings: Partial<StorageData>) => void
