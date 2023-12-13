@@ -1,5 +1,7 @@
 import Brain from 'react:~/assets/brain.svg'
 
+import { Button } from '~/components/ui/button'
+
 import { IconSpinner } from './icon-spinner'
 
 interface StoreButtonProps {
@@ -9,18 +11,17 @@ interface StoreButtonProps {
 
 export const StoreButton = ({ handleClick, loading }: StoreButtonProps) => {
   return (
-    <button
+    <Button
       title="Store in Mind Trail"
       onClick={handleClick}
-      type="button"
       disabled={loading}
-      className="relative flex flex-row items-center rounded-lg transition-all border-none shadow-lg hover:shadow-md active:scale-105 bg-slate-50 hover:bg-slate-100 opacity-75 hover:opacity-100">
+      className="relative py-4 px-0 rounded-s-2xl overflow-hidden bg-white opacity-70 hover:bg-white hover:opacity-100">
       <Brain width={48} height={48} className="fill-red-600" />
       {loading && (
-        <span className="absolute flex bg-slate-100/50 w-full h-full justify-center items-center rounded-lg text-slate-500">
+        <span className="absolute flex bg-slate-100/50 w-full h-full justify-center items-center  text-slate-500">
           <IconSpinner />
         </span>
       )}
-    </button>
+    </Button>
   )
 }

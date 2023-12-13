@@ -39,7 +39,7 @@ const PlasmoOverlay = () => {
 
   return (
     overlayVisible && (
-      <div className="z-50 flex fixed top-28 right-[-4px] shadow-md">
+      <div className="z-50 group flex flex-col fixed top-36 right-[-8px] drop-shadow-xl">
         <StoreButton handleClick={handleClick} loading={loading} />
       </div>
     )
