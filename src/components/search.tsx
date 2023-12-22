@@ -12,7 +12,7 @@ import { addHttpsIfMissing } from '~/lib/utils'
 type SearchResult = {
   hostName: string
   image: string
-  metaDescription: string
+  description: string
   summary: string
   name: string
 }
@@ -82,13 +82,11 @@ export function Search() {
                   {foundWebsite?.hostName}
                 </Typography>
                 <Typography variant="p" className="text-gray-600 leading-5">
-                  {foundWebsite?.summary
-                    ? foundWebsite?.summary
-                    : foundWebsite?.metaDescription}
+                  {foundWebsite?.description}
                 </Typography>
                 <img
                   width={500}
-                  alt={foundWebsite?.metaDescription}
+                  alt={foundWebsite?.description}
                   src={foundWebsite?.image}
                 />
               </a>
