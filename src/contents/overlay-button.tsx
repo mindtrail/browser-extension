@@ -5,6 +5,7 @@ import { useMemo, useReducer, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 
 import { StoreButton } from '~/components/store-button'
+import { TooltipProvider } from '~/components/ui/tooltip'
 import { MESSAGES } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 
@@ -38,11 +39,13 @@ const PlasmoOverlay = () => {
   // const addOverlay = await shouldAddOverlay()
 
   return (
-    overlayVisible && (
-      <div className="z-50 group flex flex-col fixed top-36 right-[-8px] drop-shadow-xl">
-        <StoreButton handleClick={handleClick} loading={loading} />
-      </div>
-    )
+    <TooltipProvider>
+      {overlayVisible && (
+        <div className="z-50 group flex flex-col fixed top-36 right-[-8px] drop-shadow-xl">
+          <StoreButton handleClick={handleClick} loading={loading} />
+        </div>
+      )}
+    </TooltipProvider>
   )
 }
 
