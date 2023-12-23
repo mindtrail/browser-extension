@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-const PX_SIZING = {
+const DIMENSIONS_PX = {
   0: '0px',
   0.5: '2px',
   1: '4px',
@@ -35,6 +35,15 @@ const PX_SIZING = {
   72: '288px',
   80: '320px',
   96: '384px',
+}
+
+const RADIUS_PX = {
+  sm: 'calc(var(--radius) - 4px)',
+  md: 'calc(var(--radius) - 2px)',
+  lg: 'var(--radius)',
+  xl: '12px',
+  '2xl': '16px',
+  '3xl': '24px',
 }
 
 module.exports = {
@@ -85,20 +94,17 @@ module.exports = {
         },
       },
       // Use PX instead of REM
-      padding: PX_SIZING,
-      margin: PX_SIZING,
-      width: PX_SIZING,
-      height: PX_SIZING,
-      maxWidth: PX_SIZING,
-      maxHeight: PX_SIZING,
-      gap: PX_SIZING,
-      flexBasis: PX_SIZING,
+      padding: DIMENSIONS_PX,
+      margin: DIMENSIONS_PX,
+      width: DIMENSIONS_PX,
+      height: DIMENSIONS_PX,
+      maxWidth: DIMENSIONS_PX,
+      maxHeight: DIMENSIONS_PX,
+      gap: DIMENSIONS_PX,
+      flexBasis: DIMENSIONS_PX,
+      inset: DIMENSIONS_PX,
+      borderRadius: RADIUS_PX,
 
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
-      },
       keyframes: {
         'accordion-down': {
           from: { height: 0 },
