@@ -34,3 +34,20 @@ export const PLASMO_CONFIG: PlasmoCSConfig = {
   matches: CONTENT_SCRIPT_MATCH,
   exclude_matches: CONTENT_SCRIPT_EXCLUDE,
 }
+
+export enum OverlayPosition {
+  top = 'top',
+  bottom = 'bottom',
+  center = 'center',
+}
+
+export enum MoveDirection {
+  top = OverlayPosition.top,
+  bottom = OverlayPosition.bottom,
+}
+
+export const DEFAULT_EXTENSION_SETTINGS: StorageData = {
+  autoSave: true,
+  saveDelay: AUTO_SAVE_DELAY,
+  excludeList: DEFAULT_EXCLUDE_LIST,
+}

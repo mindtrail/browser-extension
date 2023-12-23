@@ -6,16 +6,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip'
 
-export enum OverlayPosition {
-  top = 'top',
-  bottom = 'bottom',
-  center = 'center',
-}
-
-export enum MoveDirection {
-  top = OverlayPosition.top,
-  bottom = OverlayPosition.bottom,
-}
+import { MoveDirection, OverlayPosition } from '~/lib/constants'
 
 interface MoveOverlayProps {
   handleClick: (direction: MoveDirection) => void

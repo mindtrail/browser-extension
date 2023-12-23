@@ -1,19 +1,19 @@
 import cssText from 'data-text:~style.css'
 import { minimatch } from 'minimatch'
-import { useMemo, useReducer, useState, useEffect, useCallback } from 'react'
-
-import { Storage } from '@plasmohq/storage'
+import { useReducer, useState, useEffect, useCallback } from 'react'
+import { useStorage } from '@plasmohq/storage/hook'
 
 import { TooltipProvider } from '~/components/ui/tooltip'
 import { StoreButton } from '~components/overlay/store-button'
+import { MoveOverlay } from '~components/overlay/move-overlay'
+
+import { getPageData } from '~/lib/page-data'
 import {
-  MoveOverlay,
+  DEFAULT_EXTENSION_SETTINGS,
+  MESSAGES,
   MoveDirection,
   OverlayPosition,
-} from '~components/overlay/move-overlay'
-
-import { MESSAGES } from '~/lib/constants'
-import { getPageData } from '~/lib/page-data'
+} from '~/lib/constants'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
@@ -43,10 +43,22 @@ const OVERLAY_NEW_POS = {
 
 const InteractionOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
-  const [overlayVisible, setOverlayVisible] = useState(false)
-  const [currentPos, setCurrentPos] = useState(OverlayPosition.center)
+  const [overlayVisible, setOverlayVisible] = useState(true)
 
-  const handleClick = useCallback(async () => {
+  const [settings, setSettings] = useStorage(
+    'settings',
+    DEFAULT_EXTENSION_SETTINGS
+  )
+
+  const { excludeList } = settings
+  const currentPos = settings.overlayPosition
+
+  useEffect(() => {
+    const overlayVisibility = isOverlayAllowedOnWebsite(excludeList)
+    setOverlayVisible(overlayVisibility)
+  }, [excludeList])
+
+  const handlePageSave = useCallback(async () => {
     toggleLoading()
     const payload = getPageData(false)
 
@@ -57,55 +69,43 @@ const InteractionOverlay = () => {
     toggleLoading()
   }, [])
 
-  useEffect(() => {
-    const fetchStorageData = async () => {
-      const storage = new Storage()
-      const settings = (await storage.get('settings')) as StorageData
-
-      const { excludeList } = settings
-
-      const overlayVisibility = await isOverlayAllowedOnWebsite(excludeList)
-      setOverlayVisible(overlayVisibility)
-    }
-    fetchStorageData()
-  }, [])
-
   const handlePositionChange = useCallback(
     (direction: MoveDirection) => {
-      console.log('handlePositionChange', currentPos, direction)
       const nextPosition = OVERLAY_NEW_POS[currentPos][direction]
 
-      setCurrentPos(nextPosition)
+      setSettings((prev) => ({ ...prev, overlayPosition: nextPosition }))
     },
     [currentPos]
   )
 
+  if (!overlayVisible || !currentPos) {
+    return null
+  }
+
   return (
     <TooltipProvider>
-      {overlayVisible && (
-        <div
-          className={`z-50 group flex flex-col fixed right-[-8px] drop-shadow-xl ${OVERLAY_Y_OFFSET[currentPos]} `}>
-          <MoveOverlay
-            handleClick={handlePositionChange}
-            direction={MoveDirection.top}
-            currentPos={currentPos}
-          />
-          <StoreButton handleClick={handleClick} loading={loading} />
-          <MoveOverlay
-            handleClick={handlePositionChange}
-            direction={MoveDirection.bottom}
-            currentPos={currentPos}
-          />
-        </div>
-      )}
+      <div
+        className={`z-50 group flex flex-col fixed right-[-8px] drop-shadow-xl ${OVERLAY_Y_OFFSET[currentPos]} `}>
+        <MoveOverlay
+          handleClick={handlePositionChange}
+          direction={MoveDirection.top}
+          currentPos={currentPos}
+        />
+        <StoreButton handleClick={handlePageSave} loading={loading} />
+        <MoveOverlay
+          handleClick={handlePositionChange}
+          direction={MoveDirection.bottom}
+          currentPos={currentPos}
+        />
+      </div>
     </TooltipProvider>
   )
 }
 
-async function isOverlayAllowedOnWebsite(excludeList: string[] = []) {
+export default InteractionOverlay
+
+function isOverlayAllowedOnWebsite(excludeList: string[] = []) {
   const hostName = window.location.hostname
 
   return !excludeList?.some((pattern) => minimatch(hostName, pattern))
 }
-
-export default InteractionOverlay
