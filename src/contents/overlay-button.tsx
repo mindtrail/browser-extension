@@ -59,3 +59,5 @@ async function shouldAddOverlay() {
 }
 
 export default PlasmoOverlay
+
+// hsl(221.2 83.2% 53.3%)
