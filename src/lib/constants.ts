@@ -42,8 +42,8 @@ export enum OverlayPosition {
 }
 
 export enum MoveDirection {
-  top = OverlayPosition.top,
-  bottom = OverlayPosition.bottom,
+  up = 'up',
+  down = 'down',
 }
 
 export const DEFAULT_EXTENSION_SETTINGS: StorageData = {

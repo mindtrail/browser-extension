@@ -1,13 +1,13 @@
-import { CaretUpIcon, CaretDownIcon } from '@radix-ui/react-icons'
+import { CaretDownIcon, CaretUpIcon } from '@radix-ui/react-icons'
+
 import { Button } from '~/components/ui/button'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip'
-
-import { cn } from '~/lib/utils'
 import { MoveDirection, OverlayPosition } from '~/lib/constants'
+import { cn } from '~/lib/utils'
 
 interface MoveOverlayProps {
   handleClick: (direction: MoveDirection) => void
@@ -23,15 +23,14 @@ export const MoveOverlay = ({
   className,
 }: MoveOverlayProps) => {
   const isNotVisible =
-    (currentPos === OverlayPosition.top && direction === MoveDirection.top) ||
-    (currentPos === OverlayPosition.bottom &&
-      direction === MoveDirection.bottom)
+    (currentPos === OverlayPosition.top && direction === MoveDirection.up) ||
+    (currentPos === OverlayPosition.bottom && direction === MoveDirection.down)
 
   if (isNotVisible) {
     return null
   }
 
-  const Icon = direction === MoveDirection.top ? CaretUpIcon : CaretDownIcon
+  const Icon = direction === MoveDirection.up ? CaretUpIcon : CaretDownIcon
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -39,13 +38,14 @@ export const MoveOverlay = ({
           onClick={() => handleClick(direction)}
           variant="outline"
           className={cn(
-            `relative -right-4 py-4 px-0 rounded-full group-hover:animate-slide-to-left`,
+            `relative -right-4 py-4 px-0 rounded-full text-secondary-foreground
+              group-hover:animate-slide-to-left`,
             className
           )}>
           <Icon width={24} height={24} />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Store in Mind Trail</TooltipContent>
+      <TooltipContent>Move {direction}</TooltipContent>
     </Tooltip>
   )
 }

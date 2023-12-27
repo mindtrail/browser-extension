@@ -1,19 +1,19 @@
 import cssText from 'data-text:~style.css'
 import { minimatch } from 'minimatch'
-import { useReducer, useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
+
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { TooltipProvider } from '~/components/ui/tooltip'
-import { StoreButton } from '~components/overlay/store-button'
-import { MoveOverlay } from '~components/overlay/move-overlay'
-
-import { getPageData } from '~/lib/page-data'
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
   MoveDirection,
   OverlayPosition,
 } from '~/lib/constants'
+import { getPageData } from '~/lib/page-data'
+import { MoveOverlay } from '~components/overlay/move-overlay'
+import { StoreButton } from '~components/overlay/store-button'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
@@ -30,14 +30,14 @@ const OVERLAY_Y_OFFSET = {
 
 const OVERLAY_NEW_POS = {
   [OverlayPosition.top]: {
-    [MoveDirection.bottom]: OverlayPosition.center,
+    [MoveDirection.down]: OverlayPosition.center,
   },
   [OverlayPosition.center]: {
-    [MoveDirection.top]: OverlayPosition.top,
-    [MoveDirection.bottom]: OverlayPosition.bottom,
+    [MoveDirection.up]: OverlayPosition.top,
+    [MoveDirection.down]: OverlayPosition.bottom,
   },
   [OverlayPosition.bottom]: {
-    [MoveDirection.top]: OverlayPosition.center,
+    [MoveDirection.up]: OverlayPosition.center,
   },
 }
 
@@ -90,13 +90,13 @@ const InteractionOverlay = () => {
         <div className="flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto">
           <MoveOverlay
             handleClick={handlePositionChange}
-            direction={MoveDirection.top}
+            direction={MoveDirection.up}
             currentPos={currentPos}
           />
           <StoreButton handleClick={handlePageSave} loading={loading} />
           <MoveOverlay
             handleClick={handlePositionChange}
-            direction={MoveDirection.bottom}
+            direction={MoveDirection.down}
             currentPos={currentPos}
           />
         </div>
