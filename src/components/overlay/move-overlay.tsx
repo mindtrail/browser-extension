@@ -36,10 +36,9 @@ export const MoveOverlay = ({
       <TooltipTrigger asChild>
         <Button
           onClick={() => handleClick(direction)}
-          variant="outline"
+          variant="secondary"
           className={cn(
-            `relative -right-4 py-4 px-0 rounded-full text-secondary-foreground
-              group-hover:animate-slide-to-left`,
+            `relative -right-4 px-1 py-4 w-9 rounded-full group-hover:animate-slide-to-left`,
             className
           )}>
           <Icon width={24} height={24} />
