@@ -34,6 +34,12 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 8px;
+    --gradient-bg: linear-gradient(
+      180deg,
+      hsl(194deg 100% 43%) 0%,
+      hsl(248deg 72% 72%) 50%,
+      hsl(332deg 92% 61%) 100%
+    );
   }
 
   .dark {

@@ -85,18 +85,21 @@ const InteractionOverlay = () => {
   return (
     <TooltipProvider>
       <div
-        className={`z-50 group flex flex-col fixed right-[-8px] drop-shadow-xl ${OVERLAY_Y_OFFSET[currentPos]} `}>
-        <MoveOverlay
-          handleClick={handlePositionChange}
-          direction={MoveDirection.top}
-          currentPos={currentPos}
-        />
-        <StoreButton handleClick={handlePageSave} loading={loading} />
-        <MoveOverlay
-          handleClick={handlePositionChange}
-          direction={MoveDirection.bottom}
-          currentPos={currentPos}
-        />
+        className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12 flex flex-col justify-center
+         ${OVERLAY_Y_OFFSET[currentPos]} `}>
+        <div className="flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto">
+          <MoveOverlay
+            handleClick={handlePositionChange}
+            direction={MoveDirection.top}
+            currentPos={currentPos}
+          />
+          <StoreButton handleClick={handlePageSave} loading={loading} />
+          <MoveOverlay
+            handleClick={handlePositionChange}
+            direction={MoveDirection.bottom}
+            currentPos={currentPos}
+          />
+        </div>
       </div>
     </TooltipProvider>
   )
