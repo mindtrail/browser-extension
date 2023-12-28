@@ -23,7 +23,7 @@ export const SavePage = ({ handleClick, loading }: SavePageProps) => {
       variant="secondary"
       className={`relative py-4 px-0 rounded-full bg-gradient-to-b from-primary to-[#F74296]
         opacity-75
-        group-hover:from-primary/40  group-hover:to-[#F74296]/40
+        group-hover:from-primary/50  group-hover:to-[#F74296]/50 group-hover:bg-white
         group-hover:opacity-100 group-hover:animate-slide-to-left `}>
       <Brain width={48} height={48} />
       {loading && (
