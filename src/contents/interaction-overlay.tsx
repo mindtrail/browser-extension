@@ -12,8 +12,8 @@ import {
   OverlayPosition,
 } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
-import { MoveOverlay } from '~components/overlay/move-overlay'
-import { StoreButton } from '~components/overlay/store-button'
+import { ChangePosition } from '~components/overlay/change-position'
+import { SavePage } from '~components/overlay/save-page'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
@@ -88,13 +88,13 @@ const InteractionOverlay = () => {
         className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12 flex flex-col justify-center
          ${OVERLAY_Y_OFFSET[currentPos]} `}>
         <div className="flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto">
-          <MoveOverlay
+          <ChangePosition
             handleClick={handlePositionChange}
             direction={MoveDirection.up}
             currentPos={currentPos}
           />
-          <StoreButton handleClick={handlePageSave} loading={loading} />
-          <MoveOverlay
+          <SavePage handleClick={handlePageSave} loading={loading} />
+          <ChangePosition
             handleClick={handlePositionChange}
             direction={MoveDirection.down}
             currentPos={currentPos}

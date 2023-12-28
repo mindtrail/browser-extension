@@ -9,19 +9,19 @@ import {
 import { MoveDirection, OverlayPosition } from '~/lib/constants'
 import { cn } from '~/lib/utils'
 
-interface MoveOverlayProps {
+interface ChangePositionProps {
   handleClick: (direction: MoveDirection) => void
   direction: MoveDirection
   currentPos: OverlayPosition
   className?: string
 }
 
-export const MoveOverlay = ({
+export const ChangePosition = ({
   handleClick,
   direction,
   currentPos = OverlayPosition.top,
   className,
-}: MoveOverlayProps) => {
+}: ChangePositionProps) => {
   const isNotVisible =
     (currentPos === OverlayPosition.top && direction === MoveDirection.up) ||
     (currentPos === OverlayPosition.bottom && direction === MoveDirection.down)

@@ -10,12 +10,12 @@ import { Button } from '~/components/ui/button'
 
 import { IconSpinner } from '../icon-spinner'
 
-interface StoreButtonProps {
+interface SavePageProps {
   handleClick: () => void
   loading: boolean
 }
 
-export const StoreButton = ({ handleClick, loading }: StoreButtonProps) => {
+export const SavePage = ({ handleClick, loading }: SavePageProps) => {
   return (
     <Button
       onClick={handleClick}
