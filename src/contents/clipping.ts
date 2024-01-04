@@ -36,83 +36,41 @@ export const getStyle: PlasmoGetStyle = () => {
   return style
 }
 
-const MIN_TEXT_LENGTH = 20
+const MIN_TEXT_LENGTH = 4
 const storage = new Storage()
 
 let saveIcon: HTMLElement | null = null
-let iconTimer: NodeJS.Timeout
 let selectedText: string = ''
 
-// addEventListener version
-document.addEventListener('selectionchange', () => {
-  selectedText = document.getSelection().toString().trim()
+initClipping()
+
+document.addEventListener('click', (event) => {
+  // Deffered execution to allow the selectionchange event to complete
+  setTimeout(() => {
+    const selection = window.getSelection()
+    selectedText = selection.toString().trim()
+
+    if (
+      selectedText.length < MIN_TEXT_LENGTH ||
+      isExcludedElement(event?.target)
+    ) {
+      saveIcon.style.display = 'none'
+      return
+    }
+
+    if (event.target === saveIcon && selectedText.length > MIN_TEXT_LENGTH) {
+      // saveContent(selectedText);
+      // then...
+      // saveIcon.style.display = 'none'
+      // selection.empty()
+      return
+    }
+
+    showSaveIcon()
+  }, 0)
 })
 
-document.addEventListener('mouseup', function (event: MouseEvent) {
-  if (isExcludedElement(event?.target)) {
-    return
-  }
-
-  // Clear any previous timer
-  clearTimeout(iconTimer)
-
-  // Set a timer to show the icon after a short delay,
-  // otherwise onClick will be called immediately after and hide the icon
-  iconTimer = setTimeout(() => showSaveIcon(event), 100) // 100ms delay
-})
-
-function showSaveIcon(event: MouseEvent) {
-  const selection = window.getSelection()
-  let commonAncestorContainer = selection?.getRangeAt(0).commonAncestorContainer
-
-  // if commonAncestorContainer is a text node, get its parent element
-  commonAncestorContainer =
-    commonAncestorContainer.nodeType === 3
-      ? commonAncestorContainer.parentNode
-      : commonAncestorContainer
-
-  // @ts-ignore - Add highlightedContent class to the common ancestor container
-  commonAncestorContainer?.classList?.add('mindtrailClipping')
-
-  selectedText = selection.toString().trim()
-
-  console.log(1111, selectedText)
-
-  if (selectedText.length > MIN_TEXT_LENGTH) {
-    saveIcon.style.left = event.clientX + 'px'
-    saveIcon.style.top = event.clientY + 'px'
-    saveIcon.style.display = 'block'
-  }
-}
-
-// Hide the save icon when clicking elsewhere
-document.addEventListener('click', function (event) {
-  console.log('Clicked')
-
-  if (event.target === saveIcon && selectedText.length > MIN_TEXT_LENGTH) {
-    console.log('Saving content', selectedText)
-    // window.getSelection()
-    // Code to handle the saving of content
-    // saveContent(selectedText);
-  }
-
-  saveIcon.style.display = 'none'
-})
-
-function savePageContent() {
-  // Set flag to prevent further calls
-  let contentSaved = true
-  // Extract page data and send to background script or save directly
-  const payload = getPageData()
-
-  console.log('Saving page content', payload)
-  chrome.runtime.sendMessage({
-    message: MESSAGES.AUTO_SAVE,
-    payload,
-  })
-}
-
-async function initClippingListener() {
+async function initClipping() {
   const settings = (await storage.get('settings')) as StorageData
 
   if (!saveIcon) {
@@ -130,7 +88,46 @@ async function initClippingListener() {
     saveIcon.style.display = 'none'
   }
 
-  console.log('Clipping listener initialized', saveIcon)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Clipping initialized')
+  }
+}
+
+function showSaveIcon() {
+  const selection = window.getSelection()
+
+  if (!selection) {
+    return
+  }
+
+  // // if commonAncestorContainer is a text node, get its parent element
+  // commonAncestorContainer =
+  //   commonAncestorContainer.nodeType === Node.TEXT_NODE
+  //     ? commonAncestorContainer.parentNode
+  //     : commonAncestorContainer
+
+  // @ts-ignore - Add highlightedContent class to the common ancestor container
+  // commonAncestorContainer?.classList?.add('mindtrailClipping')
+
+  // console.log(1111, selectedText)
+
+  const { iconLeft, iconTop } = getButtonPos(selection)
+  saveIcon.style.left = iconLeft + 'px'
+  saveIcon.style.top = iconTop + 'px'
+  saveIcon.style.display = 'block'
+}
+
+function savePageContent() {
+  // Set flag to prevent further calls
+  let contentSaved = true
+  // Extract page data and send to background script or save directly
+  const payload = getPageData()
+
+  console.log('Saving page content', payload)
+  chrome.runtime.sendMessage({
+    message: MESSAGES.AUTO_SAVE,
+    payload,
+  })
 }
 
 function isExcludedElement(element: EventTarget) {
@@ -139,4 +136,43 @@ function isExcludedElement(element: EventTarget) {
   return excludedTagNames.includes(element?.tagName)
 }
 
-initClippingListener()
+function getButtonPos(selection: Selection) {
+  const docElement = document.documentElement
+  const { width: docWidth } = docElement.getBoundingClientRect()
+
+  const range = selection?.getRangeAt(0)
+  const anchorNode = getAnchorNodeForOverlay(range)
+  const { left, top, width, height } = anchorNode.getBoundingClientRect()
+
+  const scrollLeft = window.scrollX || docElement.scrollLeft
+  const scrollTop = window.scrollY || docElement.scrollTop
+
+  const leftOffset = left + width < docWidth * 0.8 ? 10 : -50
+  const topOffset = left + width < docWidth * 0.8 ? -30 : 0
+
+  const iconLeft = left + width + scrollLeft + leftOffset
+  const iconTop = top + height + scrollTop + topOffset
+
+  return { iconLeft, iconTop }
+}
+
+function getAnchorNodeForOverlay(range: Range) {
+  let { startContainer, endContainer } = range
+
+  while (startContainer && startContainer.nodeType !== Node.ELEMENT_NODE) {
+    startContainer = startContainer.parentNode
+  }
+
+  while (endContainer && endContainer.nodeType !== Node.ELEMENT_NODE) {
+    endContainer = endContainer.parentNode
+  }
+
+  const startElement = startContainer as Element
+  const endElement = endContainer as Element
+
+  const startTop = startElement?.getBoundingClientRect().top
+  const endTop = endElement?.getBoundingClientRect().top
+
+  console.log(startTop, endTop)
+  return startTop < endTop ? endElement : startElement
+}
