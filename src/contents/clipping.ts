@@ -112,6 +112,7 @@ function showSaveIcon() {
   // console.log(1111, selectedText)
 
   const { iconLeft, iconTop } = getButtonPos(selection)
+
   saveIcon.style.left = iconLeft + 'px'
   saveIcon.style.top = iconTop + 'px'
   saveIcon.style.display = 'block'
