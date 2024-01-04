@@ -72,7 +72,7 @@ function showSaveIcon(event: MouseEvent) {
       : commonAncestorContainer
 
   // @ts-ignore - Add highlightedContent class to the common ancestor container
-  commonAncestorContainer?.classList?.add('highlightedContent')
+  commonAncestorContainer?.classList?.add('mindtrailClipping')
 
   selectedText = selection.toString().trim()
 
@@ -122,6 +122,9 @@ async function initClippingListener() {
     saveIcon.src = manualModeIcon // URL to your icon image
     saveIcon.id = 'clipping-icon'
     saveIcon.style.position = 'absolute'
+    saveIcon.style.zIndex = '999'
+    saveIcon.style.width = '32px'
+    saveIcon.style.height = '32px'
     saveIcon.style.cursor = 'pointer'
     document.body.appendChild(saveIcon)
     saveIcon.style.display = 'none'

@@ -1,4 +1,4 @@
-.highlightedContent::selection {
+.mindtrailClipping::selection {
   background-color: #f8e02c !important; /* Your desired highlight color */
   color: black; /* Text color */
 }
