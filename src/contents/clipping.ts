@@ -36,10 +36,10 @@ export const getStyle: PlasmoGetStyle = () => {
   return style
 }
 
-const MIN_TEXT_LENGTH = 4
+const MIN_TEXT_LENGTH = 5
 const storage = new Storage()
 
-let saveIcon: HTMLElement | null = null
+let saveClippingBtn: HTMLElement | null = null
 let selectedText: string = ''
 
 initClipping()
@@ -54,38 +54,41 @@ document.addEventListener('click', (event) => {
       selectedText.length < MIN_TEXT_LENGTH ||
       isExcludedElement(event?.target)
     ) {
-      saveIcon.style.display = 'none'
+      saveClippingBtn.style.display = 'none'
       return
     }
 
-    if (event.target === saveIcon && selectedText.length > MIN_TEXT_LENGTH) {
+    if (
+      event.target === saveClippingBtn &&
+      selectedText.length > MIN_TEXT_LENGTH
+    ) {
       // saveContent(selectedText);
       // then...
-      // saveIcon.style.display = 'none'
+      // saveClippingBtn.style.display = 'none'
       // selection.empty()
       return
     }
 
-    showSaveIcon()
-  }, 0)
+    showClippingButton()
+  }, 100)
 })
 
 async function initClipping() {
   const settings = (await storage.get('settings')) as StorageData
 
-  if (!saveIcon) {
-    saveIcon = document.createElement('img')
+  if (!saveClippingBtn) {
+    saveClippingBtn = document.createElement('img')
 
     // @ts-ignore
-    saveIcon.src = manualModeIcon // URL to your icon image
-    saveIcon.id = 'clipping-icon'
-    saveIcon.style.position = 'absolute'
-    saveIcon.style.zIndex = '999'
-    saveIcon.style.width = '32px'
-    saveIcon.style.height = '32px'
-    saveIcon.style.cursor = 'pointer'
-    document.body.appendChild(saveIcon)
-    saveIcon.style.display = 'none'
+    saveClippingBtn.src = manualModeIcon // URL to your icon image
+    saveClippingBtn.id = 'clipping-button'
+    saveClippingBtn.style.position = 'absolute'
+    saveClippingBtn.style.zIndex = '999'
+    saveClippingBtn.style.width = '32px'
+    saveClippingBtn.style.height = '32px'
+    saveClippingBtn.style.cursor = 'pointer'
+    document.body.appendChild(saveClippingBtn)
+    saveClippingBtn.style.display = 'none'
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -93,29 +96,95 @@ async function initClipping() {
   }
 }
 
-function showSaveIcon() {
+function showClippingButton() {
   const selection = window.getSelection()
 
   if (!selection) {
     return
   }
 
-  // // if commonAncestorContainer is a text node, get its parent element
-  // commonAncestorContainer =
-  //   commonAncestorContainer.nodeType === Node.TEXT_NODE
-  //     ? commonAncestorContainer.parentNode
-  //     : commonAncestorContainer
+  const isAlreadyVisible = saveClippingBtn.style.display !== 'none'
+  const { leftPos, topPos } = getButtonPosition(selection)
 
-  // @ts-ignore - Add highlightedContent class to the common ancestor container
-  // commonAncestorContainer?.classList?.add('mindtrailClipping')
+  // If the button was not visible initially, skip the transition
+  if (!isAlreadyVisible) {
+    saveClippingBtn.style.transform = 'none' // Reset translate values
 
-  // console.log(1111, selectedText)
+    saveClippingBtn.style.left = leftPos + 'px'
+    saveClippingBtn.style.top = topPos + 'px'
+  } else {
+    const translateX = leftPos - saveClippingBtn.offsetLeft
+    const translateY = topPos - saveClippingBtn.offsetTop
 
-  const { iconLeft, iconTop } = getButtonPos(selection)
+    saveClippingBtn.style.transform = `translate(${translateX}px, ${translateY}px)`
+  }
 
-  saveIcon.style.left = iconLeft + 'px'
-  saveIcon.style.top = iconTop + 'px'
-  saveIcon.style.display = 'block'
+  saveClippingBtn.style.display = 'block'
+}
+
+function isExcludedElement(element: EventTarget) {
+  const excludedTagNames = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT']
+  // @ts-ignore
+  return excludedTagNames.includes(element?.tagName)
+}
+
+function getButtonPosition(selection: Selection) {
+  const { scrollX, scrollY } = window
+  const range = selection?.getRangeAt(0)
+
+  if (!range) {
+    return { leftPos: 0, topPos: 0 }
+  }
+
+  const { startContainer, endContainer } = range
+  const { bottom: rangeBottom, right: rangeRight } =
+    range.getBoundingClientRect()
+
+  // If the selection is within a single element, return the Range bounding rect
+  if (startContainer === endContainer) {
+    return {
+      leftPos: rangeRight + scrollX,
+      topPos: rangeBottom + scrollY,
+    }
+  }
+
+  // Make sure we have element nodes, not text nodes, to get bounding rects
+  const startElement = getClosestElementNode(startContainer)
+  const endElement = getClosestElementNode(endContainer)
+
+  if (!startElement || !endElement) {
+    return {
+      leftPos: rangeRight + scrollX,
+      topPos: rangeBottom + scrollY,
+    }
+  }
+
+  // Selection may be top-down or bottom-up, so we'll return the rect of the bottom element
+  const { right: startRight, bottom: startBottom } =
+    startElement.getBoundingClientRect()
+  const { right: endRight, bottom: endBottom } =
+    endElement.getBoundingClientRect()
+
+  let { width: docWidth } = document.documentElement.getBoundingClientRect()
+  docWidth = docWidth * 0.8
+
+  let leftPos = startBottom > endBottom ? startRight : endRight
+  let topPos = startBottom > endBottom ? startBottom : endBottom
+
+  leftPos = leftPos > docWidth ? docWidth : leftPos
+  topPos = leftPos > docWidth ? topPos : topPos - 30
+
+  return {
+    leftPos: leftPos + scrollX,
+    topPos: topPos + scrollY,
+  }
+}
+
+function getClosestElementNode(node: Node | null): Element | null {
+  while (node && node.nodeType !== Node.ELEMENT_NODE) {
+    node = node.parentNode
+  }
+  return node as Element | null
 }
 
 function savePageContent() {
@@ -129,64 +198,4 @@ function savePageContent() {
     message: MESSAGES.AUTO_SAVE,
     payload,
   })
-}
-
-function isExcludedElement(element: EventTarget) {
-  const excludedTagNames = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT']
-  // @ts-ignore
-  return excludedTagNames.includes(element?.tagName)
-}
-
-function getButtonPos(selection: Selection) {
-  const docElement = document.documentElement
-  const { width: docWidth } = docElement.getBoundingClientRect()
-
-  const scrollLeft = window.scrollX || docElement.scrollLeft
-  const scrollTop = window.scrollY || docElement.scrollTop
-
-  const { left, top, width, height } = getSelectionCoordinates(selection)
-
-  const leftOffset = left + width < docWidth * 0.8 ? 10 : -50
-  const topOffset = left + width < docWidth * 0.8 ? -30 : 0
-
-  const iconLeft = left + width + scrollLeft + leftOffset
-  const iconTop = top + height + scrollTop + topOffset
-
-  return { iconLeft, iconTop }
-}
-
-function getSelectionCoordinates(selection: Selection) {
-  const range = selection?.getRangeAt(0)
-  let { startContainer, endContainer } = range
-
-  // If the selection is within a single element, return the range bounding rect
-  if (startContainer === endContainer) {
-    return range.getBoundingClientRect()
-  }
-
-  // Make sure we have element nodes, not text nodes, to get bounding rects
-
-  const startElement = getClosestElementNode(startContainer)
-  const endElement = getClosestElementNode(endContainer)
-
-  if (!startElement || !endElement) {
-    return range.getBoundingClientRect()
-  }
-
-  // Selection may be top-down or bottom-up, so we'll return the rect of the bottom element
-
-  
-
-  const startTop = startElement?.getBoundingClientRect().top
-  const endTop = endElement?.getBoundingClientRect().top
-
-  console.log(startTop, endTop)
-  return startTop < endTop ? endElement : startElement
-}
-
-function getClosestElementNode(node: Node | null): Element | null {
-  while (node && node.nodeType !== Node.ELEMENT_NODE) {
-    node = node.parentNode
-  }
-  return node as Element | null
 }
