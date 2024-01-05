@@ -141,12 +141,10 @@ function getButtonPos(selection: Selection) {
   const docElement = document.documentElement
   const { width: docWidth } = docElement.getBoundingClientRect()
 
-  const range = selection?.getRangeAt(0)
-  const anchorNode = getAnchorNodeForOverlay(range)
-  const { left, top, width, height } = anchorNode.getBoundingClientRect()
-
   const scrollLeft = window.scrollX || docElement.scrollLeft
   const scrollTop = window.scrollY || docElement.scrollTop
+
+  const { left, top, width, height } = getSelectionCoordinates(selection)
 
   const leftOffset = left + width < docWidth * 0.8 ? 10 : -50
   const topOffset = left + width < docWidth * 0.8 ? -30 : 0
@@ -157,23 +155,38 @@ function getButtonPos(selection: Selection) {
   return { iconLeft, iconTop }
 }
 
-function getAnchorNodeForOverlay(range: Range) {
+function getSelectionCoordinates(selection: Selection) {
+  const range = selection?.getRangeAt(0)
   let { startContainer, endContainer } = range
 
-  while (startContainer && startContainer.nodeType !== Node.ELEMENT_NODE) {
-    startContainer = startContainer.parentNode
+  // If the selection is within a single element, return the range bounding rect
+  if (startContainer === endContainer) {
+    return range.getBoundingClientRect()
   }
 
-  while (endContainer && endContainer.nodeType !== Node.ELEMENT_NODE) {
-    endContainer = endContainer.parentNode
+  // Make sure we have element nodes, not text nodes, to get bounding rects
+
+  const startElement = getClosestElementNode(startContainer)
+  const endElement = getClosestElementNode(endContainer)
+
+  if (!startElement || !endElement) {
+    return range.getBoundingClientRect()
   }
 
-  const startElement = startContainer as Element
-  const endElement = endContainer as Element
+  // Selection may be top-down or bottom-up, so we'll return the rect of the bottom element
+
+  
 
   const startTop = startElement?.getBoundingClientRect().top
   const endTop = endElement?.getBoundingClientRect().top
 
   console.log(startTop, endTop)
   return startTop < endTop ? endElement : startElement
+}
+
+function getClosestElementNode(node: Node | null): Element | null {
+  while (node && node.nodeType !== Node.ELEMENT_NODE) {
+    node = node.parentNode
+  }
+  return node as Element | null
 }
