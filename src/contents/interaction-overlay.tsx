@@ -47,10 +47,7 @@ const InteractionOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
   const [overlayVisible, setOverlayVisible] = useState(true)
 
-  const [settings, setSettings] = useStorage(
-    'settings',
-    DEFAULT_EXTENSION_SETTINGS
-  )
+  const [settings, setSettings] = useStorage('settings', DEFAULT_EXTENSION_SETTINGS)
 
   const { excludeList } = settings
   const currentPos = settings.overlayPosition
@@ -77,7 +74,7 @@ const InteractionOverlay = () => {
 
       setSettings((prev) => ({ ...prev, overlayPosition: nextPosition }))
     },
-    [currentPos]
+    [currentPos],
   )
 
   if (!overlayVisible || !currentPos) {
@@ -88,8 +85,9 @@ const InteractionOverlay = () => {
     <TooltipProvider>
       <div
         className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12 flex flex-col justify-center
-         ${OVERLAY_Y_OFFSET[currentPos]} `}>
-        <div className="flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto">
+         ${OVERLAY_Y_OFFSET[currentPos]} `}
+      >
+        <div className='flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto'>
           <ChangePosition
             handleClick={handlePositionChange}
             direction={MoveDirection.up}

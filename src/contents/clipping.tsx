@@ -1,17 +1,9 @@
 import styleText from 'data-text:~style.css'
-import Brain from 'react:~/assets/brain.svg'
-import manualModeIcon from 'url:~assets/manual-32.png'
 
-import {
-  useCallback,
-  useEffect,
-  useReducer,
-  useState,
-  type MouseEventHandler,
-} from 'react'
-
+import { useCallback, useEffect, useReducer, useState } from 'react'
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo'
 import { useStorage } from '@plasmohq/storage/hook'
+import { ClipboardCopyIcon } from '@radix-ui/react-icons'
 
 import { TooltipProvider } from '~/components/ui/tooltip'
 import { IconSpinner } from '~/components/icon-spinner'
@@ -41,12 +33,9 @@ let selectedText: string = ''
 
 const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
-  const [overlayVisible, setOverlayVisible] = useState(false)
+  const [btnCoorindates, setBtnCoorindates] = useState(null)
 
-  const [settings, _setSettings] = useStorage(
-    'settings',
-    DEFAULT_EXTENSION_SETTINGS
-  )
+  const [settings, _setSettings] = useStorage('settings', DEFAULT_EXTENSION_SETTINGS)
 
   const { excludeList } = settings
   const hostExcluded = isHostExcluded(excludeList)
@@ -57,31 +46,22 @@ const ClippingOverlay = () => {
 
   const handlePageClick = useCallback((event: MouseEvent) => {
     setTimeout(() => {
-      console.log(event.target)
       const selection = window.getSelection()
-      selectedText = selection.toString().trim()
+      const selectedText = selection.toString().trim()
 
       console.log('selectedText', selectedText)
       if (
         selectedText.length < MIN_TEXT_FOR_CLIPPING ||
         isExcludedElement(event?.target)
       ) {
-        setOverlayVisible(false)
+        setBtnCoorindates(null)
         return
       }
 
-      if (
-        event.target === saveClippingBtn &&
-        selectedText.length > MIN_TEXT_FOR_CLIPPING
-      ) {
-        // saveContent(selectedText);
-        // then...
-        // saveClippingBtn.style.display = 'none'
-        // selection.empty()
-        return
-      }
-      setOverlayVisible(true)
-      showClippingButton()
+      const newCoordinates = getButtonPosition(selection)
+      console.log(newCoordinates)
+      setBtnCoorindates(newCoordinates)
+      // showClippingButton()
     }, 200)
   }, [])
 
@@ -89,44 +69,55 @@ const ClippingOverlay = () => {
     document.addEventListener('click', handlePageClick)
 
     // Return a cleanup function to remove the event listener
-    // when the component unmounts or rerenders
     return () => {
       document.removeEventListener('click', handlePageClick)
     }
   }, [])
 
-  const handlePageSave = useCallback(
-    async (event: MouseEventHandler<HTMLButtonElement>) => {
-      // @ts-ignore
-      event.stopPropagation()
-      toggleLoading()
-      const payload = getPageData(false)
+  const handleClippingSave = useCallback(async () => {
+    // @ts-ignore
+    const selection = window.getSelection()
+    selectedText = selection.toString().trim()
 
-      console.log('saving clipping...', payload)
+    if (selectedText.length < MIN_TEXT_FOR_CLIPPING) {
+      return
+    }
 
-      await chrome.runtime.sendMessage({
-        message: MESSAGES.USER_TRIGGERED_SAVE,
-        payload,
-      })
-      toggleLoading()
-    },
-    []
-  )
+    toggleLoading()
+    // const payload = getPageData(false)
 
-  if (!overlayVisible) {
+    console.log('saving clipping...', selectedText)
+
+    // await chrome.runtime.sendMessage({
+    //   message: MESSAGES.USER_TRIGGERED_SAVE,
+    //   payload,
+    // })
+    toggleLoading()
+    setBtnCoorindates(null)
+  }, [])
+
+  if (!btnCoorindates) {
     return null
   }
+
+  const { left, top } = btnCoorindates
 
   return (
     <TooltipProvider>
       <Button
-        onClick={handlePageSave}
+        onClick={(event) => {
+          event.stopPropagation()
+          handleClippingSave()
+        }}
         disabled={loading}
-        // variant=""
-        className={`p-2 rounded-full h-auto absolute z-[999] transform`}>
-        <Brain width={32} height={32} />
+        variant='outline'
+        style={{ transform: `translate(${left}px, ${top}px)` }}
+        className={`p-1 rounded-full h-auto absolute z-[999] bg-white hover:bg-slate-200
+          transform transition-transform duration-200 ease-out`}
+      >
+        <ClipboardCopyIcon width={20} height={20} />
         {loading && (
-          <span className="absolute flex bg-slate-100/50 w-full h-full justify-center items-center  text-slate-500">
+          <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center  text-slate-500'>
             <IconSpinner />
           </span>
         )}
@@ -136,32 +127,6 @@ const ClippingOverlay = () => {
 }
 
 export default ClippingOverlay
-
-function showClippingButton() {
-  const selection = window.getSelection()
-
-  if (!selection) {
-    return
-  }
-
-  const isAlreadyVisible = saveClippingBtn.style.display !== 'none'
-  const { XCoord, YCoord } = getButtonPosition(selection)
-
-  // If the button was not visible initially, skip the transition
-  if (!isAlreadyVisible) {
-    saveClippingBtn.style.transform = 'none' // Reset translate values
-
-    saveClippingBtn.style.left = XCoord + 'px'
-    saveClippingBtn.style.top = YCoord + 'px'
-  } else {
-    const translateX = XCoord - saveClippingBtn.offsetLeft
-    const translateY = YCoord - saveClippingBtn.offsetTop
-
-    saveClippingBtn.style.transform = `translate(${translateX}px, ${translateY}px)`
-  }
-
-  saveClippingBtn.style.display = 'block'
-}
 
 // @TODO - proper check if it's not in a form element, or like in Mindtrail, it detect the div...
 function isExcludedElement(element: EventTarget) {
@@ -174,13 +139,11 @@ function getButtonPosition(selection: Selection) {
   const range = selection?.getRangeAt(0)
 
   if (!range) {
-    return { XCoord: 0, YCoord: 0 }
+    return false
   }
 
-  const { startContainer, endContainer, commonAncestorContainer, endOffset } =
-    range
-  const { bottom: rangeBottom, right: rangeRight } =
-    range.getBoundingClientRect()
+  const { startContainer, endContainer, commonAncestorContainer, endOffset } = range
+  const { bottom: rangeBottom, right: rangeRight } = range.getBoundingClientRect()
 
   // If the selection is within a single element, return the Range bounding rect
   if (startContainer === endContainer) {
@@ -225,19 +188,7 @@ function getAdjustedCoordinates(XCoord: number, YCoord: number) {
   YCoord = isNearRightEdge ? YCoord + 4 : YCoord - 24
 
   return {
-    XCoord: XCoord + window.scrollX,
-    YCoord: YCoord + window.scrollY,
+    left: XCoord + window.scrollX,
+    top: YCoord + window.scrollY,
   }
-}
-
-function savePageContent() {
-  // Set flag to prevent further calls
-  let contentSaved = true
-  // Extract page data and send to background script or save directly
-  const payload = getPageData()
-
-  chrome.runtime.sendMessage({
-    message: MESSAGES.AUTO_SAVE,
-    payload,
-  })
 }
