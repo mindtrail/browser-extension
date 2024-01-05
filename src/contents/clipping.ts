@@ -104,17 +104,17 @@ function showClippingButton() {
   }
 
   const isAlreadyVisible = saveClippingBtn.style.display !== 'none'
-  const { leftPos, topPos } = getButtonPosition(selection)
+  const { XCoord, YCoord } = getButtonPosition(selection)
 
   // If the button was not visible initially, skip the transition
   if (!isAlreadyVisible) {
     saveClippingBtn.style.transform = 'none' // Reset translate values
 
-    saveClippingBtn.style.left = leftPos + 'px'
-    saveClippingBtn.style.top = topPos + 'px'
+    saveClippingBtn.style.left = XCoord + 'px'
+    saveClippingBtn.style.top = YCoord + 'px'
   } else {
-    const translateX = leftPos - saveClippingBtn.offsetLeft
-    const translateY = topPos - saveClippingBtn.offsetTop
+    const translateX = XCoord - saveClippingBtn.offsetLeft
+    const translateY = YCoord - saveClippingBtn.offsetTop
 
     saveClippingBtn.style.transform = `translate(${translateX}px, ${translateY}px)`
   }
@@ -129,55 +129,42 @@ function isExcludedElement(element: EventTarget) {
 }
 
 function getButtonPosition(selection: Selection) {
-  const { scrollX, scrollY } = window
   const range = selection?.getRangeAt(0)
 
   if (!range) {
-    return { leftPos: 0, topPos: 0 }
+    return { XCoord: 0, YCoord: 0 }
   }
 
-  const { startContainer, endContainer } = range
+  const { startContainer, endContainer, commonAncestorContainer, endOffset } =
+    range
   const { bottom: rangeBottom, right: rangeRight } =
     range.getBoundingClientRect()
 
   // If the selection is within a single element, return the Range bounding rect
   if (startContainer === endContainer) {
-    return {
-      leftPos: rangeRight + scrollX,
-      topPos: rangeBottom + scrollY,
-    }
+    return getAdjustedCoordinates(rangeRight, rangeBottom)
   }
 
   // Make sure we have element nodes, not text nodes, to get bounding rects
-  const startElement = getClosestElementNode(startContainer)
   const endElement = getClosestElementNode(endContainer)
 
-  if (!startElement || !endElement) {
-    return {
-      leftPos: rangeRight + scrollX,
-      topPos: rangeBottom + scrollY,
-    }
+  const {
+    top: endContainerTop,
+    bottom: endContainerBottom,
+    right: endContainerRight,
+  } = endElement?.getBoundingClientRect() || {}
+
+  // If I tripple click on a paragraph, or select over the end and a new line char is caught
+  // The endContainer will be the NEXT paragraph or the CommonAcestor. Then return the Range
+  if (
+    (rangeBottom < endContainerTop && endOffset === 0) ||
+    endContainer === commonAncestorContainer
+  ) {
+    return getAdjustedCoordinates(rangeRight, rangeBottom)
   }
 
-  // Selection may be top-down or bottom-up, so we'll return the rect of the bottom element
-  const { right: startRight, bottom: startBottom } =
-    startElement.getBoundingClientRect()
-  const { right: endRight, bottom: endBottom } =
-    endElement.getBoundingClientRect()
-
-  let { width: docWidth } = document.documentElement.getBoundingClientRect()
-  docWidth = docWidth * 0.8
-
-  let leftPos = startBottom > endBottom ? startRight : endRight
-  let topPos = startBottom > endBottom ? startBottom : endBottom
-
-  leftPos = leftPos > docWidth ? docWidth : leftPos
-  topPos = leftPos > docWidth ? topPos : topPos - 30
-
-  return {
-    leftPos: leftPos + scrollX,
-    topPos: topPos + scrollY,
-  }
+  // Otherwise use endContainer - it will the end of the range, can be either anchor or focus
+  return getAdjustedCoordinates(endContainerRight, endContainerBottom)
 }
 
 function getClosestElementNode(node: Node | null): Element | null {
@@ -187,13 +174,26 @@ function getClosestElementNode(node: Node | null): Element | null {
   return node as Element | null
 }
 
+function getAdjustedCoordinates(XCoord: number, YCoord: number) {
+  const maxRightPosition = document.documentElement.clientWidth * 0.85
+
+  const isNearRightEdge = XCoord > maxRightPosition
+
+  XCoord = isNearRightEdge ? maxRightPosition : XCoord + 16
+  YCoord = isNearRightEdge ? YCoord + 4 : YCoord - 24
+
+  return {
+    XCoord: XCoord + window.scrollX,
+    YCoord: YCoord + window.scrollY,
+  }
+}
+
 function savePageContent() {
   // Set flag to prevent further calls
   let contentSaved = true
   // Extract page data and send to background script or save directly
   const payload = getPageData()
 
-  console.log('Saving page content', payload)
   chrome.runtime.sendMessage({
     message: MESSAGES.AUTO_SAVE,
     payload,
