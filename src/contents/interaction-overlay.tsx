@@ -1,19 +1,21 @@
 import cssText from 'data-text:~style.css'
-import { minimatch } from 'minimatch'
-import { useCallback, useEffect, useReducer, useState } from 'react'
 
+import { useCallback, useEffect, useReducer, useState } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
 
+import { ChangePosition } from '~components/overlay/change-position'
+import { SavePage } from '~components/overlay/save-page'
 import { TooltipProvider } from '~/components/ui/tooltip'
+
+import { getPageData } from '~/lib/page-data'
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
   MoveDirection,
   OverlayPosition,
 } from '~/lib/constants'
-import { getPageData } from '~/lib/page-data'
-import { ChangePosition } from '~components/overlay/change-position'
-import { SavePage } from '~components/overlay/save-page'
+
+import { isHostExcluded } from '~lib/utils'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
@@ -54,8 +56,8 @@ const InteractionOverlay = () => {
   const currentPos = settings.overlayPosition
 
   useEffect(() => {
-    const overlayVisibility = isOverlayAllowedOnWebsite(excludeList)
-    setOverlayVisible(overlayVisibility)
+    const hostExcluded = isHostExcluded(excludeList)
+    setOverlayVisible(!hostExcluded)
   }, [excludeList])
 
   const handlePageSave = useCallback(async () => {
@@ -106,9 +108,3 @@ const InteractionOverlay = () => {
 }
 
 export default InteractionOverlay
-
-function isOverlayAllowedOnWebsite(excludeList: string[] = []) {
-  const hostName = window.location.hostname
-
-  return !excludeList?.some((pattern) => minimatch(hostName, pattern))
-}

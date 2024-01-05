@@ -1,6 +1,7 @@
 import type { PlasmoCSConfig } from 'plasmo'
 
 export const AUTO_SAVE_DELAY = 60 // seconds
+export const MIN_TEXT_FOR_CLIPPING = 10
 
 export const MESSAGES = {
   AUTO_SAVE: 'auto-save',

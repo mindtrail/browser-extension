@@ -1,14 +1,7 @@
 import Brain from 'react:~/assets/brain.svg'
 
+import { IconSpinner } from '~/components/icon-spinner'
 import { Button } from '~/components/ui/button'
-
-// import {
-//   Tooltip,
-//   TooltipContent,
-//   TooltipTrigger,
-// } from '~/components/ui/tooltip'
-
-import { IconSpinner } from '../icon-spinner'
 
 interface SavePageProps {
   handleClick: () => void
