@@ -36,7 +36,7 @@ export const getStyle: PlasmoGetStyle = () => {
   return style
 }
 
-const MIN_TEXT_LENGTH = 5
+const MIN_TEXT_LENGTH = 10
 const storage = new Storage()
 
 let saveClippingBtn: HTMLElement | null = null
@@ -70,7 +70,7 @@ document.addEventListener('click', (event) => {
     }
 
     showClippingButton()
-  }, 100)
+  }, 200)
 })
 
 async function initClipping() {
