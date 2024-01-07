@@ -84,7 +84,9 @@ const ClippingOverlay = () => {
     }
 
     toggleLoading()
-    // const payload = getPageData(false)
+    const payload = getPageData(false)
+
+    payload.html = selectedText
 
     console.log('saving clipping...', selectedText)
 
@@ -192,3 +194,31 @@ function getAdjustedCoordinates(XCoord: number, YCoord: number) {
     top: YCoord + window.scrollY,
   }
 }
+
+
+function getSelectionContent() {
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return { text: '', images: [] };
+
+  const range = selection.getRangeAt(0);
+  const fragment = range.cloneContents();
+  const text = fragment.textContent;
+
+  // Using a TreeWalker to retrieve images from the document fragment
+  const walker = document.createTreeWalker(
+    fragment,
+    NodeFilter.SHOW_ELEMENT,
+    { acceptNode: (node) => node.nodeName.toLowerCase() === 'img' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }
+  );
+
+  const images = [];
+  while (walker.nextNode()) {
+    images.push(walker.currentNode.src); // Assuming you want the image source
+  }
+
+  return { text, images };
+}
+
+const selectedContent = getSelectionContent();
+console.log(selectedContent.text); // Logs the selected text
+console.log(selectedContent.images); // Logs the arr
