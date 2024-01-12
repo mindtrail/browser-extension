@@ -61,14 +61,19 @@ const ClippingOverlay = () => {
       }
 
       const newCoordinates = getButtonPosition(selection)
+      if (!newCoordinates) {
+        return
+      }
+
       console.log(newCoordinates)
       setBtnCoorindates(newCoordinates)
       // showClippingButton()
-    }, 200)
+    }, 100)
   }, [])
 
   useEffect(() => {
     highlighter = new Highlighter({
+      exceptSelectors: ['button', 'input', 'textarea', 'select'],
       style: { className: 'mindtrailClipping' },
     })
 
@@ -84,7 +89,7 @@ const ClippingOverlay = () => {
       })
       .on('selection:create', ({ sources }) => {
         console.log(sources)
-        highlighter.stop()
+        // highlighter.stop()
 
         // sources = sources.map(hs => ({hs}));
         // save to backend
@@ -92,13 +97,13 @@ const ClippingOverlay = () => {
       })
 
     // auto-highlight selections
-    highlighter.run()
-    // document.addEventListener('click', handlePageClick)
+    document.addEventListener('click', handlePageClick)
 
     // // Return a cleanup function to remove the event listener
-    // return () => {
-    //   document.removeEventListener('click', handlePageClick)
-    // }
+    return () => {
+      document.removeEventListener('click', handlePageClick)
+      highlighter.dispose()
+    }
   }, [])
 
   const handleClippingSave = useCallback(async () => {
@@ -145,9 +150,9 @@ const ClippingOverlay = () => {
           bg-white hover:bg-slate-200 text-accent-foreground/75
           transform transition-transform duration-200 ease-out `}
       >
-        <ClipboardCopyIcon width={20} height={20} />
+        <ClipboardCopyIcon width={22} height={22} />
         {loading && (
-          <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center  text-slate-500'>
+          <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center'>
             <IconSpinner />
           </span>
         )}
@@ -168,87 +173,14 @@ function isExcludedElement(element: EventTarget) {
 function getButtonPosition(selection: Selection) {
   const range = selection?.getRangeAt(0)
 
-  if (!range) {
-    return false
-  }
-
-  const { startContainer, endContainer, commonAncestorContainer, endOffset } = range
-  const { bottom: rangeBottom, right: rangeRight } = range.getBoundingClientRect()
-
-  // If the selection is within a single element, return the Range bounding rect
-  if (startContainer === endContainer) {
-    return getAdjustedCoordinates(rangeRight, rangeBottom)
-  }
-
-  // Make sure we have element nodes, not text nodes, to get bounding rects
-  const endElement = getClosestElementNode(endContainer)
-
-  const {
-    top: endContainerTop,
-    bottom: endContainerBottom,
-    right: endContainerRight,
-  } = endElement?.getBoundingClientRect() || {}
-
-  // If I tripple click on a paragraph, or select over the end and a new line char is caught
-  // The endContainer will be the NEXT paragraph or the CommonAcestor. Then return the Range
-  if (
-    (rangeBottom < endContainerTop && endOffset === 0) ||
-    endContainer === commonAncestorContainer
-  ) {
-    return getAdjustedCoordinates(rangeRight, rangeBottom)
-  }
-
-  // Otherwise use endContainer - it will the end of the range, can be either anchor or focus
-  return getAdjustedCoordinates(endContainerRight, endContainerBottom)
-}
-
-function getClosestElementNode(node: Node | null): Element | null {
-  while (node && node.nodeType !== Node.ELEMENT_NODE) {
-    node = node.parentNode
-  }
-  return node as Element | null
-}
-
-function getAdjustedCoordinates(XCoord: number, YCoord: number) {
-  const maxRightPosition = document.documentElement.clientWidth * 0.85
-
-  const isNearRightEdge = XCoord > maxRightPosition
-
-  XCoord = isNearRightEdge ? maxRightPosition : XCoord + 16
-  YCoord = isNearRightEdge ? YCoord + 4 : YCoord - 24
+  const { bottom, left, width } = range.getBoundingClientRect()
+  const XCoord = left + width / 2 - 16 // half of button width
 
   return {
     left: XCoord + window.scrollX,
-    top: YCoord + window.scrollY,
+    top: bottom + window.scrollY + 24,
   }
 }
-
-// function getSelectionContent() {
-//   const selection = window.getSelection()
-//   if (selection.isCollapsed || !selection.rangeCount) {
-//     return { text: '', images: [] }
-//   }
-
-//   const range = selection.getRangeAt(0)
-//   const fragment = range.cloneContents()
-//   const text = fragment.textContent
-
-//   // Using a TreeWalker to retrieve images from the document fragment
-//   const walker = document.createTreeWalker(fragment, NodeFilter.SHOW_ELEMENT, {
-//     acceptNode: (node) =>
-//       node.nodeName.toLowerCase() === 'img'
-//         ? NodeFilter.FILTER_ACCEPT
-//         : NodeFilter.FILTER_REJECT,
-//   })
-
-//   const images = []
-//   while (walker.nextNode()) {
-//     // @ts-ignore
-//     images.push(walker.currentNode.src) // Assuming you want the image source
-//   }
-
-//   return { text, images }
-// }
 
 // const selectedContent = getSelectionContent()
 // console.log(selectedContent.text) // Logs the selected text
