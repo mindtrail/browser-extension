@@ -1,4 +1,5 @@
-.mindtrailClipping::selection {
-  background-color: #f8e02c !important; /* Your desired highlight color */
-  color: black; /* Text color */
+.mindtrailClipping {
+  background-color: #ffff9a;
+  color: inherit;
+  cursor: pointer;
 }

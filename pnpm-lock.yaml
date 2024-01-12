@@ -59,6 +59,9 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.3.3)
+  web-highlighter:
+    specifier: ^0.7.4
+    version: 0.7.4
 
 devDependencies:
   '@types/chrome':
@@ -6416,6 +6419,10 @@ packages:
 
   /weak-lru-cache@1.2.2:
     resolution: {integrity: sha512-DEAoo25RfSYMuTGc9vPJzZcZullwIqRDSI9LOy+fkCJPi6hykCnfKaXTuPBDuXAUcqHXyOgFtHNp/kB2FjYHbw==}
+    dev: false
+
+  /web-highlighter@0.7.4:
+    resolution: {integrity: sha512-07mWw6ib+Abcr/fuKEWYPy1Y0MsCOz6yUUVw9xMpyt5UzyXWtSlcwzy2YqnccCP/LjtM9MZHQSo3dbGJII8h6w==}
     dev: false
 
   /webidl-conversions@4.0.2:

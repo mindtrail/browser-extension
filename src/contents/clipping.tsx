@@ -1,4 +1,5 @@
 import styleText from 'data-text:~style.css'
+import Highlighter from 'web-highlighter'
 
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo'
@@ -30,6 +31,7 @@ export const getStyle: PlasmoGetStyle = () => {
 
 let saveClippingBtn: HTMLElement | null = null
 let selectedText: string = ''
+let highlighter: Highlighter | null = null
 
 const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
@@ -66,12 +68,37 @@ const ClippingOverlay = () => {
   }, [])
 
   useEffect(() => {
-    document.addEventListener('click', handlePageClick)
+    highlighter = new Highlighter({
+      style: { className: 'mindtrailClipping' },
+    })
 
-    // Return a cleanup function to remove the event listener
-    return () => {
-      document.removeEventListener('click', handlePageClick)
-    }
+    highlighter
+      .on('selection:hover', ({ id }) => {
+        console.log(1234, id)
+        // display different bg color when hover
+        highlighter.addClass('highlight-wrap-hover', id)
+      })
+      .on('selection:hover-out', ({ id }) => {
+        // remove the hover effect when leaving
+        highlighter.removeClass('highlight-wrap-hover', id)
+      })
+      .on('selection:create', ({ sources }) => {
+        console.log(sources)
+        highlighter.stop()
+
+        // sources = sources.map(hs => ({hs}));
+        // save to backend
+        // store.save(sources);
+      })
+
+    // auto-highlight selections
+    highlighter.run()
+    // document.addEventListener('click', handlePageClick)
+
+    // // Return a cleanup function to remove the event listener
+    // return () => {
+    //   document.removeEventListener('click', handlePageClick)
+    // }
   }, [])
 
   const handleClippingSave = useCallback(async () => {
@@ -114,8 +141,9 @@ const ClippingOverlay = () => {
         disabled={loading}
         variant='outline'
         style={{ transform: `translate(${left}px, ${top}px)` }}
-        className={`p-1 rounded-full h-auto absolute z-[999] bg-white hover:bg-slate-200
-          transform transition-transform duration-200 ease-out`}
+        className={`p-1 rounded-full h-auto absolute z-[999]
+          bg-white hover:bg-slate-200 text-accent-foreground/75
+          transform transition-transform duration-200 ease-out `}
       >
         <ClipboardCopyIcon width={20} height={20} />
         {loading && (
@@ -195,30 +223,33 @@ function getAdjustedCoordinates(XCoord: number, YCoord: number) {
   }
 }
 
+// function getSelectionContent() {
+//   const selection = window.getSelection()
+//   if (selection.isCollapsed || !selection.rangeCount) {
+//     return { text: '', images: [] }
+//   }
 
-function getSelectionContent() {
-  const selection = window.getSelection();
-  if (!selection.rangeCount) return { text: '', images: [] };
+//   const range = selection.getRangeAt(0)
+//   const fragment = range.cloneContents()
+//   const text = fragment.textContent
 
-  const range = selection.getRangeAt(0);
-  const fragment = range.cloneContents();
-  const text = fragment.textContent;
+//   // Using a TreeWalker to retrieve images from the document fragment
+//   const walker = document.createTreeWalker(fragment, NodeFilter.SHOW_ELEMENT, {
+//     acceptNode: (node) =>
+//       node.nodeName.toLowerCase() === 'img'
+//         ? NodeFilter.FILTER_ACCEPT
+//         : NodeFilter.FILTER_REJECT,
+//   })
 
-  // Using a TreeWalker to retrieve images from the document fragment
-  const walker = document.createTreeWalker(
-    fragment,
-    NodeFilter.SHOW_ELEMENT,
-    { acceptNode: (node) => node.nodeName.toLowerCase() === 'img' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }
-  );
+//   const images = []
+//   while (walker.nextNode()) {
+//     // @ts-ignore
+//     images.push(walker.currentNode.src) // Assuming you want the image source
+//   }
 
-  const images = [];
-  while (walker.nextNode()) {
-    images.push(walker.currentNode.src); // Assuming you want the image source
-  }
+//   return { text, images }
+// }
 
-  return { text, images };
-}
-
-const selectedContent = getSelectionContent();
-console.log(selectedContent.text); // Logs the selected text
-console.log(selectedContent.images); // Logs the arr
+// const selectedContent = getSelectionContent()
+// console.log(selectedContent.text) // Logs the selected text
+// console.log(selectedContent.images) // Logs the arr
