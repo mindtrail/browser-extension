@@ -51,4 +51,5 @@ export const DEFAULT_EXTENSION_SETTINGS: StorageData = {
   autoSave: true,
   saveDelay: AUTO_SAVE_DELAY,
   excludeList: DEFAULT_EXCLUDE_LIST,
+  overlayPosition: OverlayPosition.center,
 }

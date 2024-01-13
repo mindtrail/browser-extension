@@ -50,7 +50,8 @@ const InteractionOverlay = () => {
   const [settings, setSettings] = useStorage('settings', DEFAULT_EXTENSION_SETTINGS)
 
   const { excludeList } = settings
-  const currentPos = settings.overlayPosition
+  const currentPos =
+    settings.overlayPosition || DEFAULT_EXTENSION_SETTINGS.overlayPosition
 
   useEffect(() => {
     const hostExcluded = isHostExcluded(excludeList)
@@ -70,14 +71,16 @@ const InteractionOverlay = () => {
 
   const handlePositionChange = useCallback(
     (direction: MoveDirection) => {
-      const nextPosition = OVERLAY_NEW_POS[currentPos][direction]
+      const nextPosition =
+        OVERLAY_NEW_POS[currentPos][direction] ||
+        DEFAULT_EXTENSION_SETTINGS.overlayPosition
 
       setSettings((prev) => ({ ...prev, overlayPosition: nextPosition }))
     },
     [currentPos],
   )
 
-  if (!overlayVisible || !currentPos) {
+  if (!overlayVisible) {
     return null
   }
 
