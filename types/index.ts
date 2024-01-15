@@ -13,18 +13,25 @@ declare global {
     excludeList: string[]
     overlayPosition?: OverlayPosition
   }
-
-  interface DomMeta {
-    parentTagName: string
-    parentIndex: number
-    textOffset: number
-    extra?: unknown
+  interface ClippingRange {
+    startContainer: string
+    startOffset: number
+    startXPath?: string
+    endContainer: string
+    endOffset: number
+    endXPath?: string
+    commonAncestorContainer: string
+    pageNumber?: number
+    color?: string
+    externalResources?: []
   }
-  interface HighlightSource {
-    startMeta: DomMeta
-    endMeta: DomMeta
-    text: string
-    id: string
-    extra?: unknown
+
+  interface Clipping {
+    content: string
+    range: ClippingRange
+    notes?: []
+    pageData: string
+    type: string
+    url: string
   }
 }

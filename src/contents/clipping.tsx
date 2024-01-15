@@ -1,5 +1,4 @@
 import styleText from 'data-text:~style.css'
-import Highlighter from 'web-highlighter'
 
 import { useCallback, useEffect, useReducer, useState, type MouseEvent } from 'react'
 import type { PlasmoGetStyle } from 'plasmo'
@@ -12,7 +11,7 @@ import { IconSpinner } from '~/components/icon-spinner'
 import { Button } from '~/components/ui/button'
 
 import { getPageData } from '~/lib/page-data'
-import { isHostExcluded } from '~lib/utils'
+import { isHostExcluded, isExcludedElement, getClippingBtnPosition } from '~lib/utils'
 import {
   MESSAGES,
   MIN_TEXT_FOR_CLIPPING,
@@ -26,34 +25,16 @@ export const getStyle: PlasmoGetStyle = () => {
   return style
 }
 
-var store: HighlightSource[] = [
+var store = [
   {
-    startMeta: { parentTagName: 'P', parentIndex: 8, textOffset: 0 },
-    endMeta: { parentTagName: 'P', parentIndex: 9, textOffset: 336 },
-    text: "It's from an idea: highlight texts on the website and save the highlighted areas just like what you do in PDF.\nIf you have ever visited medium.com, you must know the feature of highlighting notes: users select a text segment and click the 'highlight' button. Then the text will be highlighted with a shining background color. Besides, the highlighted areas will be saved and recovered when you visit it next time. It's like the simple demo bellow.",
-    id: '5c5e1c11-5684-4d74-b1d4-7b8466d08100',
-  },
-  {
-    startMeta: { parentTagName: 'P', parentIndex: 11, textOffset: 0 },
-    endMeta: { parentTagName: 'H2', parentIndex: 8, textOffset: 7 },
-    text: "This is a useful feature for readers. If you're a developer, you may want your website support it and attract more visits. If you're a user (like me), you may want a browser-plugin to do this.\nFor this reason, the repo (web-highlighter) aims to help you implement highlighting-note on any website quickly (e.g. blogs, document viewers, online books and so on). It contains the core abilities for note highlighting and persistence. And you can implement your own product by some easy-to-use APIs. It has been used for our sites in production.\nInstall",
-    id: 'e0683d18-60aa-4731-b42c-fd1e4d167bfc',
-  },
-  {
-    startMeta: { parentTagName: 'SPAN', parentIndex: 422, textOffset: 0 },
-    endMeta: { parentTagName: 'PRE', parentIndex: 3, textOffset: 160 },
-    text: "import Highlighter from 'web-highlighter';\n\n// won't highlight pre&code elements\nconst highlighter = new Highlighter({\n    exceptSelectors: ['pre', 'code']\n});\n",
-    id: 'b6bd2f07-ad99-4afb-9e55-12d3adcef59c',
-  },
-  {
-    startMeta: { parentTagName: 'P', parentIndex: 16, textOffset: 0 },
-    endMeta: { parentTagName: 'PRE', parentIndex: 4, textOffset: 5 },
-    text: 'Besides, there is an example in this repo (in example folder). To play with it, you just need ——\nFirstly enter the repository and run\nnpm i',
-    id: '320fe0a9-85a0-4bd2-8722-9660b3bd30f3',
+    uid: '1e6ebbd2-0557-4902-9e7f-2c41aad74205',
+    textBefore:
+      'e.jsonadd iframetsconfig.gen-dts.jsonmigrate to typescriptView all filesRepository files navigationREADMEMIT licenseweb-marker\n\n',
+    text: 'A web page highlighter that features\n\naccurate serialization and deserialization which makes it possible to correctly restore the highlights, even if part of the web page has changed\nnested highlighting\nno runtime-dependency',
+    textAfter:
+      '\n\n\nHow to run\ngit clone https://github.com/notelix/web-marker\ncd web-marker\nnpm i\nnpm start\n    \n      \n    \n\n      \n    \n  \nHow',
   },
 ]
-
-let highlighter: Highlighter | null = null
 
 const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
@@ -69,60 +50,28 @@ const ClippingOverlay = () => {
   }
 
   useEffect(() => {
-    highlighter = new Highlighter({
-      exceptSelectors: ['button', 'input', 'textarea', 'select'],
-      style: { className: 'mindtrailClipping' },
-    })
+    // const pageData = getPageData(false)
+    // console.log('saving clipping...', pageData)
+    // await chrome.runtime.sendMessage({
+    //   message: MESSAGES.USER_TRIGGERED_SAVE,
+    //   payload,
+    // })
 
-    const { CREATE, HOVER, HOVER_OUT, CLICK } = Highlighter.event
+    // toggleLoading()
 
-    highlighter
-      .on(HOVER, ({ id }) => {
-        // console.log(1234, id)
-        // display different bg color when hover
-        // highlighter.addClass('highlight-wrap-hover', id)
-      })
-      .on(CLICK, ({ id }) => {
-        console.log(1234, id)
-        // remove the hover effect when leaving
-        highlighter.removeClass('highlight-wrap-hover', id)
-      })
-      .on(CREATE, ({ sources }) => {
-        console.log(sources)
-        // handlePageClick(new MouseEvent('click'))
-        // highlighter.stop()
-
-        const pageData = getPageData(false)
-        // console.log('saving clipping...', pageData)
-
-        // await chrome.runtime.sendMessage({
-        //   message: MESSAGES.USER_TRIGGERED_SAVE,
-        //   payload,
-        // })
-
-        // sources = sources.map(hs => ({hs}));
-        // save to backend
-        // store.save(sources);
-
-        // store.push(sources)
-        console.log(JSON.stringify(store))
-        toggleLoading()
-
-        toggleLoading()
-        setBtnCoorindates(null)
-      })
+    // toggleLoading()
+    // setBtnCoorindates(null)
 
     window.onload = () => {
-      store.forEach(({ startMeta, endMeta, id, text }) => {
-        // highlighter.fromStore(startMeta, endMeta, id, text)
-      })
+      // store.forEach(({ startMeta, endMeta, id, text }) => {
+      // highlighter.fromStore(startMeta, endMeta, id, text)
+      // })
     }
 
     document.addEventListener('click', handlePageClick)
     // Return a cleanup function to remove the event listener
     return () => {
       document.removeEventListener('click', handlePageClick)
-      highlighter.dispose()
     }
   }, [])
 
@@ -144,7 +93,7 @@ const ClippingOverlay = () => {
         return
       }
 
-      const newCoordinates = getButtonPosition(range)
+      const newCoordinates = getClippingBtnPosition(range)
       if (!newCoordinates) {
         return
       }
@@ -162,7 +111,8 @@ const ClippingOverlay = () => {
       return
     }
     const range = selection?.getRangeAt(0)
-    highlighter.fromRange(range)
+    console.log(range)
+
     // fromRange... highlighter create
   }, [])
 
@@ -200,30 +150,3 @@ const ClippingOverlay = () => {
 }
 
 export default ClippingOverlay
-
-// @TODO - proper check if it's not in a form element, or like in Mindtrail, it detect the div...
-function isExcludedElement(range: Range) {
-  const element = range.commonAncestorContainer as HTMLElement
-
-  const excludedTagNames = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT']
-
-  if (element.contentEditable === 'true') {
-    return true
-  }
-
-  return excludedTagNames.includes(element?.tagName)
-}
-
-function getButtonPosition(range: Range) {
-  const { bottom, left, width } = range.getBoundingClientRect()
-  const XCoord = left + width / 2 - 16 // half of button width
-
-  return {
-    left: XCoord + window.scrollX,
-    top: bottom + window.scrollY + 24,
-  }
-}
-
-// const selectedContent = getSelectionContent()
-// console.log(selectedContent.text) // Logs the selected text
-// console.log(selectedContent.images) // Logs the arr

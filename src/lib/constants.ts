@@ -53,3 +53,5 @@ export const DEFAULT_EXTENSION_SETTINGS: StorageData = {
   excludeList: DEFAULT_EXCLUDE_LIST,
   overlayPosition: OverlayPosition.center,
 }
+
+export const EXCLUDED_TAGS_FOR_CLIPPING = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT']
