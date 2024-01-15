@@ -13,4 +13,18 @@ declare global {
     excludeList: string[]
     overlayPosition?: OverlayPosition
   }
+
+  interface DomMeta {
+    parentTagName: string
+    parentIndex: number
+    textOffset: number
+    extra?: unknown
+  }
+  interface HighlightSource {
+    startMeta: DomMeta
+    endMeta: DomMeta
+    text: string
+    id: string
+    extra?: unknown
+  }
 }
