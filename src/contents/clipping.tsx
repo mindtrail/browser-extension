@@ -10,8 +10,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip
 import { IconSpinner } from '~/components/icon-spinner'
 import { Button } from '~/components/ui/button'
 
-import { getPageData } from '~/lib/page-data'
-import { isHostExcluded, isExcludedElement, getClippingBtnPosition } from '~lib/utils'
+import {
+  isHostExcluded,
+  isSelectionExcludedNode,
+  getClippingBtnPosition,
+  getSelectionContent,
+} from '~lib/utils'
 import {
   MESSAGES,
   MIN_TEXT_FOR_CLIPPING,
@@ -24,17 +28,6 @@ export const getStyle: PlasmoGetStyle = () => {
   style.textContent = styleText
   return style
 }
-
-var store = [
-  {
-    uid: '1e6ebbd2-0557-4902-9e7f-2c41aad74205',
-    textBefore:
-      'e.jsonadd iframetsconfig.gen-dts.jsonmigrate to typescriptView all filesRepository files navigationREADMEMIT licenseweb-marker\n\n',
-    text: 'A web page highlighter that features\n\naccurate serialization and deserialization which makes it possible to correctly restore the highlights, even if part of the web page has changed\nnested highlighting\nno runtime-dependency',
-    textAfter:
-      '\n\n\nHow to run\ngit clone https://github.com/notelix/web-marker\ncd web-marker\nnpm i\nnpm start\n    \n      \n    \n\n      \n    \n  \nHow',
-  },
-]
 
 const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
@@ -88,7 +81,7 @@ const ClippingOverlay = () => {
 
       const range = selection?.getRangeAt(0)
       const selectedText = selection.toString().trim()
-      if (selectedText.length < MIN_TEXT_FOR_CLIPPING || isExcludedElement(range)) {
+      if (selectedText.length < MIN_TEXT_FOR_CLIPPING || isSelectionExcludedNode(range)) {
         setBtnCoorindates(null)
         return
       }
@@ -113,6 +106,7 @@ const ClippingOverlay = () => {
     const range = selection?.getRangeAt(0)
     console.log(range)
 
+    getSelectionContent(range)
     // fromRange... highlighter create
   }, [])
 
