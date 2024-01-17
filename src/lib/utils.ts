@@ -21,21 +21,6 @@ export function isHostExcluded(excludeList: string[] = []) {
   return excludeList?.some((pattern) => minimatch(hostName, pattern))
 }
 
-export function getXPath(element: Element) {
-  let xpath = ''
-  // Loop through the ancestors of the element until we reach the root
-  while (element && element.nodeType === 1 && element.tagName.toLowerCase() !== 'body') {
-    const siblings = Array.from(element.parentNode.children)
-
-    // Find the index of the current element among its siblings, and add 1 to get a 1-based index
-    let position = `[${siblings.indexOf(element)}]`
-    xpath = '/' + element.tagName.toLowerCase() + position + xpath
-
-    element = element.parentNode as Element
-  }
-  return xpath
-}
-
 export function getClippingBtnPosition(range: Range) {
   const { bottom, left, width } = range.getBoundingClientRect()
   const XCoord = left + width / 2 - 16 // half of button width
@@ -107,7 +92,6 @@ export function getSelectionContent(range: Range) {
   return { text, images }
 }
 
-
 function recursiveWrapper(container, highlightInfo) {
   return _recursiveWrapper(container, highlightInfo, false, 0)
 }
@@ -162,6 +146,28 @@ function _recursiveWrapper(container, highlightInfo, startFound, charsHighlighte
 // Call the recursiveWrapper function with a DOM node instead of a jQuery object
 // recursiveWrapper(container, highlightInfo);
 
-const selectedContent = getSelectionContent()
-console.log(selectedContent.text) // Logs the selected text
-console.log(selectedContent.images) // Logs the array of image sources
+function escapeCSSString(cssString) {
+  return cssString.replace(/(:)/gu, '\\$1')
+}
+
+
+function getIdentifier(element) {
+  if (element?.id) return `#${escapeCSSString(element.id)}`
+  if (element.nodeName === 'html') return 'html'
+
+  const parent = element.parentNode
+
+  const parentSelector = getIdentifier(parent)
+  // The element is a text node
+  if (!element.nodeName) {
+    // Find the index of the text node:
+    const index = Array.prototype.indexOf.call(parent.childNodes, element)
+    return `${parentSelector}>textNode:nth-of-type(${index})`
+  } else {
+    const index =
+      Array.from(parent.childNodes)
+        .filter((child) => child.nodeName === element.nodeName)
+        .indexOf(element ) + 1
+    return `${parentSelector}>${element.nodeName}:nth-of-type(${index})`
+  }
+}

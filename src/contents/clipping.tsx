@@ -10,11 +10,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip
 import { IconSpinner } from '~/components/icon-spinner'
 import { Button } from '~/components/ui/button'
 
+import { getClippingData } from '~/lib/clipping/clipping-data'
+
 import {
   isHostExcluded,
   isSelectionExcludedNode,
   getClippingBtnPosition,
-  getSelectionContent,
 } from '~lib/utils'
 import {
   MESSAGES,
@@ -106,7 +107,7 @@ const ClippingOverlay = () => {
     const range = selection?.getRangeAt(0)
     console.log(range)
 
-    getSelectionContent(range)
+    const data = getClippingData(range)
     // fromRange... highlighter create
   }, [])
 
