@@ -3,10 +3,6 @@ import { getPageData } from '~/lib/page-data'
 import { getSelectionContent } from '~/lib/utils'
 
 const SURROUNDING_LENGTH = 40
-const SURROUNDING_DIR = {
-  BEFORE: 'before',
-  AFTER: 'after',
-}
 
 const IDENTIFIER_NESTED_LEVELS = 5
 const XPATH_LEVELS = 999
@@ -41,7 +37,10 @@ export const getClippingData = (range: Range) => {
         startOffset,
         endContainer: getContainerIdentifier(endContainer),
         endOffset,
-        commonAncestorContainer: getContainerIdentifier(commonAncestorContainer),
+        commonAncestorContainer: getContainerIdentifier(
+          commonAncestorContainer,
+          XPATH_LEVELS,
+        ),
       },
       textPosition: {
         start: 0,
@@ -49,12 +48,10 @@ export const getClippingData = (range: Range) => {
       },
       surrounding: {
         before: getTextBefore(startContainer, startOffset),
-        // after: getSurroundingText(endContainer, endOffset, SURROUNDING_DIR.AFTER),
+        after: getTextAfter(endContainer, endOffset),
       },
     },
   }
-
-  console.log(response.selector?.surrounding)
 
   return response
 }
@@ -65,19 +62,22 @@ function getContainerIdentifier(
   maxLevel = IDENTIFIER_NESTED_LEVELS,
   currentLevel = 0,
 ) {
-  // If items are have IDs, use those, as they should be unique
-  if ((node as Element)?.id) {
+  const parent = node.parentNode
+
+  if (!node || node.nodeName === 'BODY' || !parent || currentLevel >= maxLevel) {
+    return ''
+  }
+
+  // If items are have IDs, use those, as they should be unique, except when we want full XPATH
+  if ((node as Element)?.id && maxLevel !== XPATH_LEVELS) {
     return `#${escapeCSSString((node as Element).id)}`
   }
 
-  if (node.nodeName === 'html' || currentLevel >= maxLevel) {
-    return ''
-  }
-  const parent = node.parentNode
   const parentSelector = getContainerIdentifier(parent, maxLevel, currentLevel + 1)
   const nodeName = node.nodeType === Node.TEXT_NODE ? 'text' : node.nodeName.toLowerCase()
 
   const index = Array.from(parent.childNodes)
+    // We construct the XPath this way, because it reduces the risk of HTML content changes
     .filter((child) => child.nodeType === node.nodeType)
     .indexOf(node as ChildNode)
   return `${parentSelector}/${nodeName}[${index}]`
@@ -92,69 +92,64 @@ function escapeCSSString(cssString: string) {
 function getTextBefore(
   node: Node,
   startOffset: number,
-  contextLength: number = SURROUNDING_LENGTH,
+  desiredLenght: number = SURROUNDING_LENGTH,
 ) {
-  const textContent = node.textContent || ''
-  // Adjust start point based on the current node's text content length and startOffset
-  const adjustedStart = Math.max(startOffset - contextLength, 0)
-  const currentText = textContent.substring(adjustedStart, startOffset)
-
-  const remainingLength = contextLength - currentText.length
-
-  // If more text is needed and there's a parent node
-  if (remainingLength > 0 && node.parentNode) {
-    const textFromParent = getTextBefore(
-      node.parentNode,
-      node.parentNode.textContent.indexOf(textContent),
-      remainingLength,
-    )
-
-    return textFromParent + currentText
+  if (!node || desiredLenght <= 0) {
+    return ''
   }
 
-  return currentText
+  const textContent = node.textContent || ''
+  const currentText = textContent.substring(startOffset - desiredLenght, startOffset)
+  const remainingLength = desiredLenght - currentText.length
+  const parent = node.parentNode
+
+  if (remainingLength <= 0 || !parent) {
+    return currentText
+  }
+
+  const parentOffset = parent?.textContent?.indexOf(textContent)
+  const textFromParent = getTextBefore(parent, parentOffset, remainingLength)
+
+  return textFromParent + currentText
 }
 
-function getSurroundingText(
+function getTextAfter(
   node: Node,
-  offset: number,
-  direction: string = SURROUNDING_DIR.BEFORE,
-  contextLength: number = SURROUNDING_LENGTH,
-  currentContent = '',
-  currentLength = 0,
-) {
-  const textContent = node.textContent
-  let newContent = ''
-  let newOffset = 0
-
-  if (direction === SURROUNDING_DIR.BEFORE) {
-    const start = Math.max(0, offset - contextLength)
-    const end = offset
-    newContent = textContent.substring(start, end) + currentContent
-  } else {
-    // 'after'
-    const start = offset
-    const end = Math.min(textContent.length, offset + contextLength)
-    newContent = currentContent + textContent.substring(offset, offset + contextLength)
-    newOffset = 0
+  endOffset: number,
+  desiredLenght: number = SURROUNDING_LENGTH,
+): string {
+  if (!node || desiredLenght <= 0) {
+    return ''
   }
 
-  // Update the length of the extracted content
-  currentLength = newContent.length
+  const textContent = node.textContent || ''
+  const currentText = textContent.substring(endOffset, endOffset + desiredLenght)
+  const remainingLength = desiredLenght - currentText.length
+  let parent = node.parentNode
 
-  // Check if the desired length is met or if we can move up the DOM tree
-  if (currentLength < contextLength && node.parentNode) {
-    // Recursive call with the parent node
-    return getSurroundingText(
-      node.parentNode,
-      newOffset,
-      direction,
-      contextLength,
-      newContent,
-      currentLength,
-    )
-  } else {
-    // Return the final content when the desired length is met or no more parents
-    return newContent
+  if (remainingLength <= 0 || !parent) {
+    return currentText
   }
+
+  // If there are next siblings, get text from them
+  if (node.nextSibling && node.nextSibling?.textContent?.length) {
+    const textFromSibling = getTextAfter(node.nextSibling, 0, remainingLength)
+    return currentText + textFromSibling
+  }
+
+  // If no next siblings, move up to the parent node and continue
+  let child = node
+  let textFromParent = ''
+
+  while (!child?.nextSibling?.textContent && parent) {
+    child = parent
+    parent = parent.parentNode
+
+    if (child.nextSibling) {
+      textFromParent = getTextAfter(child.nextSibling, 0, remainingLength)
+      break
+    }
+  }
+
+  return currentText + textFromParent
 }
