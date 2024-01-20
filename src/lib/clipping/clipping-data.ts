@@ -7,16 +7,6 @@ const SURROUNDING_LENGTH = 40
 const IDENTIFIER_NESTED_LEVELS = 5
 const XPATH_LEVELS = 999
 
-const payload_format = {
-  content: 'clipping content',
-  selector: {},
-  notes: [],
-  pageData: '{ ...pageData }', // Only send it the first time... until the page was saved...?
-  type: 'text', // or 'file'
-  url: 'url',
-  externalResources: [],
-}
-
 export const getClippingData = (range: Range) => {
   const {
     startContainer,
@@ -26,34 +16,40 @@ export const getClippingData = (range: Range) => {
     commonAncestorContainer,
   } = range
 
-  const response = {
-    content: range.toString(),
-    color: '',
-    externalResources: [],
-    pageNumber: null,
-    selector: {
-      range: {
-        startContainer: getContainerIdentifier(startContainer),
-        startOffset,
-        endContainer: getContainerIdentifier(endContainer),
-        endOffset,
-        commonAncestorContainer: getContainerIdentifier(
-          commonAncestorContainer,
-          XPATH_LEVELS,
-        ),
-      },
-      textPosition: {
-        start: 0,
-        end: 0,
-      },
-      surrounding: {
-        before: getTextBefore(startContainer, startOffset),
-        after: getTextAfter(endContainer, endOffset),
-      },
-    },
+  const selectorRange = {
+    startContainer: getContainerIdentifier(startContainer),
+    startOffset,
+    endContainer: getContainerIdentifier(endContainer),
+    endOffset,
+    commonAncestorContainer: getContainerIdentifier(
+      commonAncestorContainer,
+      XPATH_LEVELS,
+    ),
   }
 
-  return response
+  const surroundingText = {
+    before: getTextBefore(startContainer, startOffset),
+    after: getTextAfter(endContainer, endOffset),
+  }
+
+  const textPosition = {
+    start: startOffset,
+    end: endOffset,
+  }
+
+  const content = range.toString()
+
+  return {
+    content,
+    // externalResources: [] -> TODO: get images & other assets from the selection
+    selector: {
+      range: selectorRange,
+      surroundingText,
+      textPosition,
+      // color: '', // TODO: get the color from the highlight
+      // pageNumber: null, // identifier for Files or Web Pages with multiple pages if URL is not unique
+    },
+  }
 }
 
 // From an DOM element, get a query to that DOM element
@@ -153,3 +149,5 @@ function getTextAfter(
 
   return currentText + textFromParent
 }
+
+function getTextPosition(text: string) {}
