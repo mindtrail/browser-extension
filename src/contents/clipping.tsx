@@ -98,13 +98,14 @@ const ClippingOverlay = () => {
       payload,
     })
 
-    console.log(result)
+    toggleLoading()
     if (result?.error) {
       alert('Error saving clipping. Please try again.')
+
       console.error(result.error)
+      return
     }
 
-    toggleLoading()
     setBtnCoorindates(null)
   }, [])
 
@@ -125,11 +126,12 @@ const ClippingOverlay = () => {
             style={{ transform: `translate(${left}px, ${top}px)` }}
             className={`p-1 rounded-full h-auto absolute z-[999]
               bg-white hover:bg-slate-200 text-accent-foreground/75
-              transform transition-transform duration-200 ease-out`}
+              transform transition-transform duration-200 ease-out
+              disabled:opacity-80`}
           >
             <ClipboardCopyIcon width={22} height={22} />
             {loading && (
-              <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center'>
+              <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center rounded-full'>
                 <IconSpinner />
               </span>
             )}
