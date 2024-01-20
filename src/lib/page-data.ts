@@ -1,4 +1,4 @@
-export const getPageData = () => {
+export const getPageData = (): PageData => {
   const html = document.documentElement.outerHTML
   const title = document.title
   const url = window.location.href

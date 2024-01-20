@@ -16,22 +16,52 @@ declare global {
   interface ClippingRange {
     startContainer: string
     startOffset: number
-    startXPath?: string
     endContainer: string
     endOffset: number
-    endXPath?: string
     commonAncestorContainer: string
-    pageNumber?: number
-    color?: string
-    externalResources?: []
   }
 
-  interface Clipping {
+  interface SurroundingText {
+    before: string
+    after: string
+  }
+
+  interface TextPosition {
+    start: number
+    end: number
+  }
+
+  interface SaveClipping {
     content: string
-    range: ClippingRange
+    pageData: PageData
+    selector: {
+      range: ClippingRange
+      surroundingText: SurroundingText
+      textPosition: TextPosition
+      color?: string
+      externalResources?: []
+      pageNumber?: number
+    }
     notes?: []
-    pageData: string
-    type: string
+    type?: string
+  }
+
+  type WEB_Data = {
+    title: string
+    description: string
+    image?: string
     url: string
+    tags?: string[]
+  }
+
+  type PageData = WEB_Data & {
+    autoSave?: boolean
+    html: string
+  }
+
+  interface HTMLFile {
+    name: string
+    html: string
+    metadata: Partial<PageData>
   }
 }

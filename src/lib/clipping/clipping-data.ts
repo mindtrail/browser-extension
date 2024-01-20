@@ -7,12 +7,7 @@ const SURROUNDING_LENGTH = 40
 const IDENTIFIER_NESTED_LEVELS = 5
 const XPATH_LEVELS = 999
 
-type SurroundingText = {
-  before: string
-  after: string
-}
-
-export const getClippingData = (range: Range) => {
+export const getClippingData = (range: Range): SaveClipping => {
   const {
     startContainer,
     startOffset,
@@ -24,7 +19,7 @@ export const getClippingData = (range: Range) => {
   const content = range.toString()
   const pageData = getPageData()
 
-  const selectorRange = {
+  const selectorRange: ClippingRange = {
     startContainer: getContainerIdentifier(startContainer),
     startOffset,
     endContainer: getContainerIdentifier(endContainer),
@@ -45,13 +40,10 @@ export const getClippingData = (range: Range) => {
   return {
     content,
     pageData,
-    // externalResources: [] -> TODO: get images & other assets from the selection
     selector: {
       range: selectorRange,
       surroundingText,
       textPosition,
-      // color: '', // TODO: get the color from the highlight
-      // pageNumber: null, // identifier for Files or Web Pages with multiple pages if URL is not unique
     },
   }
 }
@@ -155,7 +147,7 @@ function getTextAfter(
 }
 
 // We compute the position in respect to the text content of the BODY
-function getTextPosition(text: string, surroundingText: SurroundingText) {
+function getTextPosition(text: string, surroundingText: SurroundingText): TextPosition {
   const bodyTextContent = document.body.textContent || ''
   const { before, after } = surroundingText
 
