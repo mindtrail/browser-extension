@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   switch (message) {
     case MESSAGES.SAVE_PAGE:
-      saveData(payload, sendResponse)
+      savePage(payload, sendResponse)
       break
     case MESSAGES.SAVE_CLIPPING:
       saveClipping(payload, sendResponse)
@@ -45,17 +45,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true
 })
 
-async function saveData(payload, sendResponse) {
+async function savePage(payload: PageData, sendResponse = (resp: any) => {}) {
   log('SAVE Page --- ', payload)
 
   try {
-    const response = await fetch(TARGET_HOST + API.SAVE_PAGE, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    const response = await savePageAPICall(payload)
     sendResponse(response)
     log(response)
   } catch (e) {
@@ -63,13 +57,33 @@ async function saveData(payload, sendResponse) {
   }
 }
 
-async function saveClipping(payload, sendResponse) {
+async function savePageAPICall(payload: PageData) {
+  return await fetch(TARGET_HOST + API.SAVE_PAGE, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+async function saveClipping(payload: SaveClipping, sendResponse) {
   log('SAVE Clipping --- ', payload)
 
+  const { pageData, ...rest } = payload
   try {
+    const dataSource = await savePageAPICall(pageData)
+
+    log('dataSource', dataSource)
+
+    if (!dataSource.ok) {
+      sendResponse({ error: dataSource.status })
+      throw new Error('Network response was not ok')
+    }
+
     const response = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(rest),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -81,8 +95,9 @@ async function saveClipping(payload, sendResponse) {
     }
 
     const data = await response.json()
+    log(data)
+
     sendResponse(data)
-    log(response)
   } catch (e) {
     console.error(e)
   }
