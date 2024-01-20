@@ -49,15 +49,15 @@ async function saveData(payload, sendResponse) {
   log('SAVE Page --- ', payload)
 
   try {
-    const result = await fetch(TARGET_HOST + API.SAVE_PAGE, {
+    const response = await fetch(TARGET_HOST + API.SAVE_PAGE, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',
       },
     })
-    sendResponse(result)
-    log(result)
+    sendResponse(response)
+    log(response)
   } catch (e) {
     console.error(e)
   }
@@ -67,15 +67,22 @@ async function saveClipping(payload, sendResponse) {
   log('SAVE Clipping --- ', payload)
 
   try {
-    const result = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
+    const response = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',
       },
     })
-    sendResponse(result)
-    log(result)
+
+    if (!response.ok) {
+      sendResponse({ error: response.status })
+      throw new Error('Network response was not ok')
+    }
+
+    const data = await response.json()
+    sendResponse(data)
+    log(response)
   } catch (e) {
     console.error(e)
   }

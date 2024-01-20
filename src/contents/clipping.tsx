@@ -99,6 +99,10 @@ const ClippingOverlay = () => {
     })
 
     console.log(result)
+    if (result?.error) {
+      alert('Error saving clipping. Please try again.')
+      console.error(result.error)
+    }
 
     toggleLoading()
     setBtnCoorindates(null)
