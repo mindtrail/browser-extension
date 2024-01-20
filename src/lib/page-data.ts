@@ -1,4 +1,4 @@
-export const getPageData = (autoSave: boolean = false) => {
+export const getPageData = () => {
   const html = document.documentElement.outerHTML
   const title = document.title
   const url = window.location.href
@@ -21,6 +21,5 @@ export const getPageData = (autoSave: boolean = false) => {
     description,
     html,
     image,
-    autoSave,
   }
 }

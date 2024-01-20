@@ -44,24 +44,6 @@ const ClippingOverlay = () => {
   }
 
   useEffect(() => {
-    // const pageData = getPageData(false)
-    // console.log('saving clipping...', pageData)
-    // await chrome.runtime.sendMessage({
-    //   message: MESSAGES.USER_TRIGGERED_SAVE,
-    //   payload,
-    // })
-
-    // toggleLoading()
-
-    // toggleLoading()
-    // setBtnCoorindates(null)
-
-    window.onload = () => {
-      // store.forEach(({ startMeta, endMeta, id, text }) => {
-      // highlighter.fromStore(startMeta, endMeta, id, text)
-      // })
-    }
-
     document.addEventListener('click', handlePageClick)
     // Return a cleanup function to remove the event listener
     return () => {
@@ -96,19 +78,28 @@ const ClippingOverlay = () => {
     })
   }, [])
 
-  const handleClippingSave = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+  const handleClippingSave = useCallback(async (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     const selection = window.getSelection()
     const selectedText = selection?.toString()?.trim()
+    const range = selection?.getRangeAt(0)
 
     if (selectedText?.length < MIN_TEXT_FOR_CLIPPING) {
       return
     }
-    const range = selection?.getRangeAt(0)
 
-    const data = getClippingData(range)
-    console.log('data', data)
-    // fromRange... highlighter create
+    toggleLoading()
+
+    const payload = getClippingData(range)
+    console.log('Clipping Data', payload)
+
+    await chrome.runtime.sendMessage({
+      message: MESSAGES.SAVE_CLIPPING,
+      payload,
+    })
+
+    toggleLoading()
+    setBtnCoorindates(null)
   }, [])
 
   if (!btnCoorindates) {
@@ -127,8 +118,8 @@ const ClippingOverlay = () => {
             variant='outline'
             style={{ transform: `translate(${left}px, ${top}px)` }}
             className={`p-1 rounded-full h-auto absolute z-[999]
-        bg-white hover:bg-slate-200 text-accent-foreground/75
-        transform transition-transform duration-200 ease-out `}
+              bg-white hover:bg-slate-200 text-accent-foreground/75
+              transform transition-transform duration-200 ease-out `}
           >
             <ClipboardCopyIcon width={22} height={22} />
             {loading && (

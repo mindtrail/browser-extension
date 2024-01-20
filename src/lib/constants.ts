@@ -4,8 +4,8 @@ export const AUTO_SAVE_DELAY = 60 // seconds
 export const MIN_TEXT_FOR_CLIPPING = 10
 
 export const MESSAGES = {
-  AUTO_SAVE: 'auto-save',
-  USER_TRIGGERED_SAVE: 'user-triggered-save',
+  SAVE_PAGE: 'save-page',
+  SAVE_CLIPPING: 'save-clipping',
   SEARCH_HISTORY: 'search-history',
   UPDATE_ICON: 'update-icon',
 }
@@ -55,3 +55,14 @@ export const DEFAULT_EXTENSION_SETTINGS: StorageData = {
 }
 
 export const EXCLUDED_TAGS_FOR_CLIPPING = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT']
+
+export const HOST = {
+  LOCAL: 'http://localhost:3000',
+  REMOTE: 'https://app-chat-jgnk6lxbhq-ey.a.run.app',
+}
+
+export const API = {
+  SAVE_PAGE: '/api/data-source/browser-extension',
+  SAVE_CLIPPING: '/api/clippings',
+  SEARCH_HISTORY: '/api/history',
+}

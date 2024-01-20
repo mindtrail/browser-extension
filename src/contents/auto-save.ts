@@ -41,10 +41,7 @@ function startTimer() {
 
   lastFocusTime = Date.now()
   console.log('Timer remaining', autoSaveDelay - timeSpent)
-  minuteTimeout = setTimeout(
-    savePageContent,
-    (autoSaveDelay - timeSpent) * 1000
-  )
+  minuteTimeout = setTimeout(savePageContent, (autoSaveDelay - timeSpent) * 1000)
 }
 
 // Function to pause the timer
@@ -64,10 +61,12 @@ function savePageContent() {
   // Extract page data and send to background script or save directly
   const payload = getPageData()
 
-  console.log('Saving page content', payload)
   chrome.runtime.sendMessage({
-    message: MESSAGES.AUTO_SAVE,
-    payload,
+    message: MESSAGES.SAVE_PAGE,
+    payload: {
+      ...payload,
+      autoSave: true,
+    },
   })
 }
 

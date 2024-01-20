@@ -60,10 +60,10 @@ const InteractionOverlay = () => {
 
   const handlePageSave = useCallback(async () => {
     toggleLoading()
-    const payload = getPageData(false)
+    const payload = getPageData()
 
     await chrome.runtime.sendMessage({
-      message: MESSAGES.USER_TRIGGERED_SAVE,
+      message: MESSAGES.SAVE_PAGE,
       payload,
     })
     toggleLoading()
