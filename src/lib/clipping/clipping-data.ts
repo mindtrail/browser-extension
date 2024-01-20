@@ -7,6 +7,11 @@ const SURROUNDING_LENGTH = 40
 const IDENTIFIER_NESTED_LEVELS = 5
 const XPATH_LEVELS = 999
 
+type SurroundingText = {
+  before: string
+  after: string
+}
+
 export const getClippingData = (range: Range) => {
   const {
     startContainer,
@@ -15,6 +20,9 @@ export const getClippingData = (range: Range) => {
     endOffset,
     commonAncestorContainer,
   } = range
+
+  const content = range.toString()
+  const pageData = getPageData()
 
   const selectorRange = {
     startContainer: getContainerIdentifier(startContainer),
@@ -27,20 +35,16 @@ export const getClippingData = (range: Range) => {
     ),
   }
 
-  const surroundingText = {
+  const surroundingText: SurroundingText = {
     before: getTextBefore(startContainer, startOffset),
     after: getTextAfter(endContainer, endOffset),
   }
 
-  const textPosition = {
-    start: startOffset,
-    end: endOffset,
-  }
-
-  const content = range.toString()
+  const textPosition = getTextPosition(content, surroundingText)
 
   return {
     content,
+    pageData,
     // externalResources: [] -> TODO: get images & other assets from the selection
     selector: {
       range: selectorRange,
@@ -73,8 +77,8 @@ function getContainerIdentifier(
   const nodeName = node.nodeType === Node.TEXT_NODE ? 'text' : node.nodeName.toLowerCase()
 
   const index = Array.from(parent.childNodes)
-    // We construct the XPath this way, because it reduces the risk of HTML content changes
-    .filter((child) => child.nodeType === node.nodeType)
+    // Reduce the risk of dom changes by only relying on nodes of the same type
+    .filter((child) => child.nodeName === node.nodeName)
     .indexOf(node as ChildNode)
   return `${parentSelector}/${nodeName}[${index}]`
 }
@@ -150,4 +154,16 @@ function getTextAfter(
   return currentText + textFromParent
 }
 
-function getTextPosition(text: string) {}
+// We compute the position in respect to the text content of the BODY
+function getTextPosition(text: string, surroundingText: SurroundingText) {
+  const bodyTextContent = document.body.textContent || ''
+  const { before, after } = surroundingText
+
+  const highlightedText = before + text + after
+
+  // We add the before/after to avoid the case where the text is repeated in the page
+  const start = bodyTextContent.indexOf(highlightedText) + before.length
+  const end = start + text.length
+
+  return { start, end }
+}

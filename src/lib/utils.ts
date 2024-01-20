@@ -86,7 +86,7 @@ export function getSelectionContent(range: Range) {
 
   const images = []
   while (walker.nextNode()) {
-    images.push(walker.currentNode.src) // Assuming you want the image source
+    // images.push(walker.currentNode.src) // Assuming you want the image source
   }
 
   return { text, images }
@@ -137,37 +137,4 @@ function _recursiveWrapper(container, highlightInfo, startFound, charsHighlighte
   })
 
   return [startFound, charsHighlighted]
-}
-
-// Convert jQuery objects to regular DOM nodes for the anchor and focus
-// highlightInfo.anchor = selection.anchorNode;
-// highlightInfo.focus = selection.focusNode;
-
-// Call the recursiveWrapper function with a DOM node instead of a jQuery object
-// recursiveWrapper(container, highlightInfo);
-
-function escapeCSSString(cssString) {
-  return cssString.replace(/(:)/gu, '\\$1')
-}
-
-
-function getIdentifier(element) {
-  if (element?.id) return `#${escapeCSSString(element.id)}`
-  if (element.nodeName === 'html') return 'html'
-
-  const parent = element.parentNode
-
-  const parentSelector = getIdentifier(parent)
-  // The element is a text node
-  if (!element.nodeName) {
-    // Find the index of the text node:
-    const index = Array.prototype.indexOf.call(parent.childNodes, element)
-    return `${parentSelector}>textNode:nth-of-type(${index})`
-  } else {
-    const index =
-      Array.from(parent.childNodes)
-        .filter((child) => child.nodeName === element.nodeName)
-        .indexOf(element ) + 1
-    return `${parentSelector}>${element.nodeName}:nth-of-type(${index})`
-  }
 }

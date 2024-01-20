@@ -105,9 +105,9 @@ const ClippingOverlay = () => {
       return
     }
     const range = selection?.getRangeAt(0)
-    console.log(range)
 
     const data = getClippingData(range)
+    console.log('data', data)
     // fromRange... highlighter create
   }, [])
 

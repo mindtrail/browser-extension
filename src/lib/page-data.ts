@@ -1,4 +1,4 @@
-export const getPageData = (autoSave: boolean = true) => {
+export const getPageData = (autoSave: boolean = false) => {
   const html = document.documentElement.outerHTML
   const title = document.title
   const url = window.location.href
@@ -7,10 +7,7 @@ export const getPageData = (autoSave: boolean = true) => {
     .querySelector('meta[name="description"]')
     ?.getAttribute('content')
 
-  let image = document
-    .querySelector('meta[property="og:image"]')
-    ?.getAttribute('content')
-
+  let image = document.querySelector('meta[property="og:image"]')?.getAttribute('content')
 
   // The image may be a relative path, so we need to make it absolute
   if (image && !image.startsWith('http')) {
