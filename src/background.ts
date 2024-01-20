@@ -50,8 +50,12 @@ async function savePage(payload: PageData, sendResponse = (resp: any) => {}) {
 
   try {
     const response = await savePageAPICall(payload)
-    sendResponse(response)
-    log(response)
+    if (!response.ok) {
+      throw new Error('Network response was not ok')
+    }
+    const data = await response.json()
+    sendResponse(data)
+    log(data)
   } catch (e) {
     console.error(e)
   }
@@ -68,22 +72,33 @@ async function savePageAPICall(payload: PageData) {
 }
 
 async function saveClipping(payload: SaveClipping, sendResponse) {
-  log('SAVE Clipping --- ', payload)
-
   const { pageData, ...rest } = payload
   try {
-    const dataSource = await savePageAPICall(pageData)
+    const savePageResponse = await savePageAPICall(pageData)
 
-    log('dataSource', dataSource)
-
-    if (!dataSource.ok) {
-      sendResponse({ error: dataSource.status })
+    if (!savePageResponse.ok) {
+      sendResponse({ error: savePageResponse.status })
       throw new Error('Network response was not ok')
     }
 
+    const { dataSource } = (await savePageResponse.json()) as CreatePageResponse
+    log('dataSource', dataSource)
+
+    if (!dataSource) {
+      sendResponse({ error: 'No dataSource' })
+      throw new Error('No dataSource')
+    }
+
+    const saveClippingData = {
+      ...rest,
+      dataSourceId: dataSource.id,
+    }
+
+    console.log('saveClippingData', saveClippingData)
+
     const response = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
       method: 'POST',
-      body: JSON.stringify(rest),
+      body: JSON.stringify(saveClippingData),
       headers: {
         'Content-Type': 'application/json',
       },

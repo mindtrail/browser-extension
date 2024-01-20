@@ -62,11 +62,19 @@ const InteractionOverlay = () => {
     toggleLoading()
     const payload = getPageData()
 
-    await chrome.runtime.sendMessage({
+    const result = await chrome.runtime.sendMessage({
       message: MESSAGES.SAVE_PAGE,
       payload,
     })
+
     toggleLoading()
+
+    if (result?.error) {
+      alert('Error saving Page. Please try again.')
+
+      console.error(result.error)
+      return
+    }
   }, [])
 
   const handlePositionChange = useCallback(

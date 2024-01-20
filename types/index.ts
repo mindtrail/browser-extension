@@ -59,6 +59,14 @@ declare global {
     html: string
   }
 
+  type CreatePageResponse = {
+    result: string
+    dataSource: {
+      id: string
+      name: string
+    }
+  }
+
   interface HTMLFile {
     name: string
     html: string
