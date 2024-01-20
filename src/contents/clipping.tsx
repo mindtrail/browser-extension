@@ -93,10 +93,12 @@ const ClippingOverlay = () => {
     const payload = getClippingData(range)
     console.log('Clipping Data', payload)
 
-    await chrome.runtime.sendMessage({
+    const result = await chrome.runtime.sendMessage({
       message: MESSAGES.SAVE_CLIPPING,
       payload,
     })
+
+    console.log(result)
 
     toggleLoading()
     setBtnCoorindates(null)
@@ -119,7 +121,7 @@ const ClippingOverlay = () => {
             style={{ transform: `translate(${left}px, ${top}px)` }}
             className={`p-1 rounded-full h-auto absolute z-[999]
               bg-white hover:bg-slate-200 text-accent-foreground/75
-              transform transition-transform duration-200 ease-out `}
+              transform transition-transform duration-200 ease-out`}
           >
             <ClipboardCopyIcon width={22} height={22} />
             {loading && (

@@ -138,3 +138,9 @@ function _recursiveWrapper(container, highlightInfo, startFound, charsHighlighte
 
   return [startFound, charsHighlighted]
 }
+
+export function log(...args: any) {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args)
+  }
+}

@@ -5,6 +5,7 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 import { Storage } from '@plasmohq/storage'
 
 import { MESSAGES, HOST, API } from '~/lib/constants'
+import { log } from '~/lib/utils'
 
 const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
 
@@ -17,12 +18,11 @@ updateExtensionIcon()
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { message, payload } = request
 
-  IS_DEV &&
-    console.log(
-      sender.tab
-        ? 'From Content script:' + sender.tab.url + message
-        : 'From Extension' + message,
-    )
+  log(
+    sender.tab
+      ? 'From Content script:' + sender.tab.url + message
+      : 'From Extension' + message,
+  )
 
   switch (message) {
     case MESSAGES.SAVE_PAGE:
@@ -46,7 +46,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 })
 
 async function saveData(payload, sendResponse) {
-  IS_DEV && console.log('SAVE Page --- ', payload)
+  log('SAVE Page --- ', payload)
 
   try {
     const result = await fetch(TARGET_HOST + API.SAVE_PAGE, {
@@ -56,8 +56,26 @@ async function saveData(payload, sendResponse) {
         'Content-Type': 'application/json',
       },
     })
-    sendResponse({ result })
-    console.log(await result.json())
+    sendResponse(result)
+    log(result)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function saveClipping(payload, sendResponse) {
+  log('SAVE Clipping --- ', payload)
+
+  try {
+    const result = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    sendResponse(result)
+    log(result)
   } catch (e) {
     console.error(e)
   }
@@ -71,11 +89,11 @@ async function updateExtensionIcon() {
     path: autoSave ? autoModeIcon : manualModeIcon,
   })
 
-  console.log('autoSave update --- :', autoSave)
+  log('autoSave update --- :', autoSave)
 }
 
 async function searchHistorySemantic(payload, sendResponse) {
-  IS_DEV && console.log(payload)
+  log(payload)
 
   try {
     const result = await fetch(TARGET_HOST + API.SEARCH_HISTORY, {
@@ -89,10 +107,10 @@ async function searchHistorySemantic(payload, sendResponse) {
       },
     })
     const websites = await result.json()
-    console.log(websites)
+    log(websites)
     sendResponse(websites)
   } catch (e) {
-    console.log('error', e)
+    log('error', e)
     sendResponse('')
   }
 }
@@ -102,22 +120,4 @@ async function getAutoSaveStatus() {
   const settings = (await storage.get('settings')) as StorageData
 
   return settings?.autoSave
-}
-
-async function saveClipping(payload, sendResponse) {
-  IS_DEV && console.log('SAVE Clipping --- ', payload)
-
-  try {
-    const result = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    sendResponse({ result })
-    console.log(await result.json())
-  } catch (e) {
-    console.error(e)
-  }
 }
