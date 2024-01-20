@@ -63,6 +63,6 @@ export const HOST = {
 
 export const API = {
   SAVE_PAGE: '/api/data-source/browser-extension',
-  SAVE_CLIPPING: '/api/clipping',
+  CLIPPING: '/api/clipping',
   SEARCH_HISTORY: '/api/history',
 }

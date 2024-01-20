@@ -4,7 +4,7 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { MESSAGES, HOST, API } from '~/lib/constants'
+import { MESSAGES, HOST, API, DEFAULT_EXTENSION_SETTINGS } from '~/lib/constants'
 import { log } from '~/lib/utils'
 
 const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
@@ -12,8 +12,6 @@ const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
 const NODE_ENV = process.env.NODE_ENV
 const IS_DEV = NODE_ENV === 'development'
 const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
-
-updateExtensionIcon()
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { message, payload } = request
@@ -32,7 +30,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       saveClipping(payload, sendResponse)
       break
     case MESSAGES.SEARCH_HISTORY:
-      searchHistorySemantic(payload, sendResponse)
+      searchHistory(payload, sendResponse)
       break
     case MESSAGES.UPDATE_ICON:
       updateExtensionIcon()
@@ -96,7 +94,7 @@ async function saveClipping(payload: SaveClipping, sendResponse) {
 
     console.log('saveClippingData', saveClippingData)
 
-    const response = await fetch(TARGET_HOST + API.SAVE_CLIPPING, {
+    const response = await fetch(TARGET_HOST + API.CLIPPING, {
       method: 'POST',
       body: JSON.stringify(saveClippingData),
       headers: {
@@ -129,7 +127,7 @@ async function updateExtensionIcon() {
   log('autoSave update --- :', autoSave)
 }
 
-async function searchHistorySemantic(payload, sendResponse) {
+async function searchHistory(payload, sendResponse) {
   log(payload)
 
   try {
@@ -152,9 +150,43 @@ async function searchHistorySemantic(payload, sendResponse) {
   }
 }
 
-async function getAutoSaveStatus() {
-  const storage = new Storage()
+let storage: Storage
+
+async function initializeExtension() {
+  storage = new Storage()
+
   const settings = (await storage.get('settings')) as StorageData
 
+  console.log(settings)
+  if (!settings) {
+    await storage.set('settings', DEFAULT_EXTENSION_SETTINGS)
+  }
+
+  updateExtensionIcon()
+
+  const clippingList = await getClippingList()
+  if (clippingList?.length) {
+    console.log(1111, clippingList)
+    storage.set('clippingList', clippingList)
+  }
+}
+
+async function getAutoSaveStatus() {
+  const settings = (await storage.get('settings')) as StorageData
   return settings?.autoSave
 }
+
+async function getClippingList() {
+  try {
+    const result = await fetch(TARGET_HOST + API.CLIPPING)
+    if (!result.ok) {
+      throw new Error('Network response was not ok')
+    }
+    return await result.json()
+  } catch (e) {
+    log('error', e)
+    return []
+  }
+}
+
+initializeExtension()
