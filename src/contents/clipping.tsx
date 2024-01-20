@@ -106,6 +106,8 @@ const ClippingOverlay = () => {
       return
     }
 
+    selection?.empty()
+
     setBtnCoorindates(null)
   }, [])
 
