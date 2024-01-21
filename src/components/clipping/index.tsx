@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useReducer, useState, type MouseEvent } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
+import type { MouseEvent } from 'react'
+
 import { useStorage } from '@plasmohq/storage/hook'
 import { ClipboardCopyIcon } from '@radix-ui/react-icons'
 
@@ -7,32 +9,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip
 import { IconSpinner } from '~/components/icon-spinner'
 import { Button } from '~/components/ui/button'
 
+import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
+import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import { getClippingData } from '~/lib/clipping/clipping-data'
-import {
-  isHostExcluded,
-  isSelectionExcludedNode,
-  getClippingBtnPosition,
-} from '~lib/utils'
-import {
-  MESSAGES,
-  MIN_TEXT_FOR_CLIPPING,
-  DEFAULT_EXTENSION_SETTINGS,
-} from '~/lib/constants'
 
 export const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
   const [btnCoorindates, setBtnCoorindates] = useState(null)
 
-  const [settings, _setSettings] = useStorage('settings', DEFAULT_EXTENSION_SETTINGS)
   const [clippingList, setClippingList] = useStorage('clippingList', [])
-  // console.log('Clipping List', clippingList)
-
-  const { excludeList } = settings
-  const hostExcluded = isHostExcluded(excludeList)
-
-  if (hostExcluded) {
-    return null
-  }
+  console.log('Clipping List', clippingList)
 
   useEffect(() => {
     document.addEventListener('click', handlePageClick)

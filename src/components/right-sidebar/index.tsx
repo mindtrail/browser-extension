@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import { useCallback, useMemo, useReducer } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
 import { ChangePosition } from '~components/right-sidebar/change-position'
@@ -13,31 +13,19 @@ import {
   OVERLAY_Y_OFFSET,
 } from '~/lib/constants'
 
-import { isHostExcluded } from '~lib/utils'
-
 interface RightSidebarProps {
   settings: SettingsStored
   setSettings: Dispatch<SetStateAction<SettingsStored>>
 }
 
-export const RightSidebar = (props: RightSidebarProps) => {
-  const { settings, setSettings } = props
-
+export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
-  const [overlayVisible, setOverlayVisible] = useState(true)
 
-  const { excludeList } = settings
-  const currentPos =
-    settings.overlayPosition || DEFAULT_EXTENSION_SETTINGS.overlayPosition
+  const currentPos = settings.overlayPosition
 
   const YPos = useMemo(() => {
     return OVERLAY_Y_OFFSET[currentPos]
   }, [currentPos])
-
-  useEffect(() => {
-    const hostExcluded = isHostExcluded(excludeList)
-    setOverlayVisible(!hostExcluded)
-  }, [excludeList])
 
   const handlePageSave = useCallback(async () => {
     toggleLoading()
@@ -68,10 +56,6 @@ export const RightSidebar = (props: RightSidebarProps) => {
     },
     [currentPos],
   )
-
-  if (!overlayVisible) {
-    return null
-  }
 
   return (
     <div
