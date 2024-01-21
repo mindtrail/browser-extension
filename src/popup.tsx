@@ -13,7 +13,7 @@ import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
 
 const DEFAULT_TAB = 'search'
 
-const defaultSettings: StorageData = {
+const defaultSettings: SettingsStored = {
   autoSave: true,
   saveDelay: AUTO_SAVE_DELAY,
   excludeList: DEFAULT_EXCLUDE_LIST,
@@ -22,21 +22,21 @@ const defaultSettings: StorageData = {
 function IndexPopup() {
   const [settings, setSettings] = useStorage('settings', defaultSettings)
 
-  const updatedSettings = useCallback((newSettings: Partial<StorageData>) => {
+  const updatedSettings = useCallback((newSettings: Partial<SettingsStored>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }))
   }, [])
 
   return (
-    <div className="flex h-[500px] w-96">
-      <Tabs defaultValue={DEFAULT_TAB} className="flex flex-col w-full text-">
-        <TabsList className="flex w-full relative justify-between border-b bg-inherit rounded-none">
-          <TabsTrigger value="search">Search</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+    <div className='flex h-[500px] w-96'>
+      <Tabs defaultValue={DEFAULT_TAB} className='flex flex-col w-full text-'>
+        <TabsList className='flex w-full relative justify-between border-b bg-inherit rounded-none'>
+          <TabsTrigger value='search'>Search</TabsTrigger>
+          <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value="search">
+        <TabsContent value='search'>
           <Search />
         </TabsContent>
-        <TabsContent value="settings">
+        <TabsContent value='settings'>
           <Settings {...settings} updateSettings={updatedSettings} />
         </TabsContent>
       </Tabs>

@@ -71,7 +71,7 @@ function savePageContent() {
 }
 
 async function initAutoSave() {
-  const settings = (await storage.get('settings')) as StorageData
+  const settings = (await storage.get('settings')) as SettingsStored
 
   if (settings?.autoSave) {
     autoSaveDelay = settings.saveDelay

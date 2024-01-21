@@ -155,7 +155,7 @@ let storage: Storage
 async function initializeExtension() {
   storage = new Storage()
 
-  const settings = (await storage.get('settings')) as StorageData
+  const settings = (await storage.get('settings')) as SettingsStored
 
   console.log(settings)
   if (!settings) {
@@ -172,7 +172,7 @@ async function initializeExtension() {
 }
 
 async function getAutoSaveStatus() {
-  const settings = (await storage.get('settings')) as StorageData
+  const settings = (await storage.get('settings')) as SettingsStored
   return settings?.autoSave
 }
 

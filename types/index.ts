@@ -7,7 +7,7 @@ declare global {
     center = 'center',
   }
 
-  type StorageData = {
+  type SettingsStored = {
     autoSave: boolean
     saveDelay: number
     excludeList: string[]
