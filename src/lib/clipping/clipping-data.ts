@@ -1,9 +1,6 @@
-import { start } from 'repl'
 import { getPageData } from '~/lib/page-data'
-import { getSelectionContent } from '~/lib/utils'
 
 const SURROUNDING_LENGTH = 40
-
 const IDENTIFIER_NESTED_LEVELS = 5
 const XPATH_LEVELS = 999
 
@@ -16,7 +13,7 @@ export const getClippingData = (range: Range): SaveClipping => {
     commonAncestorContainer,
   } = range
 
-  const content = range.toString()
+  const { text: content } = getSelectionContent(range)
   const pageData = getPageData()
 
   const selectorRange: ClippingRange = {
@@ -158,4 +155,16 @@ function getTextPosition(text: string, surroundingText: SurroundingText): TextPo
   const end = start + text.length
 
   return { start, end }
+}
+
+function getSelectionContent(range: Range) {
+  const fragment = range.cloneContents()
+  const text = fragment.textContent
+
+  const images = []
+  fragment
+    .querySelectorAll('img')
+    .forEach((img) => images.push({ src: img.src, alt: img.alt }))
+
+  return { text, images }
 }

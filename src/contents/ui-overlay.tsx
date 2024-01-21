@@ -22,7 +22,6 @@ const UIOverlay = () => {
   const [overlayVisible, setOverlayVisible] = useState(true)
   const [settings, setSettings] = useStorage('settings', DEFAULT_EXTENSION_SETTINGS)
 
-  console.log(222, settings)
   const { excludeList } = settings
 
   useEffect(() => {

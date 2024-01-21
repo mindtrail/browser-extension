@@ -11,7 +11,7 @@ import { Button } from '~/components/ui/button'
 
 import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
-import { getClippingData } from '~/lib/clipping/clipping-data'
+import { getClippingData } from '~lib/clipping/clipping-data'
 
 export const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
@@ -66,7 +66,6 @@ export const ClippingOverlay = () => {
     }
 
     toggleLoading()
-
     const payload = getClippingData(range)
     console.log('Clipping Data', payload)
 
@@ -84,7 +83,6 @@ export const ClippingOverlay = () => {
     }
 
     selection?.empty()
-
     setBtnCoorindates(null)
   }, [])
 
