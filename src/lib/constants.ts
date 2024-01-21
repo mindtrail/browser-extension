@@ -66,22 +66,3 @@ export const API = {
   CLIPPING: '/api/clipping',
   SEARCH_HISTORY: '/api/history',
 }
-
-export const OVERLAY_Y_OFFSET = {
-  [OverlayPosition.top]: 'top-36',
-  [OverlayPosition.center]: 'top-[calc(50vh-48px)]',
-  [OverlayPosition.bottom]: 'bottom-36',
-}
-
-export const OVERLAY_NEXT_POS = {
-  [OverlayPosition.top]: {
-    [MoveDirection.down]: OverlayPosition.center,
-  },
-  [OverlayPosition.center]: {
-    [MoveDirection.up]: OverlayPosition.top,
-    [MoveDirection.down]: OverlayPosition.bottom,
-  },
-  [OverlayPosition.bottom]: {
-    [MoveDirection.up]: OverlayPosition.center,
-  },
-}

@@ -9,8 +9,7 @@ import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
   MoveDirection,
-  OVERLAY_NEXT_POS,
-  OVERLAY_Y_OFFSET,
+  OverlayPosition,
 } from '~/lib/constants'
 
 interface RightSidebarProps {
@@ -18,10 +17,32 @@ interface RightSidebarProps {
   setSettings: Dispatch<SetStateAction<SettingsStored>>
 }
 
+// Because of the dynamic nature of this, importing from constants won't work
+const OVERLAY_Y_OFFSET = {
+  [OverlayPosition.top]: 'top-36',
+  [OverlayPosition.center]: 'top-[calc(50vh-48px)]',
+  [OverlayPosition.bottom]: 'bottom-36',
+}
+
+const OVERLAY_NEXT_POS = {
+  [OverlayPosition.top]: {
+    [MoveDirection.down]: OverlayPosition.center,
+  },
+  [OverlayPosition.center]: {
+    [MoveDirection.up]: OverlayPosition.top,
+    [MoveDirection.down]: OverlayPosition.bottom,
+  },
+  [OverlayPosition.bottom]: {
+    [MoveDirection.up]: OverlayPosition.center,
+  },
+}
+
+const DEFAULT_OVERLAY_POS = DEFAULT_EXTENSION_SETTINGS.overlayPosition
+
 export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
 
-  const currentPos = settings.overlayPosition
+  const currentPos = settings.overlayPosition || DEFAULT_OVERLAY_POS
 
   const YPos = useMemo(() => {
     return OVERLAY_Y_OFFSET[currentPos]
@@ -48,9 +69,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
 
   const handlePositionChange = useCallback(
     (direction: MoveDirection) => {
-      const nextPosition =
-        OVERLAY_NEXT_POS[currentPos][direction] ||
-        DEFAULT_EXTENSION_SETTINGS.overlayPosition
+      const nextPosition = OVERLAY_NEXT_POS[currentPos][direction] || DEFAULT_OVERLAY_POS
 
       setSettings((prev) => ({ ...prev, overlayPosition: nextPosition }))
     },
@@ -59,8 +78,8 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
 
   return (
     <div
-      className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12 flex flex-col justify-center
-         ${YPos} `}
+      className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12
+        flex flex-col justify-center ${YPos}`}
     >
       <div className='flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto'>
         <ChangePosition
