@@ -25,7 +25,7 @@ export const ClippingOverlay = () => {
 
   const [settings, _setSettings] = useStorage('settings', DEFAULT_EXTENSION_SETTINGS)
   const [clippingList, setClippingList] = useStorage('clippingList', [])
-  console.log('Clipping List', clippingList)
+  // console.log('Clipping List', clippingList)
 
   const { excludeList } = settings
   const hostExcluded = isHostExcluded(excludeList)

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 import { ChangePosition } from '~components/right-sidebar/change-position'
 import { SavePage } from '~components/right-sidebar/save-page'
@@ -16,7 +17,7 @@ import { isHostExcluded } from '~lib/utils'
 
 interface RightSidebarProps {
   settings: SettingsStored
-  setSettings: (settings: SettingsStored) => SettingsStored
+  setSettings: Dispatch<SetStateAction<SettingsStored>>
 }
 
 export const RightSidebar = (props: RightSidebarProps) => {
@@ -28,6 +29,10 @@ export const RightSidebar = (props: RightSidebarProps) => {
   const { excludeList } = settings
   const currentPos =
     settings.overlayPosition || DEFAULT_EXTENSION_SETTINGS.overlayPosition
+
+  const YPos = useMemo(() => {
+    return OVERLAY_Y_OFFSET[currentPos]
+  }, [currentPos])
 
   useEffect(() => {
     const hostExcluded = isHostExcluded(excludeList)
@@ -71,7 +76,7 @@ export const RightSidebar = (props: RightSidebarProps) => {
   return (
     <div
       className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12 flex flex-col justify-center
-         ${OVERLAY_Y_OFFSET[currentPos]} `}
+         ${YPos} `}
     >
       <div className='flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto'>
         <ChangePosition
