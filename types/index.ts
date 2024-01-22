@@ -31,7 +31,7 @@ declare global {
     end: number
   }
 
-  interface SaveClipping {
+  interface SavedClipping {
     content: string
     pageData: PageData
     selector: {

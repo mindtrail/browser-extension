@@ -66,3 +66,5 @@ export const API = {
   CLIPPING: '/api/clipping',
   SEARCH_HISTORY: '/api/history',
 }
+
+export const HIGHLIGHT_CLASS = 'mindtrail-clipping'

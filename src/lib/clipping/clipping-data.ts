@@ -1,10 +1,9 @@
 import { getPageData } from '~/lib/page-data'
 
 const SURROUNDING_LENGTH = 40
-const IDENTIFIER_NESTED_LEVELS = 5
 const XPATH_LEVELS = 999
 
-export const getClippingData = (range: Range): SaveClipping => {
+export const getClippingData = (range: Range): SavedClipping => {
   const {
     startContainer,
     startOffset,
@@ -12,6 +11,18 @@ export const getClippingData = (range: Range): SaveClipping => {
     endOffset,
     commonAncestorContainer,
   } = range
+
+  /**
+    const highlightInfo = {
+    color: color ? color : "yellow",
+    textColor: textColor ? textColor : "inherit",
+    highlightIndex: highlightIndex,
+    selectionString: selString,
+    anchor: $(selection.anchorNode),
+    anchorOffset: selection.anchorOffset,
+    focus: $(selection.focusNode),
+    focusOffset: selection.focusOffset,
+}; */
 
   const { text: content } = getSelectionContent(range)
   const pageData = getPageData()
@@ -45,24 +56,20 @@ export const getClippingData = (range: Range): SaveClipping => {
   }
 }
 
-// From an DOM element, get a query to that DOM element
-function getContainerIdentifier(
-  node: ChildNode | Node,
-  maxLevel = IDENTIFIER_NESTED_LEVELS,
-  currentLevel = 0,
-) {
+// Get an identifier for a DOM element, be it an ID or a 'filtered' XPath starting from the BODY
+function getContainerIdentifier(node: ChildNode | Node, currentLevel = 0) {
   const parent = node.parentNode
 
-  if (!node || node.nodeName === 'BODY' || !parent || currentLevel >= maxLevel) {
+  if (!node || !parent || node.nodeName === 'BODY') {
     return ''
   }
 
   // If items are have IDs, use those, as they should be unique, except when we want full XPATH
-  if ((node as Element)?.id && maxLevel !== XPATH_LEVELS) {
+  if ((node as Element)?.id) {
     return `#${escapeCSSString((node as Element).id)}`
   }
 
-  const parentSelector = getContainerIdentifier(parent, maxLevel, currentLevel + 1)
+  const parentSelector = getContainerIdentifier(parent, currentLevel + 1)
   const nodeName = node.nodeType === Node.TEXT_NODE ? 'text' : node.nodeName.toLowerCase()
 
   const index = Array.from(parent.childNodes)

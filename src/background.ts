@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       savePage(payload, sendResponse)
       break
     case MESSAGES.SAVE_CLIPPING:
-      saveClipping(payload, sendResponse)
+      SavedClipping(payload, sendResponse)
       break
     case MESSAGES.SEARCH_HISTORY:
       searchHistory(payload, sendResponse)
@@ -69,7 +69,7 @@ async function savePageAPICall(payload: PageData) {
   })
 }
 
-async function saveClipping(payload: SaveClipping, sendResponse) {
+async function SavedClipping(payload: SavedClipping, sendResponse) {
   const { pageData, ...rest } = payload
   try {
     const savePageResponse = await savePageAPICall(pageData)
@@ -87,16 +87,16 @@ async function saveClipping(payload: SaveClipping, sendResponse) {
       throw new Error('No dataSource')
     }
 
-    const saveClippingData = {
+    const SavedClippingData = {
       ...rest,
       dataSourceId: dataSource.id,
     }
 
-    console.log('saveClippingData', saveClippingData)
+    console.log('SavedClippingData', SavedClippingData)
 
     const response = await fetch(TARGET_HOST + API.CLIPPING, {
       method: 'POST',
-      body: JSON.stringify(saveClippingData),
+      body: JSON.stringify(SavedClippingData),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -164,11 +164,10 @@ async function initializeExtension() {
 
   updateExtensionIcon()
 
-  const clippingList = await getClippingList()
-  if (clippingList?.length) {
-    console.log(1111, clippingList)
-    storage.set('clippingList', clippingList)
-  }
+  const clippingList = (await getClippingList()) || []
+  console.log('initializing', clippingList)
+
+  storage.set('clippingList', clippingList)
 }
 
 async function getAutoSaveStatus() {

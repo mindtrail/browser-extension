@@ -12,13 +12,13 @@ import { Button } from '~/components/ui/button'
 import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import { getClippingData } from '~lib/clipping/clipping-data'
+import { highlightClippings } from '~lib/clipping/highlight-clipping'
 
 export const ClippingOverlay = () => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
   const [btnCoorindates, setBtnCoorindates] = useState(null)
 
   const [clippingList, setClippingList] = useStorage('clippingList', [])
-  console.log('Clipping List', clippingList)
 
   useEffect(() => {
     document.addEventListener('click', handlePageClick)
@@ -27,6 +27,10 @@ export const ClippingOverlay = () => {
       document.removeEventListener('click', handlePageClick)
     }
   }, [])
+
+  useEffect(() => {
+    highlightClippings(clippingList)
+  }, [clippingList])
 
   const handlePageClick = useCallback(() => {
     // "Click" event fires before "selectionchange".
