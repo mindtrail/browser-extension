@@ -29,11 +29,18 @@ function wrapClipping(clipping: SavedClipping, startFound = false, charsHighligh
   // @ts-ignore -> in the DB it's serialized, so the return is a string
   const selector = JSON.parse(selectorString as string) as ClippingSelector
   console.log('selector', selector)
+  console.log('content', clippingLength, content)
 
   const { startContainer, commonAncestorContainer } = selector.range
 
-  const container = getDOMElementFromIdentifier(commonAncestorContainer)
-  console.log(container)
+  const parentContainer = getDOMElementFromIdentifier(commonAncestorContainer)
+  console.log(parentContainer)
+  const start = getDOMElementFromIdentifier(startContainer)
+  console.log(start)
+  if (!parentContainer) {
+    return
+  }
+
   // Get the child nodes of the container
   const childNodes = [] // [...commonAncestorContainer.childNodes]
 
@@ -62,7 +69,8 @@ function wrapClipping(clipping: SavedClipping, startFound = false, charsHighligh
 }
 
 function getDOMElementFromIdentifier(identifier: string) {
-  let element = document.body // Default start element
+  // The starting point for the xpath is the body element
+  let element = document.body
 
   const pathArray = identifier.split('/')
 
@@ -87,14 +95,12 @@ function getDOMElementFromIdentifier(identifier: string) {
     }
 
     let [, nodeName, indexStr] = matches
+    nodeName = nodeName === 'TEXT_NODE' ? '#text' : nodeName
     const index = parseInt(indexStr)
 
-    nodeName = nodeName === 'TEXT_NODE' ? '#text' : nodeName
-    const childNodes = Array.from(element.childNodes).filter(
+    const childNodes = [...element.childNodes].filter(
       (child) => child.nodeName === nodeName,
     )
-
-    console.log(index, childNodes)
 
     element = childNodes[index] as HTMLElement
 
