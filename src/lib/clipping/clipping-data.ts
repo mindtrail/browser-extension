@@ -70,7 +70,8 @@ function getContainerIdentifier(node: ChildNode | Node, currentLevel = 0) {
   }
 
   const parentSelector = getContainerIdentifier(parent, currentLevel + 1)
-  const nodeName = node.nodeType === Node.TEXT_NODE ? 'text' : node.nodeName.toLowerCase()
+  // nodeName of text is '#text'. It may conflict with an id that is #text or starts with #text
+  const nodeName = node.nodeType === Node.TEXT_NODE ? 'TEXT_NODE' : node.nodeName
 
   const index = Array.from(parent.childNodes)
     // Reduce the risk of dom changes by only relying on nodes of the same type

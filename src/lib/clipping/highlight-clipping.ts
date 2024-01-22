@@ -3,11 +3,10 @@ import { HIGHLIGHT_CLASS } from '~/lib/constants'
 // Used same approach as https://github.com/jeromepl/highlighter for the range selector
 /**
  * STEPS:
- * 1 - Use the offset of the startContainer to find the start of the selected text
- *     - Use the first of the anchor of the focus elements to appear
- * 2 - From there, go through the elements and find all Text Nodes until the selected text is all found.
- *     - Wrap all the text nodes (or parts of them) in a span DOM element with special highlight class name and bg color
- * 3 - Deselect text
+ * 1 - From the startContainer & it's offset,  find the start of the clipping
+ * 2 - Find all Nodes until the selection is covered.
+ *   -> Wrap them text nodes (or parts of them) in a span DOM element.
+ * 3 - Clear selection
  * 4 - Attach mouse hover event listeners to display tools when hovering a highlight
  */
 export function highlightClippings(clippingList: SavedClipping[]) {
@@ -39,7 +38,9 @@ function wrapClipping(clipping: SavedClipping, startFound = false, charsHighligh
   const childNodes = [] // [...commonAncestorContainer.childNodes]
 
   childNodes.forEach((element) => {
-    if (charsHighlighted >= clippingLength) return
+    if (charsHighlighted >= clippingLength) {
+      return
+    }
 
     // Skip non-text nodes and invisible nodes
     if (element.nodeType !== Node.TEXT_NODE) {
@@ -59,53 +60,41 @@ function wrapClipping(clipping: SavedClipping, startFound = false, charsHighligh
 
   return [startFound, charsHighlighted]
 }
-function getNonStandardElements(query) {
-  try {
-    return document.querySelector(query)
-  } catch (error) {
-    // It is possible that this query fails because of an invalid CSS selector that actually exists in the DOM.
-    // This was happening for example here: https://lawphil.net/judjuris/juri2013/sep2013/gr_179987_2013.html
-    // where there is a tag <p"> that is invalid in HTML5 but was still rendered by the browser
-    // In this case, manually find the element:
-    let element = document
-    for (const queryPart of query.split('>')) {
-      if (!element) return null
-
-      const re = /^(.*):nth-of-type\(([0-9]+)\)$/iu
-      const result = re.exec(queryPart)
-      const [, tagName, index] = result || [undefined, queryPart, 1]
-      element = Array.from(element.childNodes).filter(
-        (child) => child.localName === tagName,
-      )[index - 1]
-    }
-    return element
-  }
-}
 
 function getDOMElementFromIdentifier(identifier: string) {
-  if (identifier.startsWith('#')) {
-    const id = identifier.substring(1) // Get text after '#'
-    return document.getElementById(id)
-  }
+  let element = document.body // Default start element
 
-  // Start from the BODY element to build the XPath
-  let element = document.body
-  const queryParts = identifier.split('/')
+  const pathArray = identifier.split('/')
 
-  for (const part of queryParts) {
-    if (!part) continue // Skip empty parts
+  for (const part of pathArray) {
+    if (!part) {
+      continue // Skip empty parts
+    }
+
+    if (part.startsWith('#') && !part.startsWith('#text')) {
+      // If part is an ID selector, find the element by ID
+      const id = part.substring(1)
+      element = document.getElementById(id)
+      if (!element) {
+        return null // Element with the specified ID not found
+      }
+      continue
+    }
 
     const matches = part.match(/^(.+)\[(\d+)\]$/) // Match nodeName[index]
-    if (!matches) return null // Invalid part format
+    if (!matches) {
+      return null // Invalid part format
+    }
 
-    const [, nodeName, indexStr] = matches
-    const index = parseInt(indexStr, 10) - 1 // Convert to 0-based index
+    let [, nodeName, indexStr] = matches
+    const index = parseInt(indexStr)
 
+    nodeName = nodeName === 'TEXT_NODE' ? '#text' : nodeName
     const childNodes = Array.from(element.childNodes).filter(
-      (child) =>
-        (child.nodeType === Node.TEXT_NODE ? 'text' : child.nodeName.toLowerCase()) ===
-        nodeName,
+      (child) => child.nodeName === nodeName,
     )
+
+    console.log(index, childNodes)
 
     element = childNodes[index] as HTMLElement
 
