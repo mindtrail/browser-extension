@@ -9,116 +9,103 @@ import { HIGHLIGHT_CLASS } from '~/lib/constants'
  * 3 - Clear selection
  * 4 - Attach mouse hover event listeners to display tools when hovering a highlight
  */
-export function highlightClippings(clippingList: SavedClipping[]) {
-  // Step 1 + 2:
-  clippingList.forEach((clipping) => {
-    let { selector } = clipping
-    // Selector comes serialized from the DB
-    selector = typeof selector === 'string' ? JSON.parse(selector) : selector
-
-    const { range } = selector || {}
-    if (!range) {
-      console.error('Failed to highlight clipping', clipping)
-      return
-    }
-
-    let {
-      startContainer: startPath,
-      endContainer: endPath,
-      commonAncestorContainer: parentPath,
-      startOffset,
-      endOffset,
-    } = range
-
-    const parentContainer = getDOMElementFromIdentifier(parentPath)
-
-    // If selection is only inside a single element, handle it directly
-    if (startPath === parentPath && parentContainer) {
-      return splitTextAndAddSpan(parentContainer, startOffset, endOffset)
-    }
-
-    // Otherwise Start & End containers are children of commonAncestor
-    startPath = startPath.substring(parentPath.length)
-    endPath = endPath.substring(parentPath.length)
-
-    const startContainer = getDOMElementFromIdentifier(startPath, parentContainer)
-    const endContainer = getDOMElementFromIdentifier(endPath, parentContainer)
-
-    const highlightPayload: HighlightRange = {
-      startContainer,
-      startOffset,
-      endContainer,
-      endOffset,
-      content: clipping.content,
-    }
-
-    // If we don't have the parentConainter, the star&end won't be there implicitly
-    const successfullyHighlighet = parentContainer
-      ? wrapClippingTextInSpan(parentContainer, highlightPayload)
-      : false
-
-    if (!successfullyHighlighet) {
-      // @TODO: try 2nd approach...
-      return
-    }
-  })
-}
 
 type HighlightRange = {
-  startContainer: HTMLElement
-  endContainer: HTMLElement
+  startNodeEl: HTMLElement
+  endNodeEl: HTMLElement
   startOffset: number
   endOffset: number
   content: string
 }
 
-function wrapClippingTextInSpan(
-  parentContainer: Node,
-  clipping: HighlightRange,
-  startFound = false,
-  endFound = false,
-  charsHighlighted = 0
-): [boolean, boolean, number] | null {
-  const { content, startContainer, endContainer, startOffset, endOffset } = clipping
+let startFound = false
+let endFound = false
+let charsHighlighted = 0
+
+export function highlightClippings(clippingList: SavedClipping[]) {
+  // Step 1 + 2:
+  clippingList.forEach((clipping) => {
+    try {
+      let { selector, content } = clipping
+      // Selector comes serialized from the DB
+      selector = typeof selector === 'string' ? JSON.parse(selector) : selector
+
+      let {
+        startContainer,
+        endContainer,
+        commonAncestorContainer,
+        startOffset,
+        endOffset,
+      } = selector.range
+
+      const parentNodeEl = getDOMElementFromIdentifier(commonAncestorContainer)
+
+      if (!parentNodeEl) {
+        throw new Error('Parent node not found')
+      }
+
+      // If selection is only inside a single element, handle it directly
+      if (startContainer === commonAncestorContainer && parentNodeEl) {
+        return splitTextAndAddSpan(parentNodeEl, startOffset, endOffset)
+      }
+
+      const startNodeEl = getDOMElementFromIdentifier(startContainer)
+      const endNodeEl = getDOMElementFromIdentifier(endContainer)
+
+      const highlightRange: HighlightRange = {
+        startNodeEl,
+        endNodeEl,
+        startOffset,
+        endOffset,
+        content,
+      }
+
+      startFound = false
+      endFound = false
+      charsHighlighted = 0
+
+      const success = recursiveNodeProcess(parentNodeEl, highlightRange)
+
+      if (!success) {
+        throw new Error('Failed to highlight clipping')
+      }
+    } catch (error) {
+      // @TODO: try 2nd approach... of searchgin by text + surrounding, not only range
+      console.error(error, clipping)
+    }
+  })
+}
+
+function recursiveNodeProcess(rootEl: Node, highlightRange: HighlightRange) {
+  const { content, startNodeEl, endNodeEl, startOffset, endOffset } = highlightRange
   const clippingLength = content?.length
 
-  const childNodes = [...parentContainer.childNodes]
+  const childNodes = [...rootEl.childNodes]
 
   childNodes.forEach((element: Node) => {
-    console.log(endFound, charsHighlighted, clippingLength)
     if (charsHighlighted >= clippingLength || endFound) {
       return
     }
 
-    // Element nodes represent containers -> recurseive call to find text nodes
+    // Element nodes represent containers -> recurseive call on the visible nodes
     if (element.nodeType === Node.ELEMENT_NODE) {
       const { visibility, display } = window.getComputedStyle(element as Element)
-
-      if (visibility === 'hidden' || display === 'none') {
-        return
+      if (visibility !== 'hidden' && display !== 'none') {
+        return recursiveNodeProcess(element, highlightRange)
       }
-
-      // Update startFound while going recursivelly
-      ;[startFound, endFound, charsHighlighted] = wrapClippingTextInSpan(
-        element,
-        clipping,
-        startFound,
-        endFound,
-        charsHighlighted
-      )
       return
     }
 
     // Text nodes represent the content
     if (element.nodeType === Node.TEXT_NODE) {
       // If start not found, skip node
-      if (!startFound && element !== startContainer) {
+      if (!startFound && element !== startNodeEl) {
         return
       }
 
       const startIndex = startFound ? 0 : startOffset
 
-      endFound = element === endContainer
+      endFound = element === endNodeEl
       const endIndex = endFound ? endOffset : element.textContent?.length ?? 0
       charsHighlighted += splitTextAndAddSpan(element, startIndex, endIndex)
 
@@ -126,19 +113,15 @@ function wrapClippingTextInSpan(
     }
   })
 
-  return [startFound, endFound, charsHighlighted]
+  return charsHighlighted
 }
 
-function getDOMElementFromIdentifier(
-  identifier: string,
-  startDOMElement: HTMLElement = document.body
-) {
+function getDOMElementFromIdentifier(identifier: string) {
   if (!identifier) {
     return null
   }
 
-  let DOMElement = startDOMElement
-
+  let DOMElement = document.body
   const pathArray = identifier.split('/')
 
   for (const part of pathArray) {
