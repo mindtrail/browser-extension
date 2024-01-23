@@ -18,57 +18,11 @@ type HighlightRange = {
   content: string
 }
 
-let startFound = false
-let endFound = false
-let charsHighlighted = 0
-
 export function highlightClippings(clippingList: SavedClipping[]) {
   // Step 1 + 2:
   clippingList.forEach((clipping) => {
     try {
-      let { selector, content } = clipping
-      // Selector comes serialized from the DB
-      selector = typeof selector === 'string' ? JSON.parse(selector) : selector
-
-      let {
-        startContainer,
-        endContainer,
-        commonAncestorContainer,
-        startOffset,
-        endOffset,
-      } = selector.range
-
-      const parentNodeEl = getDOMElementFromIdentifier(commonAncestorContainer)
-
-      if (!parentNodeEl) {
-        throw new Error('Parent node not found')
-      }
-
-      // If selection is only inside a single element, handle it directly
-      if (startContainer === commonAncestorContainer && parentNodeEl) {
-        return splitTextAndAddSpan(parentNodeEl, startOffset, endOffset)
-      }
-
-      const startNodeEl = getDOMElementFromIdentifier(startContainer)
-      const endNodeEl = getDOMElementFromIdentifier(endContainer)
-
-      const highlightRange: HighlightRange = {
-        startNodeEl,
-        endNodeEl,
-        startOffset,
-        endOffset,
-        content,
-      }
-
-      startFound = false
-      endFound = false
-      charsHighlighted = 0
-
-      const success = recursiveNodeProcess(parentNodeEl, highlightRange)
-
-      if (!success) {
-        throw new Error('Failed to highlight clipping')
-      }
+      highlightClippingFromRange(clipping)
     } catch (error) {
       // @TODO: try 2nd approach... of searchgin by text + surrounding, not only range
       console.error(error, clipping)
@@ -76,44 +30,113 @@ export function highlightClippings(clippingList: SavedClipping[]) {
   })
 }
 
-function recursiveNodeProcess(rootEl: Node, highlightRange: HighlightRange) {
+function highlightClippingFromRange(clipping: SavedClipping) {
+  let { selector, content } = clipping
+  selector = parseSelector(selector)
+
+  const { range } = selector
+  const parentNodeEl = getDOMElementFromIdentifier(range.commonAncestorContainer)
+
+  if (!parentNodeEl) {
+    throw new Error('Parent node not found')
+  }
+
+  const {
+    startContainer,
+    endContainer,
+    commonAncestorContainer,
+    startOffset,
+    endOffset,
+  } = range
+
+  if (startContainer === commonAncestorContainer) {
+    return splitTextAndAddSpan(parentNodeEl, startOffset, endOffset)
+  }
+
+  const startNodeEl = getDOMElementFromIdentifier(startContainer)
+  const endNodeEl = getDOMElementFromIdentifier(endContainer)
+
+  const highlightRange = {
+    startNodeEl,
+    endNodeEl,
+    startOffset,
+    endOffset,
+    content,
+  }
+
+  const success = recursiveNodeProcess({ rootEl: parentNodeEl, highlightRange })
+
+  if (!success) {
+    throw new Error('Failed to highlight clipping from Range')
+  }
+}
+
+interface RecursiveNodeProcess {
+  rootEl: Node
+  highlightRange: HighlightRange
+  startFound?: boolean
+  endFound?: boolean
+  charsHighlighted?: number
+}
+
+type RecursiveResp = [boolean, boolean, number]
+
+function recursiveNodeProcess(props: RecursiveNodeProcess): RecursiveResp {
+  let {
+    rootEl,
+    highlightRange,
+    startFound = false,
+    endFound = false,
+    charsHighlighted = 0,
+  } = props
+
   const { content, startNodeEl, endNodeEl, startOffset, endOffset } = highlightRange
-  const clippingLength = content?.length
+  const clippingLength = content?.length ?? 0
 
-  const childNodes = [...rootEl.childNodes]
-
-  childNodes.forEach((element: Node) => {
-    if (charsHighlighted >= clippingLength || endFound) {
-      return
+  for (const element of rootEl.childNodes) {
+    if (endFound || charsHighlighted >= clippingLength) {
+      break
     }
 
     // Element nodes represent containers -> recurseive call on the visible nodes
     if (element.nodeType === Node.ELEMENT_NODE) {
       const { visibility, display } = window.getComputedStyle(element as Element)
       if (visibility !== 'hidden' && display !== 'none') {
-        return recursiveNodeProcess(element, highlightRange)
+        // Update the state with returned values from the recursive call
+        // semicolon is added by prettier
+        ;[startFound, endFound, charsHighlighted] = recursiveNodeProcess({
+          rootEl: element,
+          highlightRange,
+          startFound,
+          endFound,
+          charsHighlighted,
+        })
       }
-      return
+      continue
     }
 
-    // Text nodes represent the content
     if (element.nodeType === Node.TEXT_NODE) {
-      // If start not found, skip node
-      if (!startFound && element !== startNodeEl) {
-        return
+      // Process only after the start node is found
+      if (element === startNodeEl || startFound) {
+        startFound = true // Mark the start as found the first time we access the function
+
+        // Determine the start and end index for highlighting in this text node
+        const startIndex = element === startNodeEl ? startOffset : 0
+        const isEndNode = element === endNodeEl
+        const endIndex = isEndNode ? endOffset : element.textContent?.length ?? 0
+
+        // Highlight the text node and update the count of highlighted characters
+        charsHighlighted += splitTextAndAddSpan(element, startIndex, endIndex)
+
+        // If this is the end node, mark the end as found and stop processing further
+        if (isEndNode) {
+          endFound = true
+        }
       }
-
-      const startIndex = startFound ? 0 : startOffset
-
-      endFound = element === endNodeEl
-      const endIndex = endFound ? endOffset : element.textContent?.length ?? 0
-      charsHighlighted += splitTextAndAddSpan(element, startIndex, endIndex)
-
-      startFound = true
     }
-  })
+  }
 
-  return charsHighlighted
+  return [startFound, endFound, charsHighlighted]
 }
 
 function getDOMElementFromIdentifier(identifier: string) {
@@ -183,4 +206,9 @@ function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number)
   node.parentNode?.replaceChild(span, textToHighlight)
 
   return nrOfCharsToHighlight
+}
+
+// Selector comes serialized from the DB
+function parseSelector(selector: string | any) {
+  return typeof selector === 'string' ? JSON.parse(selector) : selector
 }
