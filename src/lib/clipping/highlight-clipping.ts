@@ -211,12 +211,9 @@ function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number)
     textToHighlight.splitText(endOffset)
   }
 
-  console.log(textToHighlight)
-
   const span = document.createElement('span')
   span.classList.add(HIGHLIGHT_CLASS)
   span.textContent = textToHighlight.textContent
 
   node.parentNode?.replaceChild(span, textToHighlight)
-  console.log(textNode)
 }
