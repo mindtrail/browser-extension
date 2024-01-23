@@ -13,13 +13,12 @@ export function highlightClippings(clippingList: SavedClipping[]) {
   // Step 1 + 2:
   clippingList.forEach((clipping) => {
     let { selector } = clipping
-    // selector comes serialized from the DB
+    // Selector comes serialized from the DB
     selector = typeof selector === 'string' ? JSON.parse(selector) : selector
 
     const { range } = selector || {}
-
     if (!range) {
-      console.error('Failed to highlight clipping 123', clipping)
+      console.error('Failed to highlight clipping', clipping)
       return
     }
 
@@ -77,15 +76,17 @@ function wrapClippingTextInSpan(
   parentContainer: Node,
   clipping: HighlightRange,
   startFound = false,
+  endFound = false,
   charsHighlighted = 0
-): [boolean, number] | null {
+): [boolean, boolean, number] | null {
   const { content, startContainer, endContainer, startOffset, endOffset } = clipping
   const clippingLength = content?.length
 
   const childNodes = [...parentContainer.childNodes]
 
   childNodes.forEach((element: Node) => {
-    if (charsHighlighted >= clippingLength) {
+    console.log(endFound, charsHighlighted, clippingLength)
+    if (charsHighlighted >= clippingLength || endFound) {
       return
     }
 
@@ -98,10 +99,11 @@ function wrapClippingTextInSpan(
       }
 
       // Update startFound while going recursivelly
-      ;[startFound, charsHighlighted] = wrapClippingTextInSpan(
+      ;[startFound, endFound, charsHighlighted] = wrapClippingTextInSpan(
         element,
         clipping,
         startFound,
+        endFound,
         charsHighlighted
       )
       return
@@ -114,16 +116,17 @@ function wrapClippingTextInSpan(
         return
       }
 
-      startFound = true
       const startIndex = startFound ? 0 : startOffset
-      const isEndNode = element === endContainer
-      const endIndex = isEndNode ? endOffset : element.textContent?.length ?? 0
 
-      charsHighlighted += splitTextAndAddSpan(element, startOffset, endIndex)
+      endFound = element === endContainer
+      const endIndex = endFound ? endOffset : element.textContent?.length ?? 0
+      charsHighlighted += splitTextAndAddSpan(element, startIndex, endIndex)
+
+      startFound = true
     }
   })
 
-  return [startFound, charsHighlighted]
+  return [startFound, endFound, charsHighlighted]
 }
 
 function getDOMElementFromIdentifier(
