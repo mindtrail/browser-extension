@@ -29,7 +29,9 @@ export const ClippingOverlay = () => {
   }, [])
 
   useEffect(() => {
-    highlightClippings(clippingList)
+    if (clippingList.length) {
+      setTimeout(() => highlightClippings(clippingList), 1000)
+    }
   }, [clippingList])
 
   const handlePageClick = useCallback(() => {

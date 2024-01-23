@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   log(
     sender.tab
       ? 'From Content script:' + sender.tab.url + message
-      : 'From Extension' + message,
+      : 'From Extension' + message
   )
 
   switch (message) {
@@ -164,6 +164,7 @@ async function initializeExtension() {
 
   updateExtensionIcon()
 
+  // @TODO: handle error when fetching data, in the client
   const clippingList = (await getClippingList()) || []
   console.log('initializing', clippingList)
 

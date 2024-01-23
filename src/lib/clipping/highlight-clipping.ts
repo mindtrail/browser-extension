@@ -11,66 +11,155 @@ import { HIGHLIGHT_CLASS } from '~/lib/constants'
  */
 export function highlightClippings(clippingList: SavedClipping[]) {
   // Step 1 + 2:
-  clippingList.forEach((clipping) => {
-    // Wrap the text nodes in a span with the highlight class
-    wrapClipping(clipping)
+  clippingList.forEach((clipping, index) => {
+    console.log(index)
+    let { selector } = clipping
+    // selector comes serialized from the DB
+    selector = typeof selector === 'string' ? JSON.parse(selector) : selector
+
+    const { range } = selector || {}
+
+    if (!range) {
+      console.error('Failed to highlight clipping 123', clipping)
+      return
+    }
+
+    let {
+      startContainer: startPath,
+      endContainer: endPath,
+      commonAncestorContainer: parentPath,
+      startOffset,
+      endOffset,
+    } = range
+
+    const parentContainer = getDOMElementFromIdentifier(parentPath)
+
+    // If selection is only inside a single element, directly handle it
+    if (startPath === endPath && startPath && parentPath) {
+      return splitTextAndAddSpan(parentContainer, startOffset, endOffset)
+    }
+
+    // Otherwise Start & End containers are children of commonAncestor
+    startPath = startPath.substring(parentPath.length)
+    endPath = endPath.substring(parentPath.length)
+
+    const startContainer = getDOMElementFromIdentifier(startPath, parentContainer)
+    const endContainer = getDOMElementFromIdentifier(endPath, parentContainer)
+
+    const highlightPayload: HighlightRange = {
+      startContainer,
+      startOffset,
+      endContainer,
+      endOffset,
+      content: clipping.content,
+    }
+
+    console.log(33333, highlightPayload, parentContainer)
+    if (index === 0) return
+    // If we don't have the parentConainter, the star&end won't be there implicitly
+    const successfullyHighlighet = parentContainer
+      ? wrapClippingTextInSpan(parentContainer, highlightPayload)
+      : false
+
+    if (!successfullyHighlighet) {
+      // console.error('Failed to highlight clipping 333', clipping)
+      // @TODO: try 2nd approach
+      return
+    }
   })
 }
 
-function wrapClipping(clipping: SavedClipping, startFound = false, charsHighlighted = 0) {
-  // container, highlightInfo, startFound, charsHighlighted
-  const { content, selector: selectorString } = clipping
+type HighlightRange = {
+  startContainer: HTMLElement
+  endContainer: HTMLElement
+  startOffset: number
+  endOffset: number
+  content: string
+}
+
+function wrapClippingTextInSpan(
+  parentContainer: Node,
+  clipping: HighlightRange,
+  startFound = false,
+  charsHighlighted = 0
+) {
+  const { content, startContainer, endContainer, startOffset, endOffset } = clipping
   const clippingLength = content?.length
 
-  if (!clippingLength) {
-    return
-  }
-
-  // @ts-ignore -> in the DB it's serialized, so the return is a string
-  const selector = JSON.parse(selectorString as string) as ClippingSelector
-  console.log('selector', selector)
-  console.log('content', clippingLength, content)
-
-  const { startContainer, commonAncestorContainer } = selector.range
-
-  const parentContainer = getDOMElementFromIdentifier(commonAncestorContainer)
-  console.log(parentContainer)
-  const start = getDOMElementFromIdentifier(startContainer)
-  console.log(start)
-  if (!parentContainer) {
-    return
-  }
-
-  // Get the child nodes of the container
-  const childNodes = [] // [...commonAncestorContainer.childNodes]
-
-  childNodes.forEach((element) => {
+  const childNodes = [...parentContainer.childNodes]
+  childNodes.forEach((element: Node) => {
     if (charsHighlighted >= clippingLength) {
       return
     }
 
-    // Skip non-text nodes and invisible nodes
-    if (element.nodeType !== Node.TEXT_NODE) {
-      if (element.nodeType === Node.ELEMENT_NODE && element.offsetParent !== null) {
-        let computedStyle = window.getComputedStyle(element)
-        if (computedStyle.visibility !== 'hidden') {
-          let result = wrapClipping(element, highlightInfo, startFound, charsHighlighted)
-          startFound = result[0]
-          charsHighlighted = result[1]
-        }
-      }
-      return
+    if (startContainer === parentContainer && startContainer === endContainer) {
     }
 
-    // ... rest of the code remains the same ...
+    // If we haven't found the start yet, skip text node
+    if (element.nodeType === Node.TEXT_NODE) {
+      if (!startFound) {
+        if (element !== startContainer) {
+          return
+        }
+        startFound = true
+
+        if (startContainer === endContainer) {
+          const textToHighlight = (element as Text).splitText(startOffset)
+          const span = document.createElement('span')
+          span.classList.add(HIGHLIGHT_CLASS)
+          span.textContent = textToHighlight.textContent
+          element.parentNode?.insertBefore(span, textToHighlight)
+          return
+        }
+        // console.log(11111, element)
+      }
+
+      const startIndex = element === startContainer ? startOffset : 0
+      const endIndex = element === endContainer ? endOffset : element.textContent?.length
+
+      console.log(element)
+      const textToHighlight = (element as Text)?.splitText(startIndex)
+      console.log(2222, textToHighlight)
+      // Text nodes represent the content
+    }
+
+    // Element nodes represent containers -> recurseive call to find text nodes
+    if (element.nodeType === Node.ELEMENT_NODE) {
+      const { visibility, display } = window.getComputedStyle(element as Element)
+      const elementNotVisible = visibility === 'hidden' || display === 'none'
+
+      if (elementNotVisible) {
+        return
+      }
+
+      const response = wrapClippingTextInSpan(
+        element,
+        clipping,
+        startFound,
+        charsHighlighted
+      )
+
+      if (response) {
+        startFound = response.startFound
+        charsHighlighted = response.charsHighlighted
+      }
+
+      return
+    }
   })
 
-  return [startFound, charsHighlighted]
+  return { startFound, charsHighlighted }
 }
 
-function getDOMElementFromIdentifier(identifier: string) {
-  // The starting point for the xpath is the body element
-  let element = document.body
+function getDOMElementFromIdentifier(
+  identifier: string,
+  startDOMElement: HTMLElement = document.body
+) {
+  if (!identifier) {
+    return null
+  }
+
+  let DOMElement = startDOMElement
 
   const pathArray = identifier.split('/')
 
@@ -82,8 +171,8 @@ function getDOMElementFromIdentifier(identifier: string) {
     if (part.startsWith('#') && !part.startsWith('#text')) {
       // If part is an ID selector, find the element by ID
       const id = part.substring(1)
-      element = document.getElementById(id)
-      if (!element) {
+      DOMElement = document.getElementById(id)
+      if (!DOMElement) {
         return null // Element with the specified ID not found
       }
       continue
@@ -98,20 +187,36 @@ function getDOMElementFromIdentifier(identifier: string) {
     nodeName = nodeName === 'TEXT_NODE' ? '#text' : nodeName
     const index = parseInt(indexStr)
 
-    const childNodes = [...element.childNodes].filter(
-      (child) => child.nodeName === nodeName,
+    const childNodes = [...DOMElement.childNodes].filter(
+      (child) => child.nodeName === nodeName
     )
 
-    element = childNodes[index] as HTMLElement
+    DOMElement = childNodes[index] as HTMLElement
 
-    if (!element) {
+    if (!DOMElement) {
       return null // Element not found
     }
   }
 
-  return element
+  return DOMElement
 }
 
-function escapeCSSString(cssString: string) {
-  return cssString.replace(/(:)/gu, '\\$1')
+function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number) {
+  const textNode = node as Text
+  const totalNodeLenght = textNode.textContent?.length
+
+  const textToHighlight = startOffset > 0 ? textNode.splitText(startOffset) : textNode
+
+  if (endOffset < totalNodeLenght) {
+    textToHighlight.splitText(endOffset)
+  }
+
+  console.log(textToHighlight)
+
+  const span = document.createElement('span')
+  span.classList.add(HIGHLIGHT_CLASS)
+  span.textContent = textToHighlight.textContent
+
+  node.parentNode?.replaceChild(span, textToHighlight)
+  console.log(textNode)
 }
