@@ -11,8 +11,7 @@ import { HIGHLIGHT_CLASS } from '~/lib/constants'
  */
 export function highlightClippings(clippingList: SavedClipping[]) {
   // Step 1 + 2:
-  clippingList.forEach((clipping, index) => {
-    console.log(index)
+  clippingList.forEach((clipping) => {
     let { selector } = clipping
     // selector comes serialized from the DB
     selector = typeof selector === 'string' ? JSON.parse(selector) : selector
@@ -34,8 +33,7 @@ export function highlightClippings(clippingList: SavedClipping[]) {
 
     const parentContainer = getDOMElementFromIdentifier(parentPath)
 
-    console.log(11111, parentContainer)
-    // If selection is only inside a single element, directly handle it
+    // If selection is only inside a single element, handle it directly
     if (startPath === parentPath && parentContainer) {
       return splitTextAndAddSpan(parentContainer, startOffset, endOffset)
     }
@@ -55,15 +53,13 @@ export function highlightClippings(clippingList: SavedClipping[]) {
       content: clipping.content,
     }
 
-    console.log(33333, highlightPayload, parentContainer)
     // If we don't have the parentConainter, the star&end won't be there implicitly
     const successfullyHighlighet = parentContainer
       ? wrapClippingTextInSpan(parentContainer, highlightPayload)
       : false
 
     if (!successfullyHighlighet) {
-      // console.error('Failed to highlight clipping 333', clipping)
-      // @TODO: try 2nd approach
+      // @TODO: try 2nd approach...
       return
     }
   })
@@ -82,60 +78,52 @@ function wrapClippingTextInSpan(
   clipping: HighlightRange,
   startFound = false,
   charsHighlighted = 0
-) {
+): [boolean, number] | null {
   const { content, startContainer, endContainer, startOffset, endOffset } = clipping
   const clippingLength = content?.length
 
   const childNodes = [...parentContainer.childNodes]
+
   childNodes.forEach((element: Node) => {
     if (charsHighlighted >= clippingLength) {
       return
     }
 
-    // Text nodes represent the content
-    if (element.nodeType === Node.TEXT_NODE) {
-      if (!startFound) {
-        // If we haven't found the start yet, skip text node
-        if (element !== startContainer) {
-          return
-        }
-        startFound = true
-      }
-
-      const startIndex = element === startContainer ? startOffset : 0
-      const endIndex = element === endContainer ? endOffset : element.textContent?.length
-
-      // console.log(element)
-      // const textToHighlight = (element as Text)?.splitText(startIndex)
-      // console.log(2222, textToHighlight)
-    }
-
     // Element nodes represent containers -> recurseive call to find text nodes
     if (element.nodeType === Node.ELEMENT_NODE) {
       const { visibility, display } = window.getComputedStyle(element as Element)
-      const elementNotVisible = visibility === 'hidden' || display === 'none'
 
-      if (elementNotVisible) {
+      if (visibility === 'hidden' || display === 'none') {
         return
       }
 
-      const response = wrapClippingTextInSpan(
+      // Update startFound while going recursivelly
+      ;[startFound, charsHighlighted] = wrapClippingTextInSpan(
         element,
         clipping,
         startFound,
         charsHighlighted
       )
+      return
+    }
 
-      if (response) {
-        startFound = response.startFound
-        charsHighlighted = response.charsHighlighted
+    // Text nodes represent the content
+    if (element.nodeType === Node.TEXT_NODE) {
+      // If start not found, skip node
+      if (!startFound && element !== startContainer) {
+        return
       }
 
-      return
+      startFound = true
+      const startIndex = startFound ? 0 : startOffset
+      const isEndNode = element === endContainer
+      const endIndex = isEndNode ? endOffset : element.textContent?.length ?? 0
+
+      charsHighlighted += splitTextAndAddSpan(element, startOffset, endIndex)
     }
   })
 
-  return { startFound, charsHighlighted }
+  return [startFound, charsHighlighted]
 }
 
 function getDOMElementFromIdentifier(
@@ -189,7 +177,6 @@ function getDOMElementFromIdentifier(
 }
 
 function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number) {
-  console.log(arguments)
   const textNode = node as Text
   const totalNodeLenght = textNode.textContent?.length
 
@@ -201,9 +188,13 @@ function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number)
     textToHighlight.splitText(endOffset - startOffset)
   }
 
+  const nrOfCharsToHighlight = textToHighlight.textContent?.length
+
   const span = document.createElement('span')
   span.classList.add(HIGHLIGHT_CLASS)
   span.textContent = textToHighlight.textContent
 
   node.parentNode?.replaceChild(span, textToHighlight)
+
+  return nrOfCharsToHighlight
 }
