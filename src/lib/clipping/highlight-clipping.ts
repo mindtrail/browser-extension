@@ -34,8 +34,9 @@ export function highlightClippings(clippingList: SavedClipping[]) {
 
     const parentContainer = getDOMElementFromIdentifier(parentPath)
 
+    console.log(11111, parentContainer)
     // If selection is only inside a single element, directly handle it
-    if (startPath === endPath && startPath && parentPath) {
+    if (startPath === parentPath && parentContainer) {
       return splitTextAndAddSpan(parentContainer, startOffset, endOffset)
     }
 
@@ -55,7 +56,6 @@ export function highlightClippings(clippingList: SavedClipping[]) {
     }
 
     console.log(33333, highlightPayload, parentContainer)
-    if (index === 0) return
     // If we don't have the parentConainter, the star&end won't be there implicitly
     const successfullyHighlighet = parentContainer
       ? wrapClippingTextInSpan(parentContainer, highlightPayload)
@@ -92,35 +92,22 @@ function wrapClippingTextInSpan(
       return
     }
 
-    if (startContainer === parentContainer && startContainer === endContainer) {
-    }
-
-    // If we haven't found the start yet, skip text node
+    // Text nodes represent the content
     if (element.nodeType === Node.TEXT_NODE) {
       if (!startFound) {
+        // If we haven't found the start yet, skip text node
         if (element !== startContainer) {
           return
         }
         startFound = true
-
-        if (startContainer === endContainer) {
-          const textToHighlight = (element as Text).splitText(startOffset)
-          const span = document.createElement('span')
-          span.classList.add(HIGHLIGHT_CLASS)
-          span.textContent = textToHighlight.textContent
-          element.parentNode?.insertBefore(span, textToHighlight)
-          return
-        }
-        // console.log(11111, element)
       }
 
       const startIndex = element === startContainer ? startOffset : 0
       const endIndex = element === endContainer ? endOffset : element.textContent?.length
 
-      console.log(element)
-      const textToHighlight = (element as Text)?.splitText(startIndex)
-      console.log(2222, textToHighlight)
-      // Text nodes represent the content
+      // console.log(element)
+      // const textToHighlight = (element as Text)?.splitText(startIndex)
+      // console.log(2222, textToHighlight)
     }
 
     // Element nodes represent containers -> recurseive call to find text nodes
@@ -202,13 +189,16 @@ function getDOMElementFromIdentifier(
 }
 
 function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number) {
+  console.log(arguments)
   const textNode = node as Text
   const totalNodeLenght = textNode.textContent?.length
 
+  // SplitText splits the text node in 2, and returns the new node after the offset
   const textToHighlight = startOffset > 0 ? textNode.splitText(startOffset) : textNode
 
+  // If selection is shorter than the text item, split it again
   if (endOffset < totalNodeLenght) {
-    textToHighlight.splitText(endOffset)
+    textToHighlight.splitText(endOffset - startOffset)
   }
 
   const span = document.createElement('span')

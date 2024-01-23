@@ -30,7 +30,7 @@ export const ClippingOverlay = () => {
 
   useEffect(() => {
     if (clippingList.length) {
-      setTimeout(() => highlightClippings(clippingList), 1000)
+      setTimeout(() => highlightClippings(clippingList), 500)
     }
   }, [clippingList])
 
