@@ -11,7 +11,7 @@ import { Button } from '~/components/ui/button'
 
 import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
-import { getClippingData } from '~lib/clipping/clipping-data'
+import { getClippingData } from '~lib/clipping/store-clipping'
 import { highlightClippings } from '~lib/clipping/highlight-clipping'
 
 export const ClippingOverlay = () => {
@@ -87,6 +87,9 @@ export const ClippingOverlay = () => {
       console.error(result.error)
       return
     }
+
+    console.log(result)
+    setClippingList((prev) => [...prev, payload])
 
     selection?.empty()
     setBtnCoorindates(null)

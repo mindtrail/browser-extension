@@ -8,6 +8,7 @@ export const MESSAGES = {
   SAVE_CLIPPING: 'save-clipping',
   SEARCH_HISTORY: 'search-history',
   UPDATE_ICON: 'update-icon',
+  GET_CLIPPING_LIST: 'get-clipping-list',
 }
 
 export const DEFAULT_EXCLUDE_LIST = [
@@ -68,3 +69,4 @@ export const API = {
 }
 
 export const HIGHLIGHT_CLASS = 'mindtrail-clipping'
+export const SPLIT_TEXTNODE_CLASS = 'mindtrail-split-textNode'

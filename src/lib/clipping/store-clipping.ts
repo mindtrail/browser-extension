@@ -12,18 +12,6 @@ export const getClippingData = (range: Range): SavedClipping => {
     commonAncestorContainer,
   } = range
 
-  /**
-    const highlightInfo = {
-    color: color ? color : "yellow",
-    textColor: textColor ? textColor : "inherit",
-    highlightIndex: highlightIndex,
-    selectionString: selString,
-    anchor: $(selection.anchorNode),
-    anchorOffset: selection.anchorOffset,
-    focus: $(selection.focusNode),
-    focusOffset: selection.focusOffset,
-}; */
-
   const { text: content } = getSelectionContent(range)
   const pageData = getPageData()
 
@@ -34,7 +22,7 @@ export const getClippingData = (range: Range): SavedClipping => {
     endOffset,
     commonAncestorContainer: getContainerIdentifier(
       commonAncestorContainer,
-      XPATH_LEVELS,
+      XPATH_LEVELS
     ),
   }
 
@@ -89,7 +77,7 @@ function escapeCSSString(cssString: string) {
 function getTextBefore(
   node: Node,
   startOffset: number,
-  desiredLenght: number = SURROUNDING_LENGTH,
+  desiredLenght: number = SURROUNDING_LENGTH
 ) {
   if (!node || desiredLenght <= 0) {
     return ''
@@ -113,7 +101,7 @@ function getTextBefore(
 function getTextAfter(
   node: Node,
   endOffset: number,
-  desiredLenght: number = SURROUNDING_LENGTH,
+  desiredLenght: number = SURROUNDING_LENGTH
 ): string {
   if (!node || desiredLenght <= 0) {
     return ''

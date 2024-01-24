@@ -1,4 +1,4 @@
-import { HIGHLIGHT_CLASS } from '~/lib/constants'
+import { HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS } from '~/lib/constants'
 
 // Used same approach as https://github.com/jeromepl/highlighter for the range selector
 /**
@@ -11,8 +11,8 @@ import { HIGHLIGHT_CLASS } from '~/lib/constants'
  */
 
 type HighlightRange = {
-  startNodeEl: HTMLElement
-  endNodeEl: HTMLElement
+  startDOMEl: HTMLElement
+  endDOMEl: HTMLElement
   startOffset: number
   endOffset: number
   content: string
@@ -50,21 +50,21 @@ function highlightClippingFromRange(clipping: SavedClipping) {
   } = range
 
   if (startContainer === commonAncestorContainer) {
-    return splitTextAndAddSpan(parentNodeEl, startOffset, endOffset)
+    return applyTextHighlight(parentNodeEl, startOffset, endOffset)
   }
 
-  const startNodeEl = getDOMElementFromIdentifier(startContainer)
-  const endNodeEl = getDOMElementFromIdentifier(endContainer)
+  const startDOMEl = getDOMElementFromIdentifier(startContainer)
+  const endDOMEl = getDOMElementFromIdentifier(endContainer)
 
   const highlightRange = {
-    startNodeEl,
-    endNodeEl,
+    startDOMEl,
+    endDOMEl,
     startOffset,
     endOffset,
     content,
   }
 
-  const success = recursiveNodeProcess({ rootEl: parentNodeEl, highlightRange })
+  const success = recursiveNodeProcess({ rootNode: parentNodeEl, highlightRange })
 
   if (!success) {
     throw new Error('Failed to highlight clipping from Range')
@@ -72,7 +72,7 @@ function highlightClippingFromRange(clipping: SavedClipping) {
 }
 
 interface RecursiveNodeProcess {
-  rootEl: Node
+  rootNode: Node
   highlightRange: HighlightRange
   startFound?: boolean
   endFound?: boolean
@@ -83,29 +83,30 @@ type RecursiveResp = [boolean, boolean, number]
 
 function recursiveNodeProcess(props: RecursiveNodeProcess): RecursiveResp {
   let {
-    rootEl,
+    rootNode,
     highlightRange,
     startFound = false,
     endFound = false,
     charsHighlighted = 0,
   } = props
 
-  const { content, startNodeEl, endNodeEl, startOffset, endOffset } = highlightRange
+  const { content, startDOMEl, endDOMEl, startOffset, endOffset } = highlightRange
   const clippingLength = content?.length ?? 0
 
-  for (const element of rootEl.childNodes) {
+  for (const node of rootNode.childNodes) {
     if (endFound || charsHighlighted >= clippingLength) {
+      console.log(charsHighlighted, clippingLength, endFound, highlightRange.startDOMEl)
       break
     }
 
     // Element nodes represent containers -> recurseive call on the visible nodes
-    if (element.nodeType === Node.ELEMENT_NODE) {
-      const { visibility, display } = window.getComputedStyle(element as Element)
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const { visibility, display } = window.getComputedStyle(node as Element)
       if (visibility !== 'hidden' && display !== 'none') {
         // Update the state with returned values from the recursive call
         // semicolon is added by prettier
         ;[startFound, endFound, charsHighlighted] = recursiveNodeProcess({
-          rootEl: element,
+          rootNode: node,
           highlightRange,
           startFound,
           endFound,
@@ -115,18 +116,18 @@ function recursiveNodeProcess(props: RecursiveNodeProcess): RecursiveResp {
       continue
     }
 
-    if (element.nodeType === Node.TEXT_NODE) {
+    if (node.nodeType === Node.TEXT_NODE) {
       // Process only after the start node is found
-      if (element === startNodeEl || startFound) {
+      if (node === startDOMEl || startFound) {
         startFound = true // Mark the start as found the first time we access the function
 
         // Determine the start and end index for highlighting in this text node
-        const startIndex = element === startNodeEl ? startOffset : 0
-        const isEndNode = element === endNodeEl
-        const endIndex = isEndNode ? endOffset : element.textContent?.length ?? 0
+        const startIndex = node === startDOMEl ? startOffset : 0
+        const isEndNode = node === endDOMEl
+        const endIndex = isEndNode ? endOffset : node?.textContent?.length ?? 0
 
         // Highlight the text node and update the count of highlighted characters
-        charsHighlighted += splitTextAndAddSpan(element, startIndex, endIndex)
+        charsHighlighted += applyTextHighlight(node, startIndex, endIndex)
 
         // If this is the end node, mark the end as found and stop processing further
         if (isEndNode) {
@@ -185,25 +186,41 @@ function getDOMElementFromIdentifier(identifier: string) {
   return DOMElement
 }
 
-function splitTextAndAddSpan(node: Node, startOffset: number, endOffset: number) {
+function applyTextHighlight(node: Node, startOffset: number, endOffset: number) {
   const textNode = node as Text
-  const totalNodeLenght = textNode.textContent?.length
+  const parentNode = node.parentNode as Element
+
+  const nodeTextLength = textNode?.textContent?.length ?? 0
+
+  // We skip the whitespace/newline nodes.
+  // But still return their length as if they were highlighted
+  if (!textNode?.textContent?.trim()) {
+    return nodeTextLength
+  }
+
+  // If the entire text node is to be highlighted, we apply the class onto the parent
+  if (startOffset === 0 && endOffset >= nodeTextLength) {
+    parentNode?.classList?.add(HIGHLIGHT_CLASS)
+    console.log(node, parentNode)
+    return nodeTextLength
+  }
 
   // SplitText splits the text node in 2, and returns the new node after the offset
   const textToHighlight = startOffset > 0 ? textNode.splitText(startOffset) : textNode
 
   // If selection is shorter than the text item, split it again
-  if (endOffset < totalNodeLenght) {
+  if (endOffset < nodeTextLength) {
     textToHighlight.splitText(endOffset - startOffset)
   }
 
   const nrOfCharsToHighlight = textToHighlight.textContent?.length
 
   const span = document.createElement('span')
-  span.classList.add(HIGHLIGHT_CLASS)
+  // @TODO: test the Slit TextNode class a bit better...
+  span.classList.add(HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS)
   span.textContent = textToHighlight.textContent
 
-  node.parentNode?.replaceChild(span, textToHighlight)
+  parentNode?.replaceChild(span, textToHighlight)
 
   return nrOfCharsToHighlight
 }

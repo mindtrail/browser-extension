@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       savePage(payload, sendResponse)
       break
     case MESSAGES.SAVE_CLIPPING:
-      SavedClipping(payload, sendResponse)
+      saveClipping(payload, sendResponse)
       break
     case MESSAGES.SEARCH_HISTORY:
       searchHistory(payload, sendResponse)
@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true
 })
 
-async function savePage(payload: PageData, sendResponse = (resp: any) => {}) {
+async function savePage(payload: PageData, sendResponse: SendResponse) {
   log('SAVE Page --- ', payload)
 
   try {
@@ -69,7 +69,9 @@ async function savePageAPICall(payload: PageData) {
   })
 }
 
-async function SavedClipping(payload: SavedClipping, sendResponse) {
+type SendResponse = (resp: any) => void
+
+async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) {
   const { pageData, ...rest } = payload
   try {
     const savePageResponse = await savePageAPICall(pageData)
@@ -107,10 +109,13 @@ async function SavedClipping(payload: SavedClipping, sendResponse) {
       throw new Error('Network response was not ok')
     }
 
-    const data = await response.json()
-    log(data)
+    const clipping = await response.json()
+    log(clipping)
 
-    sendResponse(data)
+    const updatedList = await fetchClippingList()
+    console.log(updatedList)
+
+    sendResponse({ clipping, updatedList })
   } catch (e) {
     console.error(e)
   }
@@ -127,7 +132,10 @@ async function updateExtensionIcon() {
   log('autoSave update --- :', autoSave)
 }
 
-async function searchHistory(payload, sendResponse) {
+interface searchPayload {
+  searchQuery: string
+}
+async function searchHistory(payload: searchPayload, sendResponse: SendResponse) {
   log(payload)
 
   try {
@@ -163,12 +171,8 @@ async function initializeExtension() {
   }
 
   updateExtensionIcon()
-
   // @TODO: handle error when fetching data, in the client
-  const clippingList = (await getClippingList()) || []
-  console.log('initializing', clippingList)
-
-  storage.set('clippingList', clippingList)
+  fetchClippingList()
 }
 
 async function getAutoSaveStatus() {
@@ -176,13 +180,16 @@ async function getAutoSaveStatus() {
   return settings?.autoSave
 }
 
-async function getClippingList() {
+async function fetchClippingList() {
   try {
     const result = await fetch(TARGET_HOST + API.CLIPPING)
     if (!result.ok) {
       throw new Error('Network response was not ok')
     }
-    return await result.json()
+    const clippingList = await result.json()
+    const response = await storage.set('clippingList', clippingList)
+
+    return response
   } catch (e) {
     log('error', e)
     return []
