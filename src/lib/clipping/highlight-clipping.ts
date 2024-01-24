@@ -198,11 +198,11 @@ function applyTextHighlight(node: Node, startOffset: number, endOffset: number) 
     return nodeTextLength
   }
 
-  // If the entire text node is to be highlighted, we apply the class onto the parent
+  // If the entire text node is to be highlighted, we can apply the class onto the parent
+  // @TODO: Decide if we that that or not... or in which cases it can make sense
   if (startOffset === 0 && endOffset >= nodeTextLength) {
-    parentNode?.classList?.add(HIGHLIGHT_CLASS)
-    console.log(node, parentNode)
-    return nodeTextLength
+    // parentNode?.classList?.add(HIGHLIGHT_CLASS)
+    // return nodeTextLength
   }
 
   // SplitText splits the text node in 2, and returns the new node after the offset
