@@ -32,7 +32,6 @@ export function highlightClippings(clippingList: SavedClipping[]) {
 }
 
 function highlightClippingFromRange(clipping: SavedClipping) {
-  console.log(clipping)
   let { selector, content, id: clippingId } = clipping
   selector = parseSelector(selector)
 
@@ -216,7 +215,8 @@ function applyTextHighlight(
   // SplitText splits the text node in 2, and returns the new node after the offset
   const textToHighlight = startOffset > 0 ? textNode.splitText(startOffset) : textNode
 
-  // If selection is shorter than the text item, split it again
+  // If selection is shorter than the text item, split again.
+  // textToHighlight will be mutated. A new textNode is added- but we don't need that one
   if (endOffset < nodeTextLength) {
     textToHighlight.splitText(endOffset - startOffset)
   }
