@@ -1,31 +1,21 @@
-import { useCallback, useEffect, useReducer, useState } from 'react'
-import type { MouseEvent } from 'react'
-
+import { useCallback, useEffect } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
-import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
-import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
-import {
-  addDeleteListener,
-  removeDeleteListener,
-  getClippingData,
-  highlightClipping,
-} from '~lib/clipping'
 
-import { SaveClipping } from './save'
+import { highlightClipping } from '~lib/clipping'
+
+import { SaveClipping } from '~/components/clipping/save'
+import { DeleteClipping } from '~/components/clipping/delete'
 
 export const ClippingOverlay = () => {
   const [clippingList, setClippingList] = useStorage('clippingList', [])
 
+  // @TODO: Filter clipping list by page url
   useEffect(() => {
     if (clippingList.length) {
       setTimeout(() => {
         highlightClipping(clippingList)
-        // Add event listener only on the nodes that have the highlight class
-        // addDeleteListener(clippingList)
-      }, 500)
+      }, 1500) // For really slow computers, this may need to be even higher
     }
-
-    // return () => removeDeleteListener()
   }, [clippingList])
 
   const addClippingToList = useCallback(
@@ -34,10 +24,10 @@ export const ClippingOverlay = () => {
     },
     [setClippingList]
   )
-
   return (
     <>
       <SaveClipping addClippingToList={addClippingToList} />
+      {clippingList?.length && <DeleteClipping clippingList={clippingList} />}
     </>
   )
 }

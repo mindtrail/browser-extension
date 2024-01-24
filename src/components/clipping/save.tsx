@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import type { MouseEvent } from 'react'
 
-import { useStorage } from '@plasmohq/storage/hook'
 import { ClipboardCopyIcon } from '@radix-ui/react-icons'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
+import { Button } from '~/components/ui/button'
 
 import { IconSpinner } from '~/components/icon-spinner'
-import { Button } from '~/components/ui/button'
 
 import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
@@ -83,7 +82,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
       return
     }
 
-    console.log(result)
+    console.log(111, result)
     addClippingToList(payload)
 
     selection?.empty()
@@ -118,7 +117,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Save Selection</TooltipContent>
+      <TooltipContent side='bottom'>Save Selection</TooltipContent>
     </Tooltip>
   )
 }

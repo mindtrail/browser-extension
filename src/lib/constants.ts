@@ -9,6 +9,7 @@ export const MESSAGES = {
   SEARCH_HISTORY: 'search-history',
   UPDATE_ICON: 'update-icon',
   GET_CLIPPING_LIST: 'get-clipping-list',
+  DELETE_CLIPPING: 'delete-clipping',
 }
 
 export const DEFAULT_EXCLUDE_LIST = [
