@@ -10,22 +10,22 @@ import { HIGHLIGHT_CLASS } from '~/lib/constants'
 
 export const ClippingOverlay = () => {
   const [clippingList, setClippingList] = useStorage('clippingList', [])
-  const prevClippingListLength = useRef(clippingList.length)
+  const highlightInitialized = useRef(false) // Ref to track if highlighting has been initialized
 
   // @TODO: Filter clipping list by page url
+  // We only run this once, since the DOM can be altered, so then the XPath will not be reliable
   useEffect(() => {
-    if (clippingList.length > prevClippingListLength.current) {
+    if (clippingList?.length && !highlightInitialized.current) {
       setTimeout(() => {
         highlightClipping(clippingList)
+        highlightInitialized.current = true // Mark as initialized
       }, 1500) // Adjust the delay as needed
     }
-
-    // Update the ref with the new length after running effects
-    prevClippingListLength.current = clippingList.length
   }, [clippingList])
 
   const addClippingToList = useCallback(
     (newClipping: SavedClipping) => {
+      highlightClipping([newClipping])
       setClippingList((prev) => [...prev, newClipping])
     },
     [setClippingList],
@@ -36,8 +36,9 @@ export const ClippingOverlay = () => {
       const elementsToRemoveHighlight = document.querySelectorAll(
         `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
       )
-      removeHighlightClass([...elementsToRemoveHighlight])
 
+      // Remove the highlight class from the removed elements
+      removeHighlightClass([...elementsToRemoveHighlight])
       setClippingList((prev) => prev.filter((c) => c.id !== clippingId))
     },
     [setClippingList],
