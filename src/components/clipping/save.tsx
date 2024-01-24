@@ -11,9 +11,9 @@ import { IconSpinner } from '~/components/icon-spinner'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import {
   getClippingData,
-  getClippingBtnPosition,
+  getSaveClippingBtnPosition,
   isSelectionExcludedNode,
-} from '~lib/clipping/save-clipping'
+} from '~lib/clipping/save'
 
 interface SaveClippingProps {
   addClippingToList: (payload: any) => void
@@ -49,7 +49,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
         return
       }
 
-      const newCoordinates = getClippingBtnPosition(range)
+      const newCoordinates = getSaveClippingBtnPosition(range)
       if (!newCoordinates) {
         return
       }

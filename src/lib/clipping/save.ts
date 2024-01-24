@@ -23,7 +23,7 @@ export const getClippingData = (range: Range): SavedClipping => {
     endOffset,
     commonAncestorContainer: getContainerIdentifier(
       commonAncestorContainer,
-      XPATH_LEVELS
+      XPATH_LEVELS,
     ),
   }
 
@@ -78,7 +78,7 @@ function escapeCSSString(cssString: string) {
 function getTextBefore(
   node: Node,
   startOffset: number,
-  desiredLenght: number = SURROUNDING_LENGTH
+  desiredLenght: number = SURROUNDING_LENGTH,
 ) {
   if (!node || desiredLenght <= 0) {
     return ''
@@ -102,7 +102,7 @@ function getTextBefore(
 function getTextAfter(
   node: Node,
   endOffset: number,
-  desiredLenght: number = SURROUNDING_LENGTH
+  desiredLenght: number = SURROUNDING_LENGTH,
 ): string {
   if (!node || desiredLenght <= 0) {
     return ''
@@ -166,8 +166,7 @@ function getSelectionContent(range: Range) {
   return { text, images }
 }
 
-
-export function getClippingBtnPosition(range: Range) {
+export function getSaveClippingBtnPosition(range: Range) {
   const { bottom, left, width } = range.getBoundingClientRect()
   const XCoord = left + width / 2 - 16 // half of button width
 
@@ -216,10 +215,4 @@ function isNodeInTheExcludedList(node: Node) {
   ) as HTMLElement
 
   return EXCLUDED_TAGS_FOR_CLIPPING.includes(element?.tagName)
-}
-
-export function log(...args: any) {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(...args)
-  }
 }

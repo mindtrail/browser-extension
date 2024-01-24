@@ -8,8 +8,12 @@ import { Button } from '~/components/ui/button'
 
 import { IconSpinner } from '~/components/icon-spinner'
 
-import { MESSAGES } from '~/lib/constants'
-import { HIGHLIGHT_CLASS } from '~/lib/constants'
+import { MESSAGES, HIGHLIGHT_CLASS } from '~/lib/constants'
+import { getDeleteBtnCoordinates } from '~/lib/clipping/delete'
+
+interface DeleteBtnProps {
+  clippingList: SavedClipping[]
+}
 
 interface DeleteClippingProps {
   clippingList: SavedClipping[]
@@ -19,9 +23,8 @@ const MAX_RETRIES = 3
 
 export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
-  const [btnCoorindates, setBtnCoorindates] = useState({ left: 300, top: 400 })
+  const [btnCoorindates, setBtnCoorindates] = useState(null)
   const [listenerRetryNr, setListenerRetryNr] = useState(0)
-  const [hoveredHighlight, setHoveredHighlight] = useState('')
   const hideTimeout = useRef(null) // useRef to persist hideTimeout between renders
 
   useEffect(() => {
@@ -45,15 +48,14 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
       `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`
     )
 
-    console.log(clippingId, allHighlightElements)
-
+    const btnCoordinates = getDeleteBtnCoordinates([...allHighlightElements])
     clearTimeout(hideTimeout.current)
-    setHoveredHighlight(clippingId)
+    setBtnCoorindates(btnCoordinates)
   }, [])
 
   const handleMouseLeave = useCallback(() => {
     hideTimeout.current = setTimeout(() => {
-      setHoveredHighlight('')
+      setBtnCoorindates(null)
     }, 400)
   }, [])
 
@@ -90,7 +92,6 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
 
     toggleLoading()
     const payload = {}
-    // console.log('Delete... ID', payload)
 
     const result = await chrome.runtime.sendMessage({
       message: MESSAGES.DELETE_CLIPPING,
@@ -104,11 +105,10 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
       console.error(result.error)
       return
     }
-    console.log(result)
     setBtnCoorindates(null)
   }, [])
 
-  if (!btnCoorindates || !hoveredHighlight) {
+  if (!btnCoorindates) {
     return null
   }
 
@@ -122,10 +122,10 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
           onMouseEnter={handleDeleteBtnMouseEnter}
           onMouseLeave={handleMouseLeave}
           disabled={loading}
-          variant='outline'
+          variant='destructive'
           style={{ transform: `translate(${left}px, ${top}px)` }}
           className={`p-1 rounded-full h-auto absolute z-[999]
-              bg-white hover:bg-slate-200 text-accent-foreground/75
+            bg-white hover:bg-slate-200 text-danger/75
               transform transition-transform duration-200 ease-out
               disabled:opacity-80`}
         >
