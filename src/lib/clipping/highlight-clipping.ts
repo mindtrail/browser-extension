@@ -19,7 +19,7 @@ type HighlightRange = {
   content: string
 }
 
-export function highlightClippings(clippingList: SavedClipping[]) {
+export function highlightClipping(clippingList: SavedClipping[]) {
   // Step 1 + 2:
   clippingList.forEach((clipping) => {
     try {
