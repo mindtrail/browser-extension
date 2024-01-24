@@ -40,7 +40,12 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
     if (!clippingId) {
       return
     }
-    console.log(clippingId)
+
+    const allHighlightElements = document.querySelectorAll(
+      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`
+    )
+
+    console.log(clippingId, allHighlightElements)
 
     clearTimeout(hideTimeout.current)
     setHoveredHighlight(clippingId)

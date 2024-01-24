@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
 
-import { highlightClipping } from '~lib/clipping'
+import { highlightClipping } from '~lib/clipping/highlight-clipping'
 
 import { SaveClipping } from '~/components/clipping/save'
 import { DeleteClipping } from '~/components/clipping/delete'

@@ -1,4 +1,5 @@
 import { getPageData } from '~/lib/page-data'
+import { EXCLUDED_TAGS_FOR_CLIPPING } from '~/lib/constants'
 
 const SURROUNDING_LENGTH = 40
 const XPATH_LEVELS = 999
@@ -163,4 +164,62 @@ function getSelectionContent(range: Range) {
     .forEach((img) => images.push({ src: img.src, alt: img.alt }))
 
   return { text, images }
+}
+
+
+export function getClippingBtnPosition(range: Range) {
+  const { bottom, left, width } = range.getBoundingClientRect()
+  const XCoord = left + width / 2 - 16 // half of button width
+
+  return {
+    left: XCoord + window.scrollX,
+    top: bottom + window.scrollY + 24,
+  }
+}
+
+// @TODO - proper check if it's not in a form element, or like in Mindtrail, it detect the div...
+export function isSelectionExcludedNode(range: Range) {
+  if (!range) {
+    return false
+  }
+
+  const { startContainer, endContainer, commonAncestorContainer } = range
+
+  const nodeIsContentEditable =
+    isNodeContentEditable(startContainer) ||
+    isNodeContentEditable(endContainer) ||
+    isNodeContentEditable(commonAncestorContainer)
+
+  const nodeIsExcluded =
+    isNodeInTheExcludedList(startContainer) ||
+    isNodeInTheExcludedList(endContainer) ||
+    isNodeInTheExcludedList(commonAncestorContainer)
+
+  return nodeIsContentEditable || nodeIsExcluded
+}
+
+function isNodeContentEditable(node: Node) {
+  if (!node) {
+    return false
+  }
+
+  const element = (
+    node.nodeType === Node.TEXT_NODE ? node.parentNode : node
+  ) as HTMLElement
+
+  return element.isContentEditable || element.contentEditable === 'true'
+}
+
+function isNodeInTheExcludedList(node: Node) {
+  const element = (
+    node.nodeType === Node.TEXT_NODE ? node.parentNode : node
+  ) as HTMLElement
+
+  return EXCLUDED_TAGS_FOR_CLIPPING.includes(element?.tagName)
+}
+
+export function log(...args: any) {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args)
+  }
 }

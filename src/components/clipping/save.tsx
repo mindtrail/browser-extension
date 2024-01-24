@@ -8,9 +8,12 @@ import { Button } from '~/components/ui/button'
 
 import { IconSpinner } from '~/components/icon-spinner'
 
-import { isSelectionExcludedNode, getClippingBtnPosition } from '~lib/utils'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
-import { getClippingData } from '~lib/clipping'
+import {
+  getClippingData,
+  getClippingBtnPosition,
+  isSelectionExcludedNode,
+} from '~lib/clipping/save-clipping'
 
 interface SaveClippingProps {
   addClippingToList: (payload: any) => void
