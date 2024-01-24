@@ -29,14 +29,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case MESSAGES.SAVE_CLIPPING:
       saveClipping(payload, sendResponse)
       break
+    case MESSAGES.DELETE_CLIPPING:
+      deleteClipping(payload, sendResponse)
+      break
     case MESSAGES.SEARCH_HISTORY:
       searchHistory(payload, sendResponse)
       break
     case MESSAGES.UPDATE_ICON:
       updateExtensionIcon()
       break
-    case MESSAGES.DELETE_CLIPPING:
-      console.log(payload)
+    case MESSAGES.GET_CLIPPING_LIST:
+      fetchClippingList()
       sendResponse(1111)
       break
     default:
@@ -125,6 +128,28 @@ async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) 
   }
 }
 
+async function deleteClipping({ clippingId }, sendResponse: SendResponse) {
+  try {
+    const response = await fetch(`${TARGET_HOST + API.CLIPPING}/${clippingId}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      sendResponse({ error: response.status })
+      throw new Error('Network response was not ok')
+    }
+
+    const clipping = await response.json()
+    log('deleted Clipping', clipping)
+
+    const updatedList = await fetchClippingList()
+
+    sendResponse({ clipping, updatedList })
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 // Based on Auto/Manual save, update the extension icon
 async function updateExtensionIcon() {
   const autoSave = await getAutoSaveStatus()
@@ -161,6 +186,8 @@ async function searchHistory(payload: searchPayload, sendResponse: SendResponse)
     sendResponse('')
   }
 }
+
+let storage: Storage
 
 async function initializeExtension() {
   storage = new Storage()
