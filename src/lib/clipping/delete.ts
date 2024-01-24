@@ -1,3 +1,5 @@
+import { HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS } from '~/lib/constants'
+
 export function getDeleteBtnCoordinates(elementList: Element[]) {
   try {
     // Find max Y value, and Min & Max X values
@@ -22,5 +24,11 @@ export function getDeleteBtnCoordinates(elementList: Element[]) {
       left: 0,
       top: 0,
     }
+  }
+}
+
+export function removeHighlightClass(elementList: Element[]) {
+  for (const element of elementList) {
+    element.classList.remove(HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS)
   }
 }

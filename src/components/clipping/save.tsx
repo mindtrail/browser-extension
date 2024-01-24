@@ -13,7 +13,7 @@ import {
   getClippingData,
   getSaveClippingBtnPosition,
   isSelectionExcludedNode,
-} from '~lib/clipping/save'
+} from '~/lib/clipping/save'
 
 interface SaveClippingProps {
   addClippingToList: (payload: any) => void
@@ -120,7 +120,9 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent side='bottom'>Save Selection</TooltipContent>
+      <TooltipContent side='bottom' sideOffset={8}>
+        Save Selection
+      </TooltipContent>
     </Tooltip>
   )
 }

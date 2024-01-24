@@ -11,20 +11,18 @@ import { IconSpinner } from '~/components/icon-spinner'
 import { MESSAGES, HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getDeleteBtnCoordinates } from '~/lib/clipping/delete'
 
-interface DeleteBtnProps {
-  clippingList: SavedClipping[]
-}
-
 interface DeleteClippingProps {
   clippingList: SavedClipping[]
+  onDelete: (id: string) => void
 }
 
 const MAX_RETRIES = 3
 
-export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
+export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
   const [btnCoorindates, setBtnCoorindates] = useState(null)
   const [listenerRetryNr, setListenerRetryNr] = useState(0)
+  const [hoveredClippingId, setHoveredClippingId] = useState<string | null>(null)
   const hideTimeout = useRef(null) // useRef to persist hideTimeout between renders
 
   useEffect(() => {
@@ -38,28 +36,38 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
     return () => removeDeleteListener()
   }, [clippingList, listenerRetryNr])
 
-  const handleMouseEnter = useCallback((event) => {
-    const clippingId = event.target?.dataset?.highlightId
+  const handleHighlightMouseEnter = useCallback((event: Event) => {
+    const target = event.target as HTMLElement
+    const clippingId = target?.dataset?.highlightId
+
     if (!clippingId) {
       return
     }
 
     const allHighlightElements = document.querySelectorAll(
-      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`
+      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
     )
 
     const btnCoordinates = getDeleteBtnCoordinates([...allHighlightElements])
     clearTimeout(hideTimeout.current)
     setBtnCoorindates(btnCoordinates)
+    setHoveredClippingId(clippingId)
   }, [])
 
   const handleMouseLeave = useCallback(() => {
+    if (loading) {
+      return
+    }
+
     hideTimeout.current = setTimeout(() => {
       setBtnCoorindates(null)
+      setHoveredClippingId(null)
     }, 400)
   }, [])
 
-  const handleDeleteBtnMouseEnter = useCallback(() => {
+  const handleBtnMouseEnter = useCallback(() => {
+    console.log(hoveredClippingId)
+
     clearTimeout(hideTimeout.current) // Clear the timeout to prevent hiding
   }, [])
 
@@ -73,7 +81,7 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
     }
 
     for (const element of highlightedElements) {
-      element.addEventListener('mouseenter', handleMouseEnter)
+      element.addEventListener('mouseenter', handleHighlightMouseEnter)
       element.addEventListener('mouseleave', handleMouseLeave)
     }
   }
@@ -82,31 +90,37 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
     const highlightedElements = document.getElementsByClassName(HIGHLIGHT_CLASS)
 
     for (const element of highlightedElements) {
-      element.removeEventListener('mouseenter', handleMouseEnter)
+      element.removeEventListener('mouseenter', handleHighlightMouseEnter)
       element.removeEventListener('mouseleave', handleMouseLeave)
     }
   }
 
-  const handleDelete = useCallback(async (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
+  const handleDelete = useCallback(
+    async (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation()
 
-    toggleLoading()
-    const payload = {}
+      console.log(hoveredClippingId)
+      toggleLoading()
+      const payload = { clippingId: hoveredClippingId }
 
-    const result = await chrome.runtime.sendMessage({
-      message: MESSAGES.DELETE_CLIPPING,
-      payload,
-    })
+      const result = await chrome.runtime.sendMessage({
+        message: MESSAGES.DELETE_CLIPPING,
+        payload,
+      })
 
-    toggleLoading()
-    if (result?.error) {
-      alert('Error saving clipping. Please try again.')
+      toggleLoading()
+      if (result?.error) {
+        alert('Error saving clipping. Please try again.')
 
-      console.error(result.error)
-      return
-    }
-    setBtnCoorindates(null)
-  }, [])
+        console.error(result.error)
+        return
+      }
+      setBtnCoorindates(null)
+      setHoveredClippingId(null)
+      onDelete(hoveredClippingId)
+    },
+    [hoveredClippingId],
+  )
 
   if (!btnCoorindates) {
     return null
@@ -114,12 +128,14 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
 
   const { left, top } = btnCoorindates
 
+  console.log(hoveredClippingId)
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           onClick={handleDelete}
-          onMouseEnter={handleDeleteBtnMouseEnter}
+          onMouseEnter={handleBtnMouseEnter}
           onMouseLeave={handleMouseLeave}
           disabled={loading}
           variant='destructive'
@@ -137,7 +153,9 @@ export const DeleteClipping = ({ clippingList }: DeleteClippingProps) => {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent side='bottom'>Delete Highlight</TooltipContent>
+      <TooltipContent side='bottom' sideOffset={8}>
+        Delete Highlight
+      </TooltipContent>
     </Tooltip>
   )
 }

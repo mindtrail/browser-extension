@@ -9,7 +9,7 @@ import { ClippingOverlay } from '~/components/clipping'
 import { RightSidebar } from '~/components/right-sidebar'
 
 import { DEFAULT_EXTENSION_SETTINGS } from '~/lib/constants'
-import { isHostExcluded } from '~lib/utils'
+import { isHostExcluded } from '~/lib/utils'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {

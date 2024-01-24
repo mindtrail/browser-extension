@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   log(
     sender.tab
       ? 'From Content script:' + sender.tab.url + message
-      : 'From Extension' + message
+      : 'From Extension' + message,
   )
 
   switch (message) {
@@ -34,6 +34,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       break
     case MESSAGES.UPDATE_ICON:
       updateExtensionIcon()
+      break
+    case MESSAGES.DELETE_CLIPPING:
+      console.log(payload)
+      sendResponse(1111)
       break
     default:
       // default case action here
@@ -158,14 +162,10 @@ async function searchHistory(payload: searchPayload, sendResponse: SendResponse)
   }
 }
 
-let storage: Storage
-
 async function initializeExtension() {
   storage = new Storage()
 
   const settings = (await storage.get('settings')) as SettingsStored
-
-  console.log(settings)
   if (!settings) {
     await storage.set('settings', DEFAULT_EXTENSION_SETTINGS)
   }

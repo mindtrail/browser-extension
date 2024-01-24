@@ -1,33 +1,54 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
-
-import { highlightClipping } from '~lib/clipping/highlight'
 
 import { SaveClipping } from '~/components/clipping/save'
 import { DeleteClipping } from '~/components/clipping/delete'
 
+import { highlightClipping } from '~/lib/clipping/highlight'
+import { removeHighlightClass } from '~/lib/clipping/delete'
+import { HIGHLIGHT_CLASS } from '~/lib/constants'
+
 export const ClippingOverlay = () => {
   const [clippingList, setClippingList] = useStorage('clippingList', [])
+  const prevClippingListLength = useRef(clippingList.length)
 
   // @TODO: Filter clipping list by page url
   useEffect(() => {
-    if (clippingList.length) {
+    if (clippingList.length > prevClippingListLength.current) {
       setTimeout(() => {
         highlightClipping(clippingList)
-      }, 1500) // For really slow computers, this may need to be even higher
+      }, 1500) // Adjust the delay as needed
     }
+
+    // Update the ref with the new length after running effects
+    prevClippingListLength.current = clippingList.length
   }, [clippingList])
 
   const addClippingToList = useCallback(
     (newClipping: SavedClipping) => {
       setClippingList((prev) => [...prev, newClipping])
     },
-    [setClippingList]
+    [setClippingList],
   )
+
+  const removeClippingFromList = useCallback(
+    (clippingId: string) => {
+      const elementsToRemoveHighlight = document.querySelectorAll(
+        `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
+      )
+      removeHighlightClass([...elementsToRemoveHighlight])
+
+      setClippingList((prev) => prev.filter((c) => c.id !== clippingId))
+    },
+    [setClippingList],
+  )
+
   return (
     <>
       <SaveClipping addClippingToList={addClippingToList} />
-      {clippingList?.length && <DeleteClipping clippingList={clippingList} />}
+      {clippingList?.length && (
+        <DeleteClipping clippingList={clippingList} onDelete={removeClippingFromList} />
+      )}
     </>
   )
 }

@@ -155,7 +155,7 @@ function getDOMElementFromIdentifier(identifier: string) {
       continue // Skip empty parts
     }
 
-    if (part.startsWith('#') && !part.startsWith('#text')) {
+    if (part.startsWith('#') && part !== '#text') {
       // If part is an ID selector, find the element by ID
       const id = part.substring(1)
       DOMElement = document.getElementById(id)
@@ -175,7 +175,7 @@ function getDOMElementFromIdentifier(identifier: string) {
     const index = parseInt(indexStr)
 
     const childNodes = [...DOMElement.childNodes].filter(
-      (child) => child.nodeName === nodeName
+      (child) => child.nodeName === nodeName,
     )
 
     DOMElement = childNodes[index] as HTMLElement
@@ -192,7 +192,7 @@ function applyTextHighlight(
   node: Node,
   startOffset: number,
   endOffset: number,
-  clippingId: string
+  clippingId: string,
 ) {
   const textNode = node as Text
   const parentNode = node.parentNode as Element
