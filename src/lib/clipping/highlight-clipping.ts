@@ -11,6 +11,7 @@ import { HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS } from '~/lib/constants'
  */
 
 type HighlightRange = {
+  clippingId: string
   startDOMEl: HTMLElement
   endDOMEl: HTMLElement
   startOffset: number
@@ -31,7 +32,8 @@ export function highlightClippings(clippingList: SavedClipping[]) {
 }
 
 function highlightClippingFromRange(clipping: SavedClipping) {
-  let { selector, content } = clipping
+  console.log(clipping)
+  let { selector, content, id: clippingId } = clipping
   selector = parseSelector(selector)
 
   const { range } = selector
@@ -50,13 +52,14 @@ function highlightClippingFromRange(clipping: SavedClipping) {
   } = range
 
   if (startContainer === commonAncestorContainer) {
-    return applyTextHighlight(parentNodeEl, startOffset, endOffset)
+    return applyTextHighlight(parentNodeEl, startOffset, endOffset, clippingId)
   }
 
   const startDOMEl = getDOMElementFromIdentifier(startContainer)
   const endDOMEl = getDOMElementFromIdentifier(endContainer)
 
-  const highlightRange = {
+  const highlightRange: HighlightRange = {
+    clippingId,
     startDOMEl,
     endDOMEl,
     startOffset,
@@ -90,12 +93,12 @@ function recursiveNodeProcess(props: RecursiveNodeProcess): RecursiveResp {
     charsHighlighted = 0,
   } = props
 
-  const { content, startDOMEl, endDOMEl, startOffset, endOffset } = highlightRange
+  const { content, startDOMEl, endDOMEl, startOffset, endOffset, clippingId } =
+    highlightRange
   const clippingLength = content?.length ?? 0
 
   for (const node of rootNode.childNodes) {
     if (endFound || charsHighlighted >= clippingLength) {
-      console.log(charsHighlighted, clippingLength, endFound, highlightRange.startDOMEl)
       break
     }
 
@@ -127,7 +130,7 @@ function recursiveNodeProcess(props: RecursiveNodeProcess): RecursiveResp {
         const endIndex = isEndNode ? endOffset : node?.textContent?.length ?? 0
 
         // Highlight the text node and update the count of highlighted characters
-        charsHighlighted += applyTextHighlight(node, startIndex, endIndex)
+        charsHighlighted += applyTextHighlight(node, startIndex, endIndex, clippingId)
 
         // If this is the end node, mark the end as found and stop processing further
         if (isEndNode) {
@@ -186,7 +189,12 @@ function getDOMElementFromIdentifier(identifier: string) {
   return DOMElement
 }
 
-function applyTextHighlight(node: Node, startOffset: number, endOffset: number) {
+function applyTextHighlight(
+  node: Node,
+  startOffset: number,
+  endOffset: number,
+  clippingId: string
+) {
   const textNode = node as Text
   const parentNode = node.parentNode as Element
 
@@ -216,8 +224,8 @@ function applyTextHighlight(node: Node, startOffset: number, endOffset: number) 
   const nrOfCharsToHighlight = textToHighlight.textContent?.length
 
   const span = document.createElement('span')
-  // @TODO: test the Slit TextNode class a bit better...
   span.classList.add(HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS)
+  span.dataset.highlightId = clippingId
   span.textContent = textToHighlight.textContent
 
   parentNode?.replaceChild(span, textToHighlight)

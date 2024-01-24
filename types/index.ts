@@ -32,6 +32,7 @@ declare global {
   }
 
   interface SavedClipping {
+    id?: string
     content: string
     pageData: PageData
     selector: {
