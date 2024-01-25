@@ -3,7 +3,7 @@
 import '~style.css'
 
 import { useCallback } from 'react'
-
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
@@ -19,8 +19,15 @@ const defaultSettings: SettingsStored = {
   excludeList: DEFAULT_EXCLUDE_LIST,
 }
 
+const LOCAL_SETTINGS = {
+  key: 'settings',
+  instance: new Storage({
+    area: 'local',
+  }),
+}
+
 function IndexPopup() {
-  const [settings, setSettings] = useStorage('settings', defaultSettings)
+  const [settings, setSettings] = useStorage(LOCAL_SETTINGS, defaultSettings)
 
   const updatedSettings = useCallback((newSettings: Partial<SettingsStored>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }))

@@ -21,9 +21,20 @@ type HighlightRange = {
 
 export function highlightClipping(clippingList: SavedClipping[]) {
   // Step 1 + 2:
+  const currentUrl = new URL(window.location.href)
   clippingList.forEach((clipping) => {
     try {
-      highlightClippingFromRange(clipping)
+      const { dataSource } = clipping
+      const dataSourceUrl = new URL(dataSource?.name)
+
+      const isSameHostAndPath =
+        dataSourceUrl.host === currentUrl.host &&
+        dataSourceUrl.pathname === currentUrl.pathname
+
+      // Only apply for clippings that are related to current URL
+      if (isSameHostAndPath) {
+        highlightClippingFromRange(clipping)
+      }
     } catch (error) {
       // @TODO: try 2nd approach... of searchgin by text + surrounding, not only range
       console.error(error, clipping)

@@ -1,6 +1,7 @@
 import cssText from 'data-text:~style.css'
 
 import { useEffect, useState } from 'react'
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { TooltipProvider } from '~/components/ui/tooltip'
@@ -16,6 +17,13 @@ export const getStyle = () => {
   const style = document.createElement('style')
   style.textContent = cssText
   return style
+}
+
+const LOCAL_SETTINGS = {
+  key: 'settings',
+  instance: new Storage({
+    area: 'local',
+  }),
 }
 
 const UIOverlay = () => {

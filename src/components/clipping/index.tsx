@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { SaveClipping } from '~components/clipping/save-clipping'
@@ -8,8 +9,15 @@ import { highlightClipping } from '~/lib/clipping/highlight'
 import { removeHighlightClass } from '~/lib/clipping/delete'
 import { HIGHLIGHT_CLASS } from '~/lib/constants'
 
+const LOCAL_CLIPPINGS = {
+  key: 'clippingList',
+  instance: new Storage({
+    area: 'local',
+  }),
+}
+
 export const ClippingOverlay = () => {
-  const [clippingList, setClippingList] = useStorage('clippingList', [])
+  const [clippingList, setClippingList] = useStorage(LOCAL_CLIPPINGS, [])
   const highlightInitialized = useRef(false) // Ref to track if highlighting has been initialized
 
   // @TODO: Filter clipping list by page url
@@ -49,7 +57,7 @@ export const ClippingOverlay = () => {
       <SaveClipping addClippingToList={addClippingToList} />
       {clippingList?.length ? (
         <DeleteClipping clippingList={clippingList} onDelete={removeClippingFromList} />
-      ): null}
+      ) : null}
     </>
   )
 }

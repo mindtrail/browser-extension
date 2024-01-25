@@ -35,6 +35,7 @@ declare global {
     id?: string
     content: string
     pageData?: PageData
+    dataSource?: DataSource
     selector: {
       range: ClippingRange
       surroundingText: SurroundingText
@@ -60,12 +61,13 @@ declare global {
     html: string
   }
 
+  type DataSource = {
+    id: string
+    name: string
+  }
   type CreatePageResponse = {
     result: string
-    dataSource: {
-      id: string
-      name: string
-    }
+    dataSource: DataSource
   }
 
   interface HTMLFile {

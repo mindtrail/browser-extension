@@ -41,6 +41,11 @@
     "typescript": "5.2.2"
   },
   "manifest": {
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "mindtrail-ai@plasmo"
+      }
+    },
     "host_permissions": [
       "https://next-postgress-auth-stripe.vercel.app/",
       "http://localhost:3000/"
@@ -50,6 +55,7 @@
       "activeTab",
       "scripting",
       "storage",
+      "unlimitedStorage",
       "cookies"
     ],
     "content_scripts": [

@@ -119,7 +119,7 @@ async function updateExtensionIcon() {
 let storage: Storage
 
 async function initializeExtension() {
-  storage = new Storage()
+  storage = new Storage({ area: 'local' })
 
   const settings = (await storage.get('settings')) as SettingsStored
   if (!settings) {
@@ -145,9 +145,9 @@ async function fetchClippingList(sendResponse?: SendResponse) {
       sendResponse(response)
     }
 
-    return response
-  } catch (e) {
-    console.log('error Clippings', e)
+    return clippingList
+  } catch (error) {
+    console.error('error Clippings', error, error?.cause)
     return []
   }
 }
