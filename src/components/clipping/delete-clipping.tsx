@@ -110,9 +110,10 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
 
       toggleLoading()
       if (result?.error) {
-        alert('Error saving clipping. Please try again.')
+        const { message, status } = result.error
 
-        console.error(result.error)
+        alert(`${status}: ${message}`) // TODO: use toast (status message)
+        console.error(`${status}: ${message}`)
         return
       }
       setBtnCoorindates(null)

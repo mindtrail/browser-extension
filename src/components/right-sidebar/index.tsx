@@ -60,9 +60,10 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
     toggleLoading()
 
     if (result?.error) {
-      alert('Error saving Page. Please try again.')
+      const { message, status } = result.error
 
-      console.error(result.error)
+      alert(`${status}: ${message}`) // TODO: use toast (status message)
+      console.error(`${status}: ${message}`)
       return
     }
   }, [])

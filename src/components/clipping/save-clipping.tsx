@@ -80,9 +80,10 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     toggleLoading()
     console.log(result)
     if (result?.error) {
-      alert('Error 111 saving clipping. Please try again.')
+      const { message, status } = result.error
 
-      console.error(result.error)
+      alert(`${status}: ${message}`) // TODO: use toast (status message)
+      console.error(`${status}: ${message}`)
       return
     }
 

@@ -4,8 +4,6 @@ const NODE_ENV = process.env.NODE_ENV
 const IS_DEV = NODE_ENV === 'development'
 const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
 
-type SendResponse = (resp: any) => void
-
 // Generic fetch wrapper
 async function makeAPICall(url: string, options = {}) {
   const response = await fetch(url, {
@@ -14,8 +12,11 @@ async function makeAPICall(url: string, options = {}) {
   })
 
   if (!response.ok) {
-    throw new Error(`API error! Status: ${response.status}`, {
-      cause: response,
+    let message = (await response?.text()) || (await response?.json()) || 'API error'
+    const { status } = response
+
+    throw new Error(message, {
+      cause: { message, status },
     })
   }
 
@@ -42,4 +43,6 @@ export const deleteClippingAPICall = (clippingId: string) =>
   })
 
 export const searchHistoryAPICall = (searchQuery: string) =>
-  makeAPICall(`${TARGET_HOST + API.SEARCH_HISTORY}?search=${searchQuery}`)
+  makeAPICall(`${TARGET_HOST + API.SEARCH_HISTORY}?searchQuery=${searchQuery}`)
+
+export const getClippingListAPICall = () => makeAPICall(TARGET_HOST + API.CLIPPING)

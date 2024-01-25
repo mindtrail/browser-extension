@@ -4,56 +4,59 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { MESSAGES, HOST, API, DEFAULT_EXTENSION_SETTINGS } from '~/lib/constants'
+import { MESSAGES, DEFAULT_EXTENSION_SETTINGS } from '~/lib/constants'
 import { log } from '~/lib/utils'
 import * as api from '~/lib/api'
 
-const NODE_ENV = process.env.NODE_ENV
-const IS_DEV = NODE_ENV === 'development'
-const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
-
 type SendResponse = (resp: any) => void
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse: SendResponse) => {
-  const { message, payload } = request
+chrome.runtime.onMessage.addListener(
+  async (request, sender, sendResponse: SendResponse) => {
+    const { message, payload } = request
 
-  log(
-    sender.tab
-      ? 'From Content script:' + sender.tab.url + message
-      : 'From Extension' + message,
-  )
+    log(
+      sender.tab
+        ? 'From Content script:' + sender.tab.url + message
+        : 'From Extension' + message,
+    )
 
-  try {
-    switch (message) {
-      case MESSAGES.SAVE_PAGE:
-        savePage(payload, sendResponse)
-        break
-      case MESSAGES.SAVE_CLIPPING:
-        saveClipping(payload, sendResponse)
-        break
-      case MESSAGES.DELETE_CLIPPING:
-        deleteClipping(payload, sendResponse)
-        break
-      case MESSAGES.SEARCH_HISTORY:
-        searchHistory(payload, sendResponse)
-        break
-      case MESSAGES.UPDATE_ICON:
-        updateExtensionIcon()
-        break
-      case MESSAGES.GET_CLIPPING_LIST:
-        fetchClippingList(sendResponse)
-        break
-      default:
-        break
+    try {
+      switch (message) {
+        case MESSAGES.SAVE_PAGE:
+          await savePage(payload, sendResponse)
+          break
+        case MESSAGES.SAVE_CLIPPING:
+          await saveClipping(payload, sendResponse)
+          break
+        case MESSAGES.DELETE_CLIPPING:
+          await deleteClipping(payload, sendResponse)
+          break
+        case MESSAGES.SEARCH_HISTORY:
+          await searchHistory(payload, sendResponse)
+          break
+        case MESSAGES.UPDATE_ICON:
+          await updateExtensionIcon()
+          break
+        case MESSAGES.GET_CLIPPING_LIST:
+          await fetchClippingList(sendResponse)
+          break
+        default:
+          break
+      }
+    } catch (error) {
+      console.error('Error ::: ', error)
+
+      const { cause } = error || {}
+      const resultError = cause || { message: 'Unknown error' }
+      log('resultError', resultError)
+
+      sendResponse({ error: resultError })
     }
-  } catch (e) {
-    console.error('Error ::: ', e)
-    sendResponse({ error: e })
-  }
 
-  // Return true keeps the connection allive with the content script
-  return true
-})
+    // Return true keeps the connection allive with the content script
+    return true
+  },
+)
 
 async function savePage(payload: PageData, sendResponse: SendResponse) {
   const response = await api.savePageAPICall(payload)
@@ -85,26 +88,19 @@ async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) 
 }
 
 async function deleteClipping({ clippingId }, sendResponse: SendResponse) {
-  try {
-    const deletedClipping = await api.deleteClippingAPICall(clippingId)
-    log('deleted Clipping', deletedClipping)
+  const deletedClipping = await api.deleteClippingAPICall(clippingId)
+  log('deleted Clipping', deletedClipping)
 
-    const updatedList = await fetchClippingList()
-    sendResponse({ clipping: deletedClipping, updatedList })
-  } catch (e) {
-    console.error(e)
-  }
+  const updatedList = await fetchClippingList()
+  sendResponse({ clipping: deletedClipping, updatedList })
 }
 
 interface searchPayload {
   searchQuery: string
 }
 async function searchHistory({ searchQuery }: searchPayload, sendResponse: SendResponse) {
-  const result = await fetch(
-    `${TARGET_HOST + API.SEARCH_HISTORY}?searchQuery=${searchQuery}`,
-  )
+  const websites = await api.searchHistoryAPICall(searchQuery)
 
-  const websites = await result.json()
   log(websites)
   sendResponse(websites)
 }
@@ -123,8 +119,6 @@ async function updateExtensionIcon() {
 let storage: Storage
 
 async function initializeExtension() {
-  console.log(NODE_ENV)
-
   storage = new Storage()
 
   const settings = (await storage.get('settings')) as SettingsStored
@@ -144,16 +138,7 @@ async function getAutoSaveStatus() {
 
 async function fetchClippingList(sendResponse?: SendResponse) {
   try {
-    const result = await fetch(TARGET_HOST + API.CLIPPING, {
-      credentials: 'include', // Include cookies for cross-origin requests
-    })
-    const { ok, status } = result
-
-    if (!ok) {
-      console.log(status)
-      throw new Error(status.toString())
-    }
-    const clippingList = await result.json()
+    const clippingList = await api.getClippingListAPICall()
     const response = await storage.set('clippingList', clippingList)
 
     if (sendResponse) {
