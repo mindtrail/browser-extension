@@ -22,24 +22,24 @@ type HighlightRange = {
 export function highlightClipping(clippingList: SavedClipping[]) {
   // Step 1 + 2:
   const currentUrl = new URL(window.location.href)
-  clippingList.forEach((clipping) => {
-    try {
-      const { dataSource } = clipping
-      const dataSourceUrl = new URL(dataSource?.name)
 
-      const isSameHostAndPath =
+  // @TODO - update this to store a hash map with host+pathname as key...
+  clippingList
+    .filter((clipping) => {
+      const dataSourceUrl = new URL(clipping.dataSource?.name)
+      return (
         dataSourceUrl.host === currentUrl.host &&
         dataSourceUrl.pathname === currentUrl.pathname
-
-      // Only apply for clippings that are related to current URL
-      if (isSameHostAndPath) {
+      )
+    })
+    .forEach((clipping) => {
+      try {
         highlightClippingFromRange(clipping)
+      } catch (error) {
+        // @TODO: try 2nd approach... of searchgin by text + surrounding, not only range
+        console.error(error, clipping)
       }
-    } catch (error) {
-      // @TODO: try 2nd approach... of searchgin by text + surrounding, not only range
-      console.error(error, clipping)
-    }
-  })
+    })
 }
 
 function highlightClippingFromRange(clipping: SavedClipping) {
