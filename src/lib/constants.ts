@@ -60,7 +60,7 @@ export const EXCLUDED_TAGS_FOR_CLIPPING = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELEC
 
 export const HOST = {
   LOCAL: 'http://localhost:3000',
-  REMOTE: 'https://app-chat-jgnk6lxbhq-ey.a.run.app',
+  REMOTE: 'https://next-postgress-auth-stripe.vercel.app/',
 }
 
 export const API = {

@@ -34,7 +34,7 @@ declare global {
   interface SavedClipping {
     id?: string
     content: string
-    pageData: PageData
+    pageData?: PageData
     selector: {
       range: ClippingRange
       surroundingText: SurroundingText

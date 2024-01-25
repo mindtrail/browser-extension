@@ -78,8 +78,9 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     })
 
     toggleLoading()
+    console.log(result)
     if (result?.error) {
-      alert('Error saving clipping. Please try again.')
+      alert('Error 111 saving clipping. Please try again.')
 
       console.error(result.error)
       return

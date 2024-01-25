@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
 
-import { SaveClipping } from '~/components/clipping/save'
-import { DeleteClipping } from '~/components/clipping/delete'
+import { SaveClipping } from '~components/clipping/save-clipping'
+import { DeleteClipping } from '~components/clipping/delete-clipping'
 
 import { highlightClipping } from '~/lib/clipping/highlight'
 import { removeHighlightClass } from '~/lib/clipping/delete'
@@ -47,9 +47,9 @@ export const ClippingOverlay = () => {
   return (
     <>
       <SaveClipping addClippingToList={addClippingToList} />
-      {clippingList?.length && (
+      {clippingList?.length ? (
         <DeleteClipping clippingList={clippingList} onDelete={removeClippingFromList} />
-      )}
+      ): null}
     </>
   )
 }

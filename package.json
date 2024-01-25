@@ -42,14 +42,15 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*",
-      "http://*/*"
+      "https://next-postgress-auth-stripe.vercel.app/",
+      "http://localhost:3000/"
     ],
     "permissions": [
       "pageCapture",
       "activeTab",
       "scripting",
-      "storage"
+      "storage",
+      "cookies"
     ],
     "content_scripts": [
       {
