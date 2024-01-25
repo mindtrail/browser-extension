@@ -26,11 +26,19 @@ export function highlightClipping(clippingList: SavedClipping[]) {
   // @TODO - update this to store a hash map with host+pathname as key...
   clippingList
     .filter((clipping) => {
-      const dataSourceUrl = new URL(clipping.dataSource?.name)
-      return (
-        dataSourceUrl.host === currentUrl.host &&
-        dataSourceUrl.pathname === currentUrl.pathname
-      )
+      try {
+        // If the clipping was from the DB it will have dataSource prop. If it was just added,
+        const dataSourceUrl =
+          new URL(clipping?.dataSource?.name) || new URL(clipping?.pageData?.url)
+
+        return (
+          dataSourceUrl.host === currentUrl.host &&
+          dataSourceUrl.pathname === currentUrl.pathname
+        )
+        // If there's some problems with building the URL, we keep it
+      } catch (error) {
+        return true
+      }
     })
     .forEach((clipping) => {
       try {
