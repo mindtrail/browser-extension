@@ -105,16 +105,17 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
       toggleLoading()
       const payload = { clippingId: hoveredClippingId }
 
-      const result = await chrome.runtime.sendMessage({
+      const response = await chrome.runtime.sendMessage({
         message: MESSAGES.DELETE_CLIPPING,
         payload,
       })
 
       toggleLoading()
-      if (result?.error) {
-        alert('Error saving clipping. Please try again.')
+      if (response?.error) {
+        const { message, status } = response.error
+        alert(`${status}: ${message}`) // TODO: use toast (status message)
 
-        console.error(result.error)
+        console.error(`${status}: ${message}`)
         return
       }
 

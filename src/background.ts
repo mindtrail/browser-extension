@@ -39,9 +39,6 @@ chrome.runtime.onMessage.addListener(
         case MESSAGES.UPDATE_ICON:
           await updateExtensionIcon()
           break
-        case MESSAGES.GET_CLIPPING_LIST:
-          await fetchClippingList(sendResponse)
-          break
         default:
           break
       }
@@ -49,6 +46,12 @@ chrome.runtime.onMessage.addListener(
       console.error('Error ::: ', error)
 
       const { cause } = error || {}
+      console.error('cause', cause)
+
+      if (parseInt(cause?.status) === 401) {
+        return redirectToAuth()
+      }
+
       const resultError = cause || { message: 'Unknown error' }
       log('resultError', resultError)
 
@@ -124,7 +127,6 @@ async function initializeExtension() {
   }
 
   updateExtensionIcon()
-  // @TODO: handle error when fetching data, in the client
   fetchClippingList()
 }
 
@@ -157,3 +159,9 @@ async function fetchClippingList(sendResponse?: SendResponse) {
 }
 
 initializeExtension()
+
+async function redirectToAuth() {
+  chrome.tabs.create({
+    url: `${api.TARGET_HOST}/api/auth/signin?callbackUrl=https://nextjs.org/docs/app/building-your-application/rendering/server-components#static-rendering-default`,
+  })
+}

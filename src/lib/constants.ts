@@ -10,6 +10,8 @@ export const MESSAGES = {
   UPDATE_ICON: 'update-icon',
   GET_CLIPPING_LIST: 'get-clipping-list',
   DELETE_CLIPPING: 'delete-clipping',
+  AUTH_REDIRECT: 'auth-redirect',
+  CLIPPING_LIST_UPDATED: 'clipping-list-updated'
 }
 
 export const DEFAULT_EXCLUDE_LIST = [

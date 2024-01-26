@@ -2,7 +2,7 @@ import { HOST, API } from '~/lib/constants'
 
 const NODE_ENV = process.env.NODE_ENV
 const IS_DEV = NODE_ENV === 'development'
-const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
+export const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
 
 // The extension has host_permissions to localhost & the deployed app.
 // That means it can access the cookies and send them with every fetch request.
