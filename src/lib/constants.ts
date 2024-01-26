@@ -76,3 +76,5 @@ export const STORAGE_KEY = {
   SETTINGS: 'settings',
   CLIPPINGS_BY_DS: 'clippings-by-ds',
 }
+
+export const CLIPPING_BTN_OFFSET = 16

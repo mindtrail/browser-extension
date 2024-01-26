@@ -29,8 +29,6 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
     if (listenerRetryNr >= MAX_RETRIES) {
       return
     }
-
-    console.log(listenerRetryNr)
     // This operation needs to happen after the highlights were added to the DOM - 1.5s
     // A 2s timeout for example is too big, because on delete, we need to wait 2s for the interaction.
     // A retry every half a second should work: 3rd try for all items, & 550ms for delete

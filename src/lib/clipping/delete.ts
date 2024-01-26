@@ -1,19 +1,24 @@
-import { HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS } from '~/lib/constants'
+import {
+  CLIPPING_BTN_OFFSET,
+  HIGHLIGHT_CLASS,
+  SPLIT_TEXTNODE_CLASS,
+} from '~/lib/constants'
 
 export function getDeleteBtnCoordinates(elementList: Element[]) {
   try {
-    // Find max Y value, and Min & Max X values
-
     let YCoord = 0
-    let XCoord = 0
+    let XCoordMin = 2000
+    let XCoordMax = 0
 
     for (const element of elementList) {
-      const { left, bottom, width } = element.getBoundingClientRect()
+      const { left, bottom, right } = element.getBoundingClientRect()
 
       YCoord = Math.max(YCoord, bottom)
-      XCoord = Math.max(XCoord, left + width / 2 - 16)
+      XCoordMin = Math.min(XCoordMin, left)
+      XCoordMax = Math.max(XCoordMax, right)
     }
 
+    const XCoord = (XCoordMax + XCoordMin) / 2 - CLIPPING_BTN_OFFSET
     return {
       left: XCoord + window.scrollX,
       top: YCoord + window.scrollY + 24,
