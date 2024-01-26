@@ -139,8 +139,10 @@ async function getAutoSaveStatus() {
 async function fetchClippingList(sendResponse?: SendResponse) {
   try {
     const clippingList = await api.getClippingListAPICall()
+    console.log(clippingList)
     const response = await storage.set('clippingList', clippingList)
 
+    console.log(response)
     if (sendResponse) {
       sendResponse(response)
     }

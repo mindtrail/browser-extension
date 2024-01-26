@@ -4,7 +4,8 @@ const NODE_ENV = process.env.NODE_ENV
 const IS_DEV = NODE_ENV === 'development'
 const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
 
-// Generic fetch wrapper
+// The extension has host_permissions to localhost & the deployed app.
+// That means it can access the cookies and send them with every fetch request.
 async function makeAPICall(url: string, options = {}) {
   const response = await fetch(url, {
     credentials: 'include',
@@ -45,4 +46,5 @@ export const deleteClippingAPICall = (clippingId: string) =>
 export const searchHistoryAPICall = (searchQuery: string) =>
   makeAPICall(`${TARGET_HOST + API.SEARCH_HISTORY}?searchQuery=${searchQuery}`)
 
-export const getClippingListAPICall = () => makeAPICall(TARGET_HOST + API.CLIPPING)
+export const getClippingListAPICall = () =>
+  makeAPICall(`${TARGET_HOST + API.CLIPPING}?groupByDataSource=true`)

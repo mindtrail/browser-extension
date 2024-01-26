@@ -1,5 +1,5 @@
 import { HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS } from '~/lib/constants'
-
+import { getBaseResourceURL } from '~/lib/utils'
 // Used same approach as https://github.com/jeromepl/highlighter for the range selector
 /**
  * STEPS:
@@ -21,21 +21,16 @@ type HighlightRange = {
 
 export function highlightClipping(clippingList: SavedClipping[]) {
   // Step 1 + 2:
-  const currentUrl = new URL(window.location.href)
+  const pageBaseURL = getBaseResourceURL(window.location.href)
 
   // @TODO - update this to store a hash map with host+pathname as key...
   clippingList
     .filter((clipping) => {
       try {
         // If the clipping was from the DB it will have dataSource prop. If it was just added,
-        const dataSourceUrl =
-          new URL(clipping?.dataSource?.name) || new URL(clipping?.pageData?.url)
+        const dataSourceUrl = clipping?.dataSource?.name || clipping?.pageData?.url
 
-        return (
-          dataSourceUrl.host === currentUrl.host &&
-          dataSourceUrl.pathname === currentUrl.pathname
-        )
-        // If there's some problems with building the URL, we keep it
+        return pageBaseURL === getBaseResourceURL(dataSourceUrl)
       } catch (error) {
         return true
       }
