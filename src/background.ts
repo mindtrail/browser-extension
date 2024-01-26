@@ -4,7 +4,7 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { MESSAGES, DEFAULT_EXTENSION_SETTINGS } from '~/lib/constants'
+import { MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { log } from '~/lib/utils'
 import * as api from '~/lib/api'
 
@@ -121,9 +121,9 @@ let storage: Storage
 async function initializeExtension() {
   storage = new Storage({ area: 'local' })
 
-  const settings = (await storage.get('settings')) as SettingsStored
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
   if (!settings) {
-    await storage.set('settings', DEFAULT_EXTENSION_SETTINGS)
+    await storage.set(STORAGE_KEY.SETTINGS, DEFAULT_EXTENSION_SETTINGS)
   }
 
   updateExtensionIcon()
@@ -132,19 +132,24 @@ async function initializeExtension() {
 }
 
 async function getAutoSaveStatus() {
-  const settings = (await storage.get('settings')) as SettingsStored
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
   return settings?.autoSave
 }
 
 async function fetchClippingList(sendResponse?: SendResponse) {
   try {
     const clippingList = await api.getClippingListAPICall()
-    console.log(clippingList)
-    const response = await storage.set('clippingList', clippingList)
+    console.log('clipping grouped by dataSource', clippingList)
 
-    console.log(response)
+    const clippingsMap = clippingList.reduce((acc: any, item: ClippingByDataSource) => {
+      acc[item.dataSourceName] = item.clippingList
+      return acc
+    }, {})
+
+    await storage.set(STORAGE_KEY.CLIPPINGS_BY_DS, clippingsMap)
+
     if (sendResponse) {
-      sendResponse(response)
+      sendResponse(clippingList)
     }
 
     return clippingList

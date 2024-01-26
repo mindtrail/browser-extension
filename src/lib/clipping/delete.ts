@@ -27,8 +27,9 @@ export function getDeleteBtnCoordinates(elementList: Element[]) {
   }
 }
 
-export function removeHighlightClass(elementList: Element[]) {
+export function removeHighlightClassAndAttr(elementList: Element[]) {
   for (const element of elementList) {
     element.classList.remove(HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS)
+    element.removeAttribute('data-highlight-id')
   }
 }

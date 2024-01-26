@@ -48,6 +48,11 @@ declare global {
     type?: string
   }
 
+  interface ClippingByDataSource {
+    dataSourceName: string
+    clippingList: SavedClipping[]
+  }
+
   type WEB_Data = {
     title: string
     description: string
