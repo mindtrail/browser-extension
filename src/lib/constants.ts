@@ -10,6 +10,8 @@ export const MESSAGES = {
   UPDATE_ICON: 'update-icon',
   GET_CLIPPING_LIST: 'get-clipping-list',
   DELETE_CLIPPING: 'delete-clipping',
+  AUTH_REDIRECT: 'auth-redirect',
+  CLIPPING_LIST_UPDATED: 'clipping-list-updated',
 }
 
 export const DEFAULT_EXCLUDE_LIST = [
@@ -60,14 +62,23 @@ export const EXCLUDED_TAGS_FOR_CLIPPING = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELEC
 
 export const HOST = {
   LOCAL: 'http://localhost:3000',
-  REMOTE: 'https://app-chat-jgnk6lxbhq-ey.a.run.app',
+  REMOTE: 'https://next-postgress-auth-stripe.vercel.app/',
 }
 
 export const API = {
   SAVE_PAGE: '/api/data-source/browser-extension',
   CLIPPING: '/api/clipping',
   SEARCH_HISTORY: '/api/history',
+  SIGN_IN: '/api/auth/signin',
+  SUCCESS_LOGIN: '/?extension-login=true',
 }
 
 export const HIGHLIGHT_CLASS = 'mindtrail-clipping'
 export const SPLIT_TEXTNODE_CLASS = 'mindtrail-split-textNode'
+
+export const STORAGE_KEY = {
+  SETTINGS: 'settings',
+  CLIPPINGS_BY_DS: 'clippings-by-ds',
+}
+
+export const CLIPPING_BTN_OFFSET = 16

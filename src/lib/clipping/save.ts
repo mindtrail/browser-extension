@@ -1,5 +1,5 @@
 import { getPageData } from '~/lib/page-data'
-import { EXCLUDED_TAGS_FOR_CLIPPING } from '~/lib/constants'
+import { CLIPPING_BTN_OFFSET, EXCLUDED_TAGS_FOR_CLIPPING } from '~/lib/constants'
 
 const SURROUNDING_LENGTH = 40
 const XPATH_LEVELS = 999
@@ -168,7 +168,7 @@ function getSelectionContent(range: Range) {
 
 export function getSaveClippingBtnPosition(range: Range) {
   const { bottom, left, width } = range.getBoundingClientRect()
-  const XCoord = left + width / 2 - 16 // half of button width
+  const XCoord = left + width / 2 - CLIPPING_BTN_OFFSET
 
   return {
     left: XCoord + window.scrollX,

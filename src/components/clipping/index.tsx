@@ -1,30 +1,42 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
-import { SaveClipping } from '~/components/clipping/save'
-import { DeleteClipping } from '~/components/clipping/delete'
+import { SaveClipping } from '~components/clipping/save-clipping'
+import { DeleteClipping } from '~components/clipping/delete-clipping'
 
 import { highlightClipping } from '~/lib/clipping/highlight'
-import { removeHighlightClass } from '~/lib/clipping/delete'
-import { HIGHLIGHT_CLASS } from '~/lib/constants'
+import { removeHighlightClassAndAttr } from '~/lib/clipping/delete'
+import { HIGHLIGHT_CLASS, STORAGE_KEY } from '~/lib/constants'
+import { getBaseResourceURL } from '~/lib/utils'
+
+const STORAGE_CLIPPINGS = {
+  key: STORAGE_KEY.CLIPPINGS_BY_DS,
+  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+}
+const pageBaseURL = getBaseResourceURL(window.location.href)
 
 export const ClippingOverlay = () => {
-  const [clippingList, setClippingList] = useStorage('clippingList', [])
-  const highlightInitialized = useRef(false) // Ref to track if highlighting has been initialized
+  const [clippingMap] = useStorage(STORAGE_CLIPPINGS)
+  const [clippingList, setClippingList] = useState<SavedClipping[]>([])
 
-  // @TODO: Filter clipping list by page url
-  // We only run this once, since the DOM can be altered, so then the XPath will not be reliable
+  // We only run this once. DOM can be altered.
+  // That means Range & XPath will not be reliable for a second run to highlight.
   useEffect(() => {
-    if (clippingList?.length && !highlightInitialized.current) {
+    if (clippingMap && !clippingList?.length) {
+      const clippingList = clippingMap[pageBaseURL] || []
+      setClippingList(clippingList)
+
+      // Highlight the clippings
       setTimeout(() => {
         highlightClipping(clippingList)
-        highlightInitialized.current = true // Mark as initialized
-      }, 1500) // Adjust the delay as needed
+      }, 1500) // Tested with 6x slower CPU & this delay works then too
     }
-  }, [clippingList])
+  }, [clippingMap])
 
   const addClippingToList = useCallback(
     (newClipping: SavedClipping) => {
+      // Add the new item individually
       highlightClipping([newClipping])
       setClippingList((prev) => [...prev, newClipping])
     },
@@ -37,8 +49,9 @@ export const ClippingOverlay = () => {
         `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
       )
 
+      console.log(clippingId)
       // Remove the highlight class from the removed elements
-      removeHighlightClass([...elementsToRemoveHighlight])
+      removeHighlightClassAndAttr([...elementsToRemoveHighlight])
       setClippingList((prev) => prev.filter((c) => c.id !== clippingId))
     },
     [setClippingList],
@@ -47,9 +60,9 @@ export const ClippingOverlay = () => {
   return (
     <>
       <SaveClipping addClippingToList={addClippingToList} />
-      {clippingList?.length && (
+      {clippingList?.length ? (
         <DeleteClipping clippingList={clippingList} onDelete={removeClippingFromList} />
-      )}
+      ) : null}
     </>
   )
 }

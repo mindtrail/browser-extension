@@ -3,13 +3,13 @@
 import '~style.css'
 
 import { useCallback } from 'react'
-
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST, STORAGE_KEY } from '~/lib/constants'
 
 const DEFAULT_TAB = 'search'
 
@@ -19,8 +19,13 @@ const defaultSettings: SettingsStored = {
   excludeList: DEFAULT_EXCLUDE_LIST,
 }
 
+const STORAGE_SETTINGS = {
+  key: STORAGE_KEY.SETTINGS,
+  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+}
+
 function IndexPopup() {
-  const [settings, setSettings] = useStorage('settings', defaultSettings)
+  const [settings, setSettings] = useStorage(STORAGE_SETTINGS, defaultSettings)
 
   const updatedSettings = useCallback((newSettings: Partial<SettingsStored>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }))

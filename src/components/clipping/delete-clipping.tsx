@@ -16,7 +16,7 @@ interface DeleteClippingProps {
   onDelete: (id: string) => void
 }
 
-const MAX_RETRIES = 3
+const MAX_RETRIES = 8
 
 export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
@@ -29,10 +29,12 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
     if (listenerRetryNr >= MAX_RETRIES) {
       return
     }
-
+    // This operation needs to happen after the highlights were added to the DOM - 1.5s
+    // A 2s timeout for example is too big, because on delete, we need to wait 2s for the interaction.
+    // A retry every half a second should work: 3rd try for all items, & 550ms for delete
     setTimeout(() => {
       addDeleteListener(clippingList)
-    }, 2000) // This timeout needs to be bigger than the one on the parent Component
+    }, 550)
     return () => removeDeleteListener()
   }, [clippingList, listenerRetryNr])
 
@@ -103,18 +105,20 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
       toggleLoading()
       const payload = { clippingId: hoveredClippingId }
 
-      const result = await chrome.runtime.sendMessage({
+      const response = await chrome.runtime.sendMessage({
         message: MESSAGES.DELETE_CLIPPING,
         payload,
       })
 
       toggleLoading()
-      if (result?.error) {
-        alert('Error saving clipping. Please try again.')
+      if (response?.error) {
+        const { message, status } = response.error
+        alert(`${status}: ${message}`) // TODO: use toast (status message)
 
-        console.error(result.error)
+        console.error(`${status}: ${message}`)
         return
       }
+
       setBtnCoorindates(null)
       setHoveredClippingId(null)
       onDelete(hoveredClippingId)

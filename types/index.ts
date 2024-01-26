@@ -34,7 +34,8 @@ declare global {
   interface SavedClipping {
     id?: string
     content: string
-    pageData: PageData
+    pageData?: PageData
+    dataSource?: DataSource
     selector: {
       range: ClippingRange
       surroundingText: SurroundingText
@@ -45,6 +46,11 @@ declare global {
     }
     notes?: []
     type?: string
+  }
+
+  interface ClippingByDataSource {
+    dataSourceName: string
+    clippingList: SavedClipping[]
   }
 
   type WEB_Data = {
@@ -60,12 +66,13 @@ declare global {
     html: string
   }
 
+  type DataSource = {
+    id: string
+    name: string
+  }
   type CreatePageResponse = {
     result: string
-    dataSource: {
-      id: string
-      name: string
-    }
+    dataSource: DataSource
   }
 
   interface HTMLFile {

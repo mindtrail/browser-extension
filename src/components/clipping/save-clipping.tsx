@@ -70,23 +70,23 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
 
     toggleLoading()
     const payload = getClippingData(range)
-    console.log('Clipping Data', payload)
+    console.log('Clipping To Save', payload)
 
-    const result = await chrome.runtime.sendMessage({
+    const response = await chrome.runtime.sendMessage({
       message: MESSAGES.SAVE_CLIPPING,
       payload,
     })
 
     toggleLoading()
-    if (result?.error) {
-      alert('Error saving clipping. Please try again.')
+    if (response?.error) {
+      const { message, status } = response.error
+      alert(`${status}: ${message}`) // TODO: use toast (status message)
 
-      console.error(result.error)
+      console.error(`${status}: ${message}`)
       return
     }
 
-    console.log(111, result)
-    addClippingToList(payload)
+    addClippingToList(response)
 
     selection?.empty()
     setBtnCoorindates(null)
@@ -96,7 +96,6 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     return null
   }
 
-  console.log(1234)
   const { left, top } = btnCoorindates
 
   return (

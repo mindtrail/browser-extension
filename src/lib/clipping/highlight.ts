@@ -1,5 +1,4 @@
 import { HIGHLIGHT_CLASS, SPLIT_TEXTNODE_CLASS } from '~/lib/constants'
-
 // Used same approach as https://github.com/jeromepl/highlighter for the range selector
 /**
  * STEPS:
@@ -19,8 +18,9 @@ type HighlightRange = {
   content: string
 }
 
-export function highlightClipping(clippingList: SavedClipping[]) {
+export function highlightClipping(clippingList: SavedClipping[] = []) {
   // Step 1 + 2:
+
   clippingList.forEach((clipping) => {
     try {
       highlightClippingFromRange(clipping)

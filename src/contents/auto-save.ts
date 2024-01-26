@@ -2,7 +2,7 @@ import { type PlasmoCSConfig } from 'plasmo'
 
 import { Storage } from '@plasmohq/storage'
 
-import { AUTO_SAVE_DELAY, MESSAGES } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, MESSAGES, STORAGE_KEY } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 
 export const CONTENT_SCRIPT_MATCH = ['https://*/*', 'http://*/*', 'file://*/*']
@@ -71,7 +71,7 @@ function savePageContent() {
 }
 
 async function initAutoSave() {
-  const settings = (await storage.get('settings')) as SettingsStored
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
 
   if (settings?.autoSave) {
     autoSaveDelay = settings.saveDelay

@@ -4,150 +4,115 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { MESSAGES, HOST, API, DEFAULT_EXTENSION_SETTINGS } from '~/lib/constants'
+import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { log } from '~/lib/utils'
-
-const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
-
-const NODE_ENV = process.env.NODE_ENV
-const IS_DEV = NODE_ENV === 'development'
-const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const { message, payload } = request
-
-  log(
-    sender.tab
-      ? 'From Content script:' + sender.tab.url + message
-      : 'From Extension' + message,
-  )
-
-  switch (message) {
-    case MESSAGES.SAVE_PAGE:
-      savePage(payload, sendResponse)
-      break
-    case MESSAGES.SAVE_CLIPPING:
-      saveClipping(payload, sendResponse)
-      break
-    case MESSAGES.DELETE_CLIPPING:
-      deleteClipping(payload, sendResponse)
-      break
-    case MESSAGES.SEARCH_HISTORY:
-      searchHistory(payload, sendResponse)
-      break
-    case MESSAGES.UPDATE_ICON:
-      updateExtensionIcon()
-      break
-    case MESSAGES.GET_CLIPPING_LIST:
-      fetchClippingList()
-      sendResponse(1111)
-      break
-    default:
-      // default case action here
-      break
-  }
-
-  return true
-})
-
-async function savePage(payload: PageData, sendResponse: SendResponse) {
-  log('SAVE Page --- ', payload)
-
-  try {
-    const response = await savePageAPICall(payload)
-    if (!response.ok) {
-      throw new Error('Network response was not ok')
-    }
-    const data = await response.json()
-    sendResponse(data)
-    log(data)
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-async function savePageAPICall(payload: PageData) {
-  return await fetch(TARGET_HOST + API.SAVE_PAGE, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
+import * as api from '~/lib/api'
 
 type SendResponse = (resp: any) => void
 
+let previousTabId = null
+let previousTabUrl = null
+
+chrome.runtime.onMessage.addListener(
+  async (request, sender, sendResponse: SendResponse) => {
+    const { message, payload } = request
+
+    log(
+      sender.tab
+        ? 'From Content script:' + sender.tab.url + message
+        : 'From Extension' + message,
+    )
+
+    try {
+      switch (message) {
+        case MESSAGES.SAVE_PAGE:
+          await savePage(payload, sendResponse)
+          break
+        case MESSAGES.SAVE_CLIPPING:
+          await saveClipping(payload, sendResponse)
+          fetchClippingList() // Update storage data afeter a new item added
+          break
+        case MESSAGES.DELETE_CLIPPING:
+          await deleteClipping(payload, sendResponse)
+          fetchClippingList() // Update storage data after a delete
+          break
+        case MESSAGES.SEARCH_HISTORY:
+          await searchHistory(payload, sendResponse)
+          break
+        case MESSAGES.UPDATE_ICON:
+          await updateExtensionIcon()
+          break
+        default:
+          break
+      }
+    } catch (error) {
+      console.error('Error ::: ', error)
+
+      const { cause } = error || {}
+      console.error('cause', cause)
+
+      if (parseInt(cause?.status) === 401) {
+        setTimeout(() => {
+          // Store the tab ID to return to after login)
+          previousTabId = sender.tab.id // Store the tab ID to return to after login
+          previousTabUrl = sender.tab.url // Store the tab URL
+
+          redirectToAuth()
+        }, 1000)
+        return
+      }
+
+      const resultError = cause || { message: 'Unknown error' }
+      log('resultError', resultError)
+
+      sendResponse({ error: resultError })
+    }
+
+    // Return true keeps the connection allive with the content script
+    return true
+  },
+)
+
+async function savePage(payload: PageData, sendResponse: SendResponse) {
+  const response = await api.savePageAPICall(payload)
+  sendResponse(response)
+}
+
 async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) {
   const { pageData, ...rest } = payload
-  try {
-    const savePageResponse = await savePageAPICall(pageData)
 
-    if (!savePageResponse.ok) {
-      sendResponse({ error: savePageResponse.status })
-      throw new Error('Network response was not ok')
-    }
+  const { dataSource } = await api.savePageAPICall(pageData)
+  log('dataSource', dataSource)
 
-    const { dataSource } = (await savePageResponse.json()) as CreatePageResponse
-    log('dataSource', dataSource)
-
-    if (!dataSource) {
-      sendResponse({ error: 'No dataSource' })
-      throw new Error('No dataSource')
-    }
-
-    const SavedClippingData = {
-      ...rest,
-      dataSourceId: dataSource.id,
-    }
-
-    console.log('SavedClippingData', SavedClippingData)
-
-    const response = await fetch(TARGET_HOST + API.CLIPPING, {
-      method: 'POST',
-      body: JSON.stringify(SavedClippingData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      sendResponse({ error: response.status })
-      throw new Error('Network response was not ok')
-    }
-
-    const clipping = await response.json()
-    log(clipping)
-
-    const updatedList = await fetchClippingList()
-    console.log(updatedList)
-
-    sendResponse({ clipping, updatedList })
-  } catch (e) {
-    console.error(e)
+  if (!dataSource) {
+    throw new Error('No dataSource', { cause: { error: 'No dataSource' } })
   }
+
+  const saveClippingPayload = {
+    ...rest,
+    dataSourceId: dataSource.id,
+  }
+
+  const newClipping = await api.saveClippingAPICall(saveClippingPayload)
+  log('newClipping', newClipping)
+  sendResponse(newClipping)
 }
 
 async function deleteClipping({ clippingId }, sendResponse: SendResponse) {
-  try {
-    const response = await fetch(`${TARGET_HOST + API.CLIPPING}/${clippingId}`, {
-      method: 'DELETE',
-    })
+  const deletedClipping = await api.deleteClippingAPICall(clippingId)
 
-    if (!response.ok) {
-      sendResponse({ error: response.status })
-      throw new Error('Network response was not ok')
-    }
+  log('deleted Clipping', deletedClipping)
+  sendResponse(deletedClipping)
+}
 
-    const clipping = await response.json()
-    log('deleted Clipping', clipping)
+interface searchPayload {
+  searchQuery: string
+}
+async function searchHistory({ searchQuery }: searchPayload, sendResponse: SendResponse) {
+  const websites = await api.searchHistoryAPICall(searchQuery)
 
-    const updatedList = await fetchClippingList()
-
-    sendResponse({ clipping, updatedList })
-  } catch (e) {
-    console.error(e)
-  }
+  log(websites)
+  sendResponse(websites)
 }
 
 // Based on Auto/Manual save, update the extension icon
@@ -161,66 +126,76 @@ async function updateExtensionIcon() {
   log('autoSave update --- :', autoSave)
 }
 
-interface searchPayload {
-  searchQuery: string
-}
-async function searchHistory(payload: searchPayload, sendResponse: SendResponse) {
-  log(payload)
-
-  try {
-    const result = await fetch(TARGET_HOST + API.SEARCH_HISTORY, {
-      method: 'POST',
-      body: JSON.stringify({
-        userId: TEST_USER,
-        searchQuery: payload.searchQuery,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const websites = await result.json()
-    log(websites)
-    sendResponse(websites)
-  } catch (e) {
-    log('error', e)
-    sendResponse('')
-  }
-}
-
 let storage: Storage
 
 async function initializeExtension() {
-  storage = new Storage()
+  storage = new Storage({ area: 'local' })
 
-  const settings = (await storage.get('settings')) as SettingsStored
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
   if (!settings) {
-    await storage.set('settings', DEFAULT_EXTENSION_SETTINGS)
+    await storage.set(STORAGE_KEY.SETTINGS, DEFAULT_EXTENSION_SETTINGS)
   }
 
   updateExtensionIcon()
-  // @TODO: handle error when fetching data, in the client
   fetchClippingList()
 }
 
 async function getAutoSaveStatus() {
-  const settings = (await storage.get('settings')) as SettingsStored
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
   return settings?.autoSave
 }
 
-async function fetchClippingList() {
+async function fetchClippingList(sendResponse?: SendResponse) {
   try {
-    const result = await fetch(TARGET_HOST + API.CLIPPING)
-    if (!result.ok) {
-      throw new Error('Network response was not ok')
-    }
-    const clippingList = await result.json()
-    const response = await storage.set('clippingList', clippingList)
+    const clippingList = await api.getClippingListAPICall()
+    console.log('clipping grouped by dataSource', clippingList)
 
-    return response
-  } catch (e) {
-    log('error', e)
+    const clippingsMap = clippingList.reduce((acc: any, item: ClippingByDataSource) => {
+      acc[item.dataSourceName] = item.clippingList
+      return acc
+    }, {})
+
+    await storage.set(STORAGE_KEY.CLIPPINGS_BY_DS, clippingsMap)
+
+    if (sendResponse) {
+      sendResponse(clippingList)
+    }
+
+    return clippingList
+  } catch (error) {
+    console.error('error Clippings', error, error?.cause)
     return []
   }
 }
 
 initializeExtension()
+
+async function redirectToAuth() {
+  const loginTab = await chrome.tabs.create({
+    url: `${api.TARGET_HOST}${API.SIGN_IN}?callbackUrl=${API.SUCCESS_LOGIN}`,
+  })
+
+  // Define the listener inside redirectToAuth to capture loginTab in the closure
+  const onTabUpdate = function (tabId: number, changeInfo: any) {
+    const url = changeInfo?.url || ''
+    // Only some updates inlcude the url, like load, we only listen to those
+    if (!url || tabId === loginTab.id) {
+      return
+    }
+
+    const isSuccessLogin =
+      url?.includes(`${API.SUCCESS_LOGIN}`) && !url?.includes(API.SIGN_IN)
+
+    if (isSuccessLogin) {
+      if (previousTabId) {
+        chrome.tabs.update(previousTabId, { url: previousTabUrl })
+        chrome.tabs.remove(loginTab.id)
+      }
+
+      initializeExtension()
+      chrome.tabs.onUpdated.removeListener(onTabUpdate)
+    }
+  }
+
+  chrome.tabs.onUpdated.addListener(onTabUpdate)
+}
