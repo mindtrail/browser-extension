@@ -4,11 +4,14 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
+import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { log } from '~/lib/utils'
 import * as api from '~/lib/api'
 
 type SendResponse = (resp: any) => void
+
+let previousTabId = null
+let previousTabUrl = null
 
 chrome.runtime.onMessage.addListener(
   async (request, sender, sendResponse: SendResponse) => {
@@ -49,7 +52,14 @@ chrome.runtime.onMessage.addListener(
       console.error('cause', cause)
 
       if (parseInt(cause?.status) === 401) {
-        return redirectToAuth()
+        setTimeout(() => {
+          // Store the tab ID to return to after login)
+          previousTabId = sender.tab.id // Store the tab ID to return to after login
+          previousTabUrl = sender.tab.url // Store the tab URL
+
+          redirectToAuth()
+        }, 1000)
+        return
       }
 
       const resultError = cause || { message: 'Unknown error' }
@@ -161,7 +171,31 @@ async function fetchClippingList(sendResponse?: SendResponse) {
 initializeExtension()
 
 async function redirectToAuth() {
-  chrome.tabs.create({
-    url: `${api.TARGET_HOST}/api/auth/signin?callbackUrl=https://nextjs.org/docs/app/building-your-application/rendering/server-components#static-rendering-default`,
+  const loginTab = await chrome.tabs.create({
+    url: `${api.TARGET_HOST}${API.SIGN_IN}?callbackUrl=${API.SUCCESS_LOGIN}`,
   })
+
+  // Define the listener inside redirectToAuth to capture loginTab in the closure
+  const onTabUpdate = function (tabId: number, changeInfo: any) {
+    const url = changeInfo?.url || ''
+    // Only some updates inlcude the url, like load, we only listen to those
+    if (!url || tabId === loginTab.id) {
+      return
+    }
+
+    const isSuccessLogin =
+      url?.includes(`${API.SUCCESS_LOGIN}`) && !url?.includes(API.SIGN_IN)
+
+    if (isSuccessLogin) {
+      if (previousTabId) {
+        chrome.tabs.update(previousTabId, { url: previousTabUrl })
+        chrome.tabs.remove(loginTab.id)
+      }
+
+      initializeExtension()
+      chrome.tabs.onUpdated.removeListener(onTabUpdate)
+    }
+  }
+
+  chrome.tabs.onUpdated.addListener(onTabUpdate)
 }

@@ -11,7 +11,7 @@ export const MESSAGES = {
   GET_CLIPPING_LIST: 'get-clipping-list',
   DELETE_CLIPPING: 'delete-clipping',
   AUTH_REDIRECT: 'auth-redirect',
-  CLIPPING_LIST_UPDATED: 'clipping-list-updated'
+  CLIPPING_LIST_UPDATED: 'clipping-list-updated',
 }
 
 export const DEFAULT_EXCLUDE_LIST = [
@@ -69,6 +69,8 @@ export const API = {
   SAVE_PAGE: '/api/data-source/browser-extension',
   CLIPPING: '/api/clipping',
   SEARCH_HISTORY: '/api/history',
+  SIGN_IN: '/api/auth/signin',
+  SUCCESS_LOGIN: '/?extension-login=true',
 }
 
 export const HIGHLIGHT_CLASS = 'mindtrail-clipping'
