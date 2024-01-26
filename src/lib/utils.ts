@@ -28,7 +28,6 @@ export function log(...args: any) {
 // Strip query params, hashes, anchor tags...
 export const getBaseResourceURL = (urlString: string): string => {
   try {
-    console.log(111, urlString)
     const url = new URL(urlString)
     return `${url.origin}${url.pathname}`
   } catch (e) {

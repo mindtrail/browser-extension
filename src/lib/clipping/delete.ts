@@ -19,11 +19,8 @@ export function getDeleteBtnCoordinates(elementList: Element[]) {
       top: YCoord + window.scrollY + 24,
     }
   } catch (error) {
-    console.error(error)
-    return {
-      left: 0,
-      top: 0,
-    }
+    console.error('Error getting Delete Btn Coordinates', error)
+    return null
   }
 }
 

@@ -27,9 +27,11 @@ chrome.runtime.onMessage.addListener(
           break
         case MESSAGES.SAVE_CLIPPING:
           await saveClipping(payload, sendResponse)
+          fetchClippingList() // Update storage data afeter a new item added
           break
         case MESSAGES.DELETE_CLIPPING:
           await deleteClipping(payload, sendResponse)
+          fetchClippingList() // Update storage data after a delete
           break
         case MESSAGES.SEARCH_HISTORY:
           await searchHistory(payload, sendResponse)
@@ -80,19 +82,14 @@ async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) 
 
   const newClipping = await api.saveClippingAPICall(saveClippingPayload)
   log('newClipping', newClipping)
-
-  const updatedList = await fetchClippingList()
-  console.log(updatedList)
-
-  sendResponse({ clipping: newClipping, updatedList })
+  sendResponse(newClipping)
 }
 
 async function deleteClipping({ clippingId }, sendResponse: SendResponse) {
   const deletedClipping = await api.deleteClippingAPICall(clippingId)
-  log('deleted Clipping', deletedClipping)
 
-  const updatedList = await fetchClippingList()
-  sendResponse({ clipping: deletedClipping, updatedList })
+  log('deleted Clipping', deletedClipping)
+  sendResponse(deletedClipping)
 }
 
 interface searchPayload {

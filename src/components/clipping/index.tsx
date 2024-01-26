@@ -30,14 +30,12 @@ export const ClippingOverlay = () => {
       // Highlight the clippings
       setTimeout(() => {
         highlightClipping(clippingList)
-      }, 1500) // Adjust the delay as needed
+      }, 1500) // Tested with 6x slower CPU & this delay works then too
     }
   }, [clippingMap])
 
   const addClippingToList = useCallback(
     (newClipping: SavedClipping) => {
-      console.log('aadddddd :::', newClipping)
-
       // Add the new item individually
       highlightClipping([newClipping])
       setClippingList((prev) => [...prev, newClipping])
@@ -51,7 +49,7 @@ export const ClippingOverlay = () => {
         `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
       )
 
-      console.log(2222, clippingId)
+      console.log(clippingId)
       // Remove the highlight class from the removed elements
       removeHighlightClassAndAttr([...elementsToRemoveHighlight])
       setClippingList((prev) => prev.filter((c) => c.id !== clippingId))
