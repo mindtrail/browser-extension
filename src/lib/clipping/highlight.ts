@@ -32,6 +32,10 @@ export function highlightClipping(clippingList: SavedClipping[] = []) {
 }
 
 function highlightClippingFromRange(clipping: SavedClipping) {
+  if (!clipping) {
+    return
+  }
+
   let { selector, content, id: clippingId } = clipping
   selector = parseSelector(selector)
 
