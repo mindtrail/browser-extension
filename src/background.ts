@@ -187,7 +187,6 @@ async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResp
         return // Ignore updates from tabs not in the login window
       }
 
-      console.log(changeInfo)
       const url = changeInfo?.url || ''
       // Only some updates inlcude the url, like load, we only listen to those
       if (!url) {
@@ -206,7 +205,6 @@ async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResp
     }
 
     const onWindowClose = function (closedWindowId: number) {
-      console.log(closedWindowId, loginWindow)
       if (closedWindowId === loginWindow.id) {
         // Reset the loginWindow.Id
         loginWindow = null
