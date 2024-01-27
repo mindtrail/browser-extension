@@ -96,7 +96,10 @@ function recursiveNodeProcess(props: RecursiveNodeProcess): RecursiveResp {
     highlightRange
   const clippingLength = content?.length ?? 0
 
-  for (const node of rootNode.childNodes) {
+  // It has to be a shallow copy. There are cases in which a node is wrapped in a
+  // Span, and that span will appear in the childnodes list if kept as reference
+  const childNodes = [...rootNode.childNodes]
+  for (const node of childNodes) {
     if (endFound || charsHighlighted >= clippingLength) {
       break
     }
