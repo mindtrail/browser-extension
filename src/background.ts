@@ -10,9 +10,6 @@ import * as api from '~/lib/api'
 
 type SendResponse = (resp: any) => void
 
-let previousTabId = null
-let previousTabUrl = null
-
 chrome.runtime.onMessage.addListener(
   async (request, sender, sendResponse: SendResponse) => {
     const { message, payload } = request
@@ -46,18 +43,12 @@ chrome.runtime.onMessage.addListener(
           break
       }
     } catch (error) {
-      console.error('Error ::: ', error)
-
       const { cause } = error || {}
-      console.error('cause', cause)
+      console.error('Error :::', cause)
 
       if (parseInt(cause?.status) === 401) {
         setTimeout(() => {
-          // Store the tab ID to return to after login)
-          previousTabId = sender.tab.id // Store the tab ID to return to after login
-          previousTabUrl = sender.tab.url // Store the tab URL
-
-          redirectToAuth()
+          redirectToAuth(sender.tab, sendResponse)
         }, 1000)
         return
       }
@@ -170,32 +161,69 @@ async function fetchClippingList(sendResponse?: SendResponse) {
 
 initializeExtension()
 
-async function redirectToAuth() {
-  const loginTab = await chrome.tabs.create({
-    url: `${api.TARGET_HOST}${API.SIGN_IN}?callbackUrl=${API.SUCCESS_LOGIN}`,
-  })
+async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResponse) {
+  try {
+    let loginWindow = null
+    let loginTabId = null
 
-  // Define the listener inside redirectToAuth to capture loginTab in the closure
-  const onTabUpdate = function (tabId: number, changeInfo: any) {
-    const url = changeInfo?.url || ''
-    // Only some updates inlcude the url, like load, we only listen to those
-    if (!url || tabId === loginTab.id) {
-      return
-    }
+    // Open the login window
+    chrome.windows.create(
+      {
+        url: `${api.TARGET_HOST}${API.SIGN_IN}?callbackUrl=${API.SUCCESS_LOGIN}`,
+        type: 'popup',
+        width: 800,
+        height: 600,
+        top: 100,
+        left: 200,
+      },
+      (newWindow) => {
+        loginWindow = newWindow
+        loginTabId = newWindow?.tabs[0]?.id
+      },
+    )
 
-    const isSuccessLogin =
-      url?.includes(`${API.SUCCESS_LOGIN}`) && !url?.includes(API.SIGN_IN)
-
-    if (isSuccessLogin) {
-      if (previousTabId) {
-        chrome.tabs.update(previousTabId, { url: previousTabUrl })
-        chrome.tabs.remove(loginTab.id)
+    const onTabUpdate = function (tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
+      if (tabId !== loginTabId) {
+        return // Ignore updates from tabs not in the login window
       }
 
-      initializeExtension()
-      chrome.tabs.onUpdated.removeListener(onTabUpdate)
-    }
-  }
+      console.log(changeInfo)
+      const url = changeInfo?.url || ''
+      // Only some updates inlcude the url, like load, we only listen to those
+      if (!url) {
+        return
+      }
 
-  chrome.tabs.onUpdated.addListener(onTabUpdate)
+      const isSuccessLogin =
+        url?.includes(`${API.SUCCESS_LOGIN}`) && !url?.includes(API.SIGN_IN)
+
+      if (isSuccessLogin) {
+        initializeExtension()
+        chrome.tabs.onUpdated.removeListener(onTabUpdate)
+        chrome.windows.onRemoved.removeListener(onWindowClose)
+        chrome.windows.remove(loginWindow.id)
+      }
+    }
+
+    const onWindowClose = function (closedWindowId: number) {
+      console.log(closedWindowId, loginWindow)
+      if (closedWindowId === loginWindow.id) {
+        // Reset the loginWindow.Id
+        loginWindow = null
+        sendResponse({
+          error: { message: 'Login unsuccessful. Window closed', status: 401 },
+        })
+
+        // Remove the listeners
+        chrome.tabs.onUpdated.removeListener(onTabUpdate)
+        chrome.windows.onRemoved.removeListener(onWindowClose)
+      }
+    }
+
+    chrome.windows.onRemoved.addListener(onWindowClose)
+
+    chrome.tabs.onUpdated.addListener(onTabUpdate)
+  } catch (error) {
+    console.error('Auth error :::', error)
+  }
 }
