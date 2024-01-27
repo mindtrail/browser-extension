@@ -11,44 +11,16 @@ import * as api from '~/lib/api'
 type SendResponse = (resp: any) => void
 
 chrome.runtime.onMessage.addListener(
-  async (request, sender, sendResponse: SendResponse) => {
-    const { message, payload } = request
-
-    log(
-      sender.tab
-        ? 'From Content script:' + sender.tab.url + message
-        : 'From Extension' + message,
-    )
-
+  async (request, _sender, sendResponse: SendResponse) => {
     try {
-      switch (message) {
-        case MESSAGES.SAVE_PAGE:
-          await savePage(payload, sendResponse)
-          break
-        case MESSAGES.SAVE_CLIPPING:
-          await saveClipping(payload, sendResponse)
-          fetchClippingList() // Update storage data afeter a new item added
-          break
-        case MESSAGES.DELETE_CLIPPING:
-          await deleteClipping(payload, sendResponse)
-          fetchClippingList() // Update storage data after a delete
-          break
-        case MESSAGES.SEARCH_HISTORY:
-          await searchHistory(payload, sendResponse)
-          break
-        case MESSAGES.UPDATE_ICON:
-          await updateExtensionIcon()
-          break
-        default:
-          break
-      }
+      await processMessage(request, sendResponse)
     } catch (error) {
       const { cause } = error || {}
       console.error('Error :::', cause)
 
       if (parseInt(cause?.status) === 401) {
-        setTimeout(() => {
-          redirectToAuth(sender.tab, sendResponse)
+        setTimeout(async () => {
+          await authenticateAndRetry(request, sendResponse)
         }, 1000)
         return
       }
@@ -161,7 +133,7 @@ async function fetchClippingList(sendResponse?: SendResponse) {
 
 initializeExtension()
 
-async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResponse) {
+async function authenticateAndRetry(request: any, sendResponse: SendResponse) {
   try {
     let loginWindow = null
     let loginTabId = null
@@ -182,7 +154,11 @@ async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResp
       },
     )
 
-    const onTabUpdate = function (tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
+    const onTabUpdate = async function (
+      tabId: number,
+      changeInfo: any,
+      tab: chrome.tabs.Tab,
+    ) {
       if (tabId !== loginTabId) {
         return // Ignore updates from tabs not in the login window
       }
@@ -198,6 +174,8 @@ async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResp
 
       if (isSuccessLogin) {
         initializeExtension()
+        processMessage(request, sendResponse)
+
         chrome.tabs.onUpdated.removeListener(onTabUpdate)
         chrome.windows.onRemoved.removeListener(onWindowClose)
         chrome.windows.remove(loginWindow.id)
@@ -223,5 +201,31 @@ async function redirectToAuth(senderTab: chrome.tabs.Tab, sendResponse: SendResp
     chrome.tabs.onUpdated.addListener(onTabUpdate)
   } catch (error) {
     console.error('Auth error :::', error)
+  }
+}
+
+async function processMessage(request: any, sendResponse: SendResponse) {
+  const { message, payload } = request
+
+  switch (message) {
+    case MESSAGES.SAVE_PAGE:
+      await savePage(payload, sendResponse)
+      break
+    case MESSAGES.SAVE_CLIPPING:
+      await saveClipping(payload, sendResponse)
+      fetchClippingList() // Update storage data afeter a new item added
+      break
+    case MESSAGES.DELETE_CLIPPING:
+      await deleteClipping(payload, sendResponse)
+      fetchClippingList() // Update storage data after a delete
+      break
+    case MESSAGES.SEARCH_HISTORY:
+      await searchHistory(payload, sendResponse)
+      break
+    case MESSAGES.UPDATE_ICON:
+      await updateExtensionIcon()
+      break
+    default:
+      break
   }
 }
