@@ -2,7 +2,16 @@ This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with
 
 ## Getting Started
 
-First, run the development server:
+First install the dependencies:
+
+```bash
+pnpm install
+# or
+npm install
+
+```
+
+Then, run the development server:
 
 ```bash
 pnpm dev
@@ -10,7 +19,10 @@ pnpm dev
 npm run dev
 ```
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+Open your browser and load the appropriate development build.
+Found in `build/chrome-mv3-dev`
+
+More details on how to load the unpacked extension can be found [here](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked).
 
 You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
 

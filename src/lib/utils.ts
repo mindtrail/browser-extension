@@ -18,3 +18,20 @@ export function isHostExcluded(excludeList: string[] = []) {
 
   return excludeList?.some((pattern) => minimatch(hostName, pattern))
 }
+
+export function log(...args: any) {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args)
+  }
+}
+
+// Strip query params, hashes, anchor tags...
+export const getBaseResourceURL = (urlString: string): string => {
+  try {
+    const url = new URL(urlString)
+    return `${url.origin}${url.pathname}`
+  } catch (e) {
+    console.error(e)
+    return urlString
+  }
+}

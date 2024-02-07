@@ -1,11 +1,7 @@
 import { CaretDownIcon, CaretUpIcon } from '@radix-ui/react-icons'
 
 import { Button } from '~/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '~/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 import { MoveDirection, OverlayPosition } from '~/lib/constants'
 import { cn } from '~/lib/utils'
@@ -37,15 +33,16 @@ export const ChangePosition = ({
       <TooltipTrigger asChild>
         <Button
           onClick={() => handleClick(direction)}
-          variant="secondary"
+          variant='secondary'
           className={cn(
             `relative -right-4 px-1 py-4 w-9 rounded-full group-hover:animate-slide-to-left`,
-            className
-          )}>
+            className,
+          )}
+        >
           <Icon width={24} height={24} />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Move {direction}</TooltipContent>
+      <TooltipContent side='left'>Move {direction}</TooltipContent>
     </Tooltip>
   )
 }

@@ -2,7 +2,7 @@ import { type PlasmoCSConfig } from 'plasmo'
 
 import { Storage } from '@plasmohq/storage'
 
-import { AUTO_SAVE_DELAY, MESSAGES } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, MESSAGES, STORAGE_KEY } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 
 export const CONTENT_SCRIPT_MATCH = ['https://*/*', 'http://*/*', 'file://*/*']
@@ -41,10 +41,7 @@ function startTimer() {
 
   lastFocusTime = Date.now()
   console.log('Timer remaining', autoSaveDelay - timeSpent)
-  minuteTimeout = setTimeout(
-    savePageContent,
-    (autoSaveDelay - timeSpent) * 1000
-  )
+  minuteTimeout = setTimeout(savePageContent, (autoSaveDelay - timeSpent) * 1000)
 }
 
 // Function to pause the timer
@@ -64,15 +61,17 @@ function savePageContent() {
   // Extract page data and send to background script or save directly
   const payload = getPageData()
 
-  console.log('Saving page content', payload)
   chrome.runtime.sendMessage({
-    message: MESSAGES.AUTO_SAVE,
-    payload,
+    message: MESSAGES.SAVE_PAGE,
+    payload: {
+      ...payload,
+      autoSave: true,
+    },
   })
 }
 
 async function initAutoSave() {
-  const settings = (await storage.get('settings')) as StorageData
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
 
   if (settings?.autoSave) {
     autoSaveDelay = settings.saveDelay

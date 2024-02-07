@@ -4,86 +4,115 @@ import manualModeIcon from 'url:~assets/manual-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { MESSAGES } from '~/lib/constants'
+import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
+import { log } from '~/lib/utils'
+import * as api from '~/lib/api'
 
-const SEARCH_URL = 'http://localhost:3000/api/history'
-const LOCAL_URL = 'http://localhost:3000/api/data-source/browser-extension'
-const REMOTE_URL =
-  'https://app-chat-jgnk6lxbhq-ey.a.run.app/api/data-source/browser-extension'
-const TEST_USER = 'clnj8rr9r00009krsmk10j07o'
+type SendResponse = (resp: any) => void
 
-const NODE_ENV = process.env.NODE_ENV
-const CREATE_DATA_SOURCE = NODE_ENV === 'development' ? LOCAL_URL : REMOTE_URL
+let previousTabId = null
+let previousTabUrl = null
 
-updateExtensionIcon()
+chrome.runtime.onMessage.addListener(
+  async (request, sender, sendResponse: SendResponse) => {
+    const { message, payload } = request
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const { message, payload } = request
+    log(
+      sender.tab
+        ? 'From Content script:' + sender.tab.url + message
+        : 'From Extension' + message,
+    )
 
-  console.log(
-    sender.tab
-      ? 'from a content 2121 script:' + sender.tab.url + message
-      : 'from the 1222 extension' + message
-  )
+    try {
+      switch (message) {
+        case MESSAGES.SAVE_PAGE:
+          await savePage(payload, sendResponse)
+          break
+        case MESSAGES.SAVE_CLIPPING:
+          await saveClipping(payload, sendResponse)
+          fetchClippingList() // Update storage data afeter a new item added
+          break
+        case MESSAGES.DELETE_CLIPPING:
+          await deleteClipping(payload, sendResponse)
+          fetchClippingList() // Update storage data after a delete
+          break
+        case MESSAGES.SEARCH_HISTORY:
+          await searchHistory(payload, sendResponse)
+          break
+        case MESSAGES.UPDATE_ICON:
+          await updateExtensionIcon()
+          break
+        default:
+          break
+      }
+    } catch (error) {
+      console.error('Error ::: ', error)
 
-  if (message === MESSAGES.USER_TRIGGERED_SAVE) {
-    saveData(payload, sendResponse)
-  }
+      const { cause } = error || {}
+      console.error('cause', cause)
 
-  if (message === MESSAGES.AUTO_SAVE) {
-    saveData(payload, sendResponse)
-  }
+      if (parseInt(cause?.status) === 401) {
+        setTimeout(() => {
+          // Store the tab ID to return to after login)
+          previousTabId = sender.tab.id // Store the tab ID to return to after login
+          previousTabUrl = sender.tab.url // Store the tab URL
 
-  if (message === MESSAGES.SEARCH_HISTORY) {
-    searchHistorySemantic(payload, sendResponse)
-  }
+          redirectToAuth()
+        }, 1000)
+        return
+      }
 
-  if (message === MESSAGES.UPDATE_ICON) {
-    updateExtensionIcon()
-  }
+      const resultError = cause || { message: 'Unknown error' }
+      log('resultError', resultError)
 
-  return true
-})
+      sendResponse({ error: resultError })
+    }
 
-async function searchHistorySemantic(payload, sendResponse) {
-  console.log(payload)
+    // Return true keeps the connection allive with the content script
+    return true
+  },
+)
 
-  try {
-    const result = await fetch(SEARCH_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        userId: TEST_USER,
-        searchQuery: payload.searchQuery,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const websites = await result.json()
-    console.log(websites)
-    sendResponse(websites)
-  } catch (e) {
-    console.log('error', e)
-    sendResponse('')
-  }
+async function savePage(payload: PageData, sendResponse: SendResponse) {
+  const response = await api.savePageAPICall(payload)
+  sendResponse(response)
 }
 
-async function saveData(payload, sendResponse) {
-  console.log('SAVE Data --- ', payload)
+async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) {
+  const { pageData, ...rest } = payload
 
-  try {
-    const result = await fetch(CREATE_DATA_SOURCE, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    sendResponse({ result })
-    console.log(await result.json())
-  } catch (e) {
-    console.error(e)
+  const { dataSource } = await api.savePageAPICall(pageData)
+  log('dataSource', dataSource)
+
+  if (!dataSource) {
+    throw new Error('No dataSource', { cause: { error: 'No dataSource' } })
   }
+
+  const saveClippingPayload = {
+    ...rest,
+    dataSourceId: dataSource.id,
+  }
+
+  const newClipping = await api.saveClippingAPICall(saveClippingPayload)
+  log('newClipping', newClipping)
+  sendResponse(newClipping)
+}
+
+async function deleteClipping({ clippingId }, sendResponse: SendResponse) {
+  const deletedClipping = await api.deleteClippingAPICall(clippingId)
+
+  log('deleted Clipping', deletedClipping)
+  sendResponse(deletedClipping)
+}
+
+interface searchPayload {
+  searchQuery: string
+}
+async function searchHistory({ searchQuery }: searchPayload, sendResponse: SendResponse) {
+  const websites = await api.searchHistoryAPICall(searchQuery)
+
+  log(websites)
+  sendResponse(websites)
 }
 
 // Based on Auto/Manual save, update the extension icon
@@ -94,12 +123,79 @@ async function updateExtensionIcon() {
     path: autoSave ? autoModeIcon : manualModeIcon,
   })
 
-  console.log('autoSave update --- :', autoSave)
+  log('autoSave update --- :', autoSave)
+}
+
+let storage: Storage
+
+async function initializeExtension() {
+  storage = new Storage({ area: 'local' })
+
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
+  if (!settings) {
+    await storage.set(STORAGE_KEY.SETTINGS, DEFAULT_EXTENSION_SETTINGS)
+  }
+
+  updateExtensionIcon()
+  fetchClippingList()
 }
 
 async function getAutoSaveStatus() {
-  const storage = new Storage()
-  const settings = (await storage.get('settings')) as StorageData
-
+  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
   return settings?.autoSave
+}
+
+async function fetchClippingList(sendResponse?: SendResponse) {
+  try {
+    const clippingList = await api.getClippingListAPICall()
+    console.log('clipping grouped by dataSource', clippingList)
+
+    const clippingsMap = clippingList.reduce((acc: any, item: ClippingByDataSource) => {
+      acc[item.dataSourceName] = item.clippingList
+      return acc
+    }, {})
+
+    await storage.set(STORAGE_KEY.CLIPPINGS_BY_DS, clippingsMap)
+
+    if (sendResponse) {
+      sendResponse(clippingList)
+    }
+
+    return clippingList
+  } catch (error) {
+    console.error('error Clippings', error, error?.cause)
+    return []
+  }
+}
+
+initializeExtension()
+
+async function redirectToAuth() {
+  const loginTab = await chrome.tabs.create({
+    url: `${api.TARGET_HOST}${API.SIGN_IN}?callbackUrl=${API.SUCCESS_LOGIN}`,
+  })
+
+  // Define the listener inside redirectToAuth to capture loginTab in the closure
+  const onTabUpdate = function (tabId: number, changeInfo: any) {
+    const url = changeInfo?.url || ''
+    // Only some updates inlcude the url, like load, we only listen to those
+    if (!url || tabId === loginTab.id) {
+      return
+    }
+
+    const isSuccessLogin =
+      url?.includes(`${API.SUCCESS_LOGIN}`) && !url?.includes(API.SIGN_IN)
+
+    if (isSuccessLogin) {
+      if (previousTabId) {
+        chrome.tabs.update(previousTabId, { url: previousTabUrl })
+        chrome.tabs.remove(loginTab.id)
+      }
+
+      initializeExtension()
+      chrome.tabs.onUpdated.removeListener(onTabUpdate)
+    }
+  }
+
+  chrome.tabs.onUpdated.addListener(onTabUpdate)
 }

@@ -3,40 +3,45 @@
 import '~style.css'
 
 import { useCallback } from 'react'
-
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST, STORAGE_KEY } from '~/lib/constants'
 
 const DEFAULT_TAB = 'search'
 
-const defaultSettings: StorageData = {
+const defaultSettings: SettingsStored = {
   autoSave: true,
   saveDelay: AUTO_SAVE_DELAY,
   excludeList: DEFAULT_EXCLUDE_LIST,
 }
 
-function IndexPopup() {
-  const [settings, setSettings] = useStorage('settings', defaultSettings)
+const STORAGE_SETTINGS = {
+  key: STORAGE_KEY.SETTINGS,
+  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+}
 
-  const updatedSettings = useCallback((newSettings: Partial<StorageData>) => {
+function IndexPopup() {
+  const [settings, setSettings] = useStorage(STORAGE_SETTINGS, defaultSettings)
+
+  const updatedSettings = useCallback((newSettings: Partial<SettingsStored>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }))
   }, [])
 
   return (
-    <div className="flex h-[500px] w-96">
-      <Tabs defaultValue={DEFAULT_TAB} className="flex flex-col w-full text-">
-        <TabsList className="flex w-full relative justify-between border-b bg-inherit rounded-none">
-          <TabsTrigger value="search">Search</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+    <div className='flex h-[500px] w-96'>
+      <Tabs defaultValue={DEFAULT_TAB} className='flex flex-col w-full text-'>
+        <TabsList className='flex w-full relative justify-between border-b bg-inherit rounded-none'>
+          <TabsTrigger value='search'>Search</TabsTrigger>
+          <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value="search">
+        <TabsContent value='search'>
           <Search />
         </TabsContent>
-        <TabsContent value="settings">
+        <TabsContent value='settings'>
           <Settings {...settings} updateSettings={updatedSettings} />
         </TabsContent>
       </Tabs>

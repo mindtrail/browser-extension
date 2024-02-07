@@ -1,4 +1,14 @@
-.mindtrailClipping::selection {
-  background-color: #f8e02c !important; /* Your desired highlight color */
-  color: black; /* Text color */
+.mindtrail-clipping {
+  background-color: hsla(60, 33%, 57%, 1) !important;
+  color: black !important;
+  cursor: default !important;
+}
+
+/*
+ *  There may be situations where the node itself is visible, but not other children
+ *  Example: #using-server-components-in-nextjs from https://nextjs.org/docs/app/building-your-application/rendering/server-components#server-rendering-strategies
+ */
+.mindtrail-split-textNode {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
