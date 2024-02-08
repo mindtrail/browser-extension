@@ -25,7 +25,7 @@ export const PLASMO_CONFIG: PlasmoCSConfig = {
   exclude_matches: CONTENT_SCRIPT_EXCLUDE,
 }
 
-const storage = new Storage()
+const storage = new Storage({ area: 'local' })
 
 let minuteTimeout = null
 let lastFocusTime = 0
