@@ -56,8 +56,11 @@ async function saveClipping(payload: SavedClipping, sendResponse: SendResponse) 
     dataSourceId: dataSource.id,
   }
 
+  console.log('payload', saveClippingPayload)
+
   const newClipping = await api.saveClippingAPICall(saveClippingPayload)
-  log('newClipping', newClipping)
+  console.log('newClipping', newClipping)
+
   sendResponse(newClipping)
 }
 

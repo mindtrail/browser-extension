@@ -86,6 +86,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
       return
     }
 
+    console.log('Clipping Saved', response)
     addClippingToList(response)
 
     selection?.empty()

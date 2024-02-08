@@ -52,7 +52,7 @@ export const ClippingOverlay = () => {
       console.log(clippingId)
       // Remove the highlight class from the removed elements
       removeHighlightClassAndAttr([...elementsToRemoveHighlight])
-      setClippingList((prev) => prev.filter((c) => c.id !== clippingId))
+      setClippingList((prev) => prev.filter((c) => c?.id !== clippingId))
     },
     [setClippingList],
   )
