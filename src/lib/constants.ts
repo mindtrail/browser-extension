@@ -62,7 +62,7 @@ export const EXCLUDED_TAGS_FOR_CLIPPING = ['INPUT', 'TEXTAREA', 'BUTTON', 'SELEC
 
 export const HOST = {
   LOCAL: 'http://localhost:3000',
-  REMOTE: 'https://next-postgress-auth-stripe.vercel.app/',
+  REMOTE: 'https://mindtrail-alexpausan.vercel.app/',
 }
 
 export const API = {
