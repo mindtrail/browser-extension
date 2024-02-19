@@ -51,37 +51,39 @@ export function Search() {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
-      <div className="flex flex-col flex-1 gap-4 w-full">
+    <div className='flex flex-col gap-4 px-4 py-4'>
+      <div className='flex flex-col flex-1 gap-4 w-full'>
         <Input
-          className="flex-1 bg-white border-[1px] disabled:bg-gray-100 disabled:text-gray-400 px-2"
+          className='flex-1 border-[1px] disabled:bg-gray-100 disabled:text-gray-400 px-2'
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="A website about travel"
+          placeholder='A website about travel'
         />
-        <div className="flex gap-2 items-center">
+        <div className='flex gap-2 items-center'>
           {/* <Label htmlFor="flowiseURL">History search:</Label> */}
           <Button
             onClick={handleSearch}
             disabled={!searchQuery || processing}
-            size="sm"
-            className="w-full">
-            {processing && <IconSpinner className="mr-2" />}
+            size='sm'
+            className='w-full'
+          >
+            {processing && <IconSpinner className='mr-2' />}
             Search
           </Button>
         </div>
-        <div className="w-full max-w-2xl flex flex-col flex-1">
+        <div className='w-full max-w-2xl flex flex-col flex-1'>
           {foundWebsite ? (
-            <ScrollArea className="flex-1 flex flex-col max-h-[70vh] rounded-md border py-2 px-2">
+            <ScrollArea className='flex-1 flex flex-col max-h-[70vh] rounded-md border py-2 px-2'>
               <a
                 href={addHttpsIfMissing(foundWebsite?.name)}
-                target="_blank"
-                className="flex flex-1 flex-col gap-2">
-                <Typography variant="h5" className="text-gray-600">
+                target='_blank'
+                className='flex flex-1 flex-col gap-2'
+              >
+                <Typography variant='h5' className='text-gray-600'>
                   {foundWebsite?.hostName}
                 </Typography>
-                <Typography variant="p" className="text-gray-600 leading-5">
+                <Typography variant='p' className='text-gray-600 leading-5'>
                   {foundWebsite?.description}
                 </Typography>
                 <img
