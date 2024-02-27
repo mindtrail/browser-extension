@@ -14,13 +14,13 @@ import { Switch } from '~/components/ui/switch'
 import { addHttpsIfMissing } from '~/lib/utils'
 import { MESSAGES, STORAGE_KEY, DEFAULT_SETTINGS, URL_REGEX } from '~/lib/constants'
 
-const SETTINGS_STORAGE_CONFIG = {
+const SETTINGS_CONFIG = {
   key: STORAGE_KEY.SETTINGS,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 
 export function Settings() {
-  const [settings, setSettings] = useStorage(SETTINGS_STORAGE_CONFIG, DEFAULT_SETTINGS)
+  const [settings, setSettings] = useStorage(SETTINGS_CONFIG, DEFAULT_SETTINGS)
   const { autoSave, excludeList, saveDelay } = settings
 
   const updateSettings = useCallback((newSettings: Partial<SettingsStored>) => {

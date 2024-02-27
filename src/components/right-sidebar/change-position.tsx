@@ -35,7 +35,8 @@ export const ChangePosition = ({
           onClick={() => handleClick(direction)}
           variant='secondary'
           className={cn(
-            `relative -right-4 px-1 py-4 w-9 rounded-full group-hover:animate-slide-to-left`,
+            `relative -right-4 px-1 py-4 w-9 rounded-full group-hover:animate-slide-to-left
+            hover:bg-white`,
             className,
           )}
         >

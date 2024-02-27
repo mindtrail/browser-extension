@@ -1,7 +1,9 @@
+import { getBaseResourceURL } from '~lib/utils'
+
 export const getPageData = (): PageData => {
   const html = document.documentElement.outerHTML
   const title = document.title
-  const url = window.location.href
+  const url = getBaseResourceURL(window.location.href)
 
   const description = document
     .querySelector('meta[name="description"]')

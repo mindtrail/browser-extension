@@ -5,7 +5,6 @@ import { ClipboardCopyIcon } from '@radix-ui/react-icons'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { Button } from '~/components/ui/button'
-
 import { IconSpinner } from '~/components/icon-spinner'
 
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'

@@ -10,14 +10,14 @@ import { removeHighlightClassAndAttr } from '~/lib/clipping/delete'
 import { HIGHLIGHT_CLASS, STORAGE_KEY } from '~/lib/constants'
 import { getBaseResourceURL } from '~/lib/utils'
 
-const STORAGE_CLIPPINGS = {
+const CLIPPINGS_CONFIG = {
   key: STORAGE_KEY.CLIPPINGS_BY_DS,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 const pageBaseURL = getBaseResourceURL(window.location.href)
 
 export const ClippingOverlay = () => {
-  const [clippingMap] = useStorage(STORAGE_CLIPPINGS)
+  const [clippingMap] = useStorage(CLIPPINGS_CONFIG)
   const [clippingList, setClippingList] = useState<SavedClipping[]>([])
 
   // We only run this once. DOM can be altered.
