@@ -82,3 +82,12 @@ export const STORAGE_KEY = {
 }
 
 export const CLIPPING_BTN_OFFSET = 16
+
+export const DEFAULT_SETTINGS = {
+  autoSave: true,
+  saveDelay: AUTO_SAVE_DELAY,
+  excludeList: DEFAULT_EXCLUDE_LIST,
+}
+
+export const URL_REGEX =
+  /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/

@@ -1,24 +1,31 @@
-import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
 import { useCallback } from 'react'
 import type { KeyboardEvent } from 'react'
+import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
+
+import { Storage } from '@plasmohq/storage'
+import { useStorage } from '@plasmohq/storage/hook'
 
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
-import { MESSAGES } from '~/lib/constants'
+
 import { addHttpsIfMissing } from '~/lib/utils'
+import { MESSAGES, STORAGE_KEY, DEFAULT_SETTINGS, URL_REGEX } from '~/lib/constants'
 
-const URL_REGEX =
-  /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
-
-type SettingsProps = SettingsStored & {
-  updateSettings: (settings: Partial<SettingsStored>) => void
+const SETTINGS_STORAGE_CONFIG = {
+  key: STORAGE_KEY.SETTINGS,
+  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 
-export function Settings(props: SettingsProps) {
-  const { autoSave, excludeList, saveDelay, updateSettings } = props
+export function Settings() {
+  const [settings, setSettings] = useStorage(SETTINGS_STORAGE_CONFIG, DEFAULT_SETTINGS)
+  const { autoSave, excludeList, saveDelay } = settings
+
+  const updateSettings = useCallback((newSettings: Partial<SettingsStored>) => {
+    setSettings((prev) => ({ ...prev, ...newSettings }))
+  }, [])
 
   const removeDomainFromExcludeList = (url: string) => {
     const updatedExcludeList = excludeList.filter((item) => item !== url)

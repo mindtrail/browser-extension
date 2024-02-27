@@ -10,8 +10,9 @@ import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST, STORAGE_KEY } from '~/lib/constants'
+import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
-const DEFAULT_TAB = 'search'
+const DEFAULT_TAB = 'settings'
 
 const defaultSettings: SettingsStored = {
   autoSave: true,
@@ -25,24 +26,21 @@ const STORAGE_SETTINGS = {
 }
 
 function IndexPopup() {
-  const [settings, setSettings] = useStorage(STORAGE_SETTINGS, defaultSettings)
-
-  const updatedSettings = useCallback((newSettings: Partial<SettingsStored>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }))
-  }, [])
-
   return (
     <div className='flex h-[500px] w-96'>
       <Tabs defaultValue={DEFAULT_TAB} className='flex flex-col w-full text-'>
         <TabsList className='flex w-full relative justify-between border-b bg-inherit rounded-none'>
-          <TabsTrigger value='search'>Search</TabsTrigger>
-          <TabsTrigger value='settings'>Settings</TabsTrigger>
+          {/* <TabsTrigger disabled value='search'>
+            Search
+          </TabsTrigger> */}
+
+          <TabsTrigger value='settings'>Mindtrail Settings</TabsTrigger>
         </TabsList>
-        <TabsContent value='search'>
+        {/* <TabsContent value='search'>
           <Search />
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value='settings'>
-          <Settings {...settings} updateSettings={updatedSettings} />
+          <Settings />
         </TabsContent>
       </Tabs>
     </div>
