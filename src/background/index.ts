@@ -105,6 +105,7 @@ async function initializeExtension() {
 
   updateExtensionIcon()
   fetchClippingList()
+  getSavedDSList()
 }
 
 async function getAutoSaveStatus() {
@@ -115,7 +116,6 @@ async function getAutoSaveStatus() {
 async function fetchClippingList(sendResponse?: SendResponse) {
   try {
     const clippingList = await api.getClippingListAPICall()
-    console.log('clipping grouped by dataSource', clippingList)
 
     const clippingsMap = clippingList.reduce((acc: any, item: ClippingByDataSource) => {
       acc[item.dataSourceName] = item.clippingList
@@ -133,6 +133,11 @@ async function fetchClippingList(sendResponse?: SendResponse) {
     console.error('error Clippings', error, error?.cause)
     return []
   }
+}
+
+async function getSavedDSList() {
+  const savedDsList = await api.getSavedDSListAPICall()
+  await storage.set(STORAGE_KEY.SAVED_WEBSITES, savedDsList)
 }
 
 initializeExtension()
@@ -214,6 +219,7 @@ async function processMessage(request: any, sendResponse: SendResponse) {
   switch (message) {
     case MESSAGES.SAVE_PAGE:
       await savePage(payload, sendResponse)
+      getSavedDSList() // Update storage data after a new page added
       break
     case MESSAGES.SAVE_CLIPPING:
       await saveClipping(payload, sendResponse)

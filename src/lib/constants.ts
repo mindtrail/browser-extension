@@ -66,6 +66,7 @@ export const HOST = {
 export const API = {
   SAVE_PAGE: '/api/data-source/browser-extension',
   CLIPPING: '/api/clipping',
+  DATA_SOURCE: '/api/data-source',
   SEARCH_HISTORY: '/api/history',
   SIGN_IN: '/api/auth/signin',
   SUCCESS_LOGIN: '/?extension-login=true',
@@ -77,6 +78,7 @@ export const SPLIT_TEXTNODE_CLASS = 'mindtrail-split-textNode'
 export const STORAGE_KEY = {
   SETTINGS: 'settings',
   CLIPPINGS_BY_DS: 'clippings-by-ds',
+  SAVED_WEBSITES: 'saved-websites',
 }
 
 export const CLIPPING_BTN_OFFSET = 16

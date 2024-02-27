@@ -41,7 +41,6 @@ const DEFAULT_OVERLAY_POS = DEFAULT_EXTENSION_SETTINGS.overlayPosition
 
 export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
   const [loading, toggleLoading] = useReducer((c) => !c, false)
-
   const currentPos = settings.overlayPosition || DEFAULT_OVERLAY_POS
 
   const YPos = useMemo(() => {
