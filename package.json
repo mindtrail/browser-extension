@@ -1,7 +1,7 @@
 {
   "name": "mind-trail",
   "displayName": "Mind Trail",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Your AI memory",
   "author": "Indie AI",
   "scripts": {
@@ -42,24 +42,18 @@
     "typescript": "5.2.2"
   },
   "manifest": {
-    "version": "0.0.1",
+    "version": "0.0.2",
     "homepage_url": "https://mindtrail.ai",
     "browser_specific_settings": {
       "gecko": {
         "id": "mindtrail-ai@plasmo"
       }
     },
-    "host_permissions": [
-      "https://next-postgress-auth-stripe.vercel.app/",
-      "http://localhost:3000/"
-    ],
     "permissions": [
-      "pageCapture",
       "activeTab",
       "scripting",
       "storage",
-      "unlimitedStorage",
-      "cookies"
+      "unlimitedStorage"
     ],
     "content_scripts": [
       {

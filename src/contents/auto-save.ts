@@ -1,29 +1,7 @@
-import { type PlasmoCSConfig } from 'plasmo'
-
 import { Storage } from '@plasmohq/storage'
 
 import { AUTO_SAVE_DELAY, MESSAGES, STORAGE_KEY } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
-
-export const CONTENT_SCRIPT_MATCH = ['https://*/*', 'http://*/*', 'file://*/*']
-
-export const CONTENT_SCRIPT_EXCLUDE = [
-  'http://localhost:*/*',
-  'https://*.google.com/*',
-  'https://www.google.com/*',
-  'https://*.slack.com/*',
-  'https://*.zoom.us/*',
-  'https://*.youtube.com/*',
-  'https://*.openai.com/*',
-  'https://*.github.com/*',
-  'https://*.gmail.com/*',
-  'https://*.plasmo.com/*',
-]
-
-export const PLASMO_CONFIG: PlasmoCSConfig = {
-  matches: CONTENT_SCRIPT_MATCH,
-  exclude_matches: CONTENT_SCRIPT_EXCLUDE,
-}
 
 const storage = new Storage({ area: 'local' })
 

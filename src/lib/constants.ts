@@ -1,5 +1,3 @@
-import type { PlasmoCSConfig } from 'plasmo'
-
 export const AUTO_SAVE_DELAY = 60 // seconds
 export const MIN_TEXT_FOR_CLIPPING = 10
 
@@ -35,10 +33,10 @@ export const CONTENT_SCRIPT_EXCLUDE = [
   'https://*.plasmo.com/*',
 ]
 
-export const PLASMO_CONFIG: PlasmoCSConfig = {
-  matches: CONTENT_SCRIPT_MATCH,
-  exclude_matches: CONTENT_SCRIPT_EXCLUDE,
-}
+// export const PLASMO_CONFIG: PlasmoCSConfig = {
+//   matches: CONTENT_SCRIPT_MATCH,
+//   exclude_matches: CONTENT_SCRIPT_EXCLUDE,
+// }
 
 export enum OverlayPosition {
   top = 'top',

@@ -20,6 +20,7 @@ chrome.runtime.onMessage.addListener(
 
       if (parseInt(cause?.status) === 401) {
         setTimeout(async () => {
+          console.log(request, cause)
           await authenticateAndRetry(request, sendResponse)
         }, 1000)
         return
