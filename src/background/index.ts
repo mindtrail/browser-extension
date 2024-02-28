@@ -1,6 +1,7 @@
 // import manualModeIcon from 'data-base64:~assets/icon-disabled.png'
 import autoModeIcon from 'url:~assets/icon.development-32.png'
 import manualModeIcon from 'url:~assets/manual-32.png'
+import savedIcon from 'url:~assets/saved-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
@@ -87,7 +88,7 @@ async function updateExtensionIcon() {
   const autoSave = await getAutoSaveStatus()
 
   chrome?.action?.setIcon({
-    path: autoSave ? autoModeIcon : manualModeIcon,
+    path: autoSave ? autoModeIcon : savedIcon,
   })
 
   log('autoSave update --- :', autoSave)
