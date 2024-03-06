@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
@@ -7,6 +7,8 @@ import { ChangePosition } from '~components/right-sidebar/change-position'
 import { SavePage } from '~components/right-sidebar/save-page'
 
 import { getPageData } from '~/lib/page-data'
+import { getBaseResourceURL } from '~lib/utils'
+
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
@@ -49,8 +51,9 @@ const SAVED_WEBSITES_CONFIG = {
 
 export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
   const [savedWebsites, setSavedWebsites] = useStorage(SAVED_WEBSITES_CONFIG, [])
-
+  const [currentPageIsSaved, setCurrentPageIsSaved] = useState(false)
   const [loading, toggleLoading] = useReducer((c) => !c, false)
+
   const currentPos = settings.overlayPosition || DEFAULT_OVERLAY_POS
 
   const YPos = useMemo(() => {
@@ -88,6 +91,11 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
     [currentPos],
   )
 
+  useEffect(() => {
+    const saveStatus = savedWebsites.includes(getBaseResourceURL(window.location.href))
+    setCurrentPageIsSaved(saveStatus)
+  }, [savedWebsites])
+
   return (
     <div
       className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12
@@ -105,7 +113,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
         <SavePage
           handleClick={handlePageSave}
           loading={loading}
-          savedWebsites={savedWebsites}
+          currentPageIsSaved={currentPageIsSaved}
         />
         <ChangePosition
           handleClick={handlePositionChange}

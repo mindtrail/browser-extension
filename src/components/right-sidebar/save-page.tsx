@@ -4,12 +4,10 @@ import { IconSpinner } from '~/components/icon-spinner'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
-import { getBaseResourceURL } from '~lib/utils'
-
 interface SavePageProps {
   handleClick: () => void
   loading: boolean
-  savedWebsites: string[]
+  currentPageIsSaved: boolean
 }
 
 const SAVE_BTN_COLORS = {
@@ -17,9 +15,7 @@ const SAVE_BTN_COLORS = {
   SAVED: 'from-[#076b1b]  to-[#42f74b] hover:from-[#076b1b]/80  hover:to-[#42f74b]/80',
 }
 
-export const SavePage = ({ handleClick, loading, savedWebsites }: SavePageProps) => {
-  const isPageSaved = savedWebsites.includes(getBaseResourceURL(window.location.href))
-
+export const SavePage = ({ handleClick, loading, currentPageIsSaved }: SavePageProps) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -28,7 +24,7 @@ export const SavePage = ({ handleClick, loading, savedWebsites }: SavePageProps)
           disabled={loading}
           variant='secondary'
           className={`relative py-4 px-0 rounded-full opacity-75 bg-gradient-to-b
-            ${isPageSaved ? SAVE_BTN_COLORS.SAVED : SAVE_BTN_COLORS.UNSAVED}
+            ${currentPageIsSaved ? SAVE_BTN_COLORS.SAVED : SAVE_BTN_COLORS.UNSAVED}
             group-hover:opacity-100 group-hover:animate-slide-to-left disabled:opacity-80
           `}
         >
@@ -41,7 +37,7 @@ export const SavePage = ({ handleClick, loading, savedWebsites }: SavePageProps)
         </Button>
       </TooltipTrigger>
       <TooltipContent side='left'>
-        {isPageSaved ? 'Page Saved' : 'Save Page'}
+        {currentPageIsSaved ? 'Page Saved' : 'Save Page'}
       </TooltipContent>
     </Tooltip>
   )

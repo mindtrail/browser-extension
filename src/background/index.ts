@@ -225,6 +225,7 @@ async function processMessage(request: any, sendResponse: SendResponse) {
     case MESSAGES.SAVE_CLIPPING:
       await saveClipping(payload, sendResponse)
       fetchClippingList() // Update storage data afeter a new item added
+      getSavedDSList() // Update storage data after a new page added
       break
     case MESSAGES.DELETE_CLIPPING:
       await deleteClipping(payload, sendResponse)
