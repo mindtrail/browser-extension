@@ -93,13 +93,20 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
       className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12
         flex flex-col justify-center ${YPos}`}
     >
-      <div className='flex flex-col gap-2 pointer-events-none group-hover:animate-slide-to-left group-hover:pointer-events-auto'>
+      <div
+        className='flex flex-col gap-2 pointer-events-none
+          group-hover:animate-slide-to-left group-hover:pointer-events-auto'
+      >
         <ChangePosition
           handleClick={handlePositionChange}
           direction={MoveDirection.up}
           currentPos={currentPos}
         />
-        <SavePage handleClick={handlePageSave} loading={loading} savedWebsites={savedWebsites}/>
+        <SavePage
+          handleClick={handlePageSave}
+          loading={loading}
+          savedWebsites={savedWebsites}
+        />
         <ChangePosition
           handleClick={handlePositionChange}
           direction={MoveDirection.down}
