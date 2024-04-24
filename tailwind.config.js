@@ -58,6 +58,10 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'], // Set Inter as the default sans-serif font
+      },
+
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

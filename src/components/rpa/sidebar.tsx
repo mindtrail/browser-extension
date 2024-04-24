@@ -49,7 +49,7 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
 
   return (
     <div
-      className={`z-50 fixed group right-0 drop-shadow-xl w-80 h-full
+      className={`font-sans z-50 fixed group right-0 drop-shadow-xl w-80 h-full
         flex flex-col bg-white ${!isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className='flex items-center py-2 gap-2 border-b'>
