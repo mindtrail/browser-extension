@@ -2,13 +2,14 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
-import { XIcon, CheckIcon } from 'lucide-react'
+import { XIcon, CheckIcon, CircleDotIcon } from 'lucide-react'
 
 import { getPageData } from '~/lib/page-data'
-import { Button } from '~/components/ui/button'
-import { Typography } from '~components/typography'
-
 import { MESSAGES, STORAGE_KEY } from '~/lib/constants'
+
+import { Typography } from '~components/typography'
+import { Button } from '~/components/ui/button'
+import { RecordIcon } from '~/components/icons/record'
 
 interface SidebarProps {
   settings: SettingsStored
@@ -58,7 +59,13 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         </Button>
         <Typography variant='h5'> Super RPA</Typography>
       </div>
-      <div className='flex flex-1 overflow-auto px-2 py-4'>
+      <div className='w-full flex px-4 py-4'>
+        <Button variant='outline' className='flex gap-2 items-center'>
+          <RecordIcon className='w-4 h-4' />
+          Record workflow
+        </Button>
+      </div>
+      <div className='flex flex-1 overflow-auto px-4 py-4'>
         <div className='flex flex-col gap-8'>
           <div className='flex items-center gap-4'>
             <div className='w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center'>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 
-import { IconSpinner } from '~/components/icon-spinner'
+import { IconSpinner } from '~components/icons/spinner'
 import { Typography } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'

@@ -6,7 +6,7 @@ import { TrashIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { Button } from '~/components/ui/button'
 
-import { IconSpinner } from '~/components/icon-spinner'
+import { IconSpinner } from '~components/icons/spinner'
 
 import { MESSAGES, HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getDeleteBtnCoordinates } from '~/lib/clipping/delete'
