@@ -112,7 +112,7 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
             <div
               key={index}
               className={`flex items-center gap-4 px-2 py-4 w-full rounded-lg
-                border border-transparent hover:border-input group/row`}
+                border border-transparent hover:border-border group/row`}
             >
               <div className='flex items-center justify-center w-8 h-8 rounded-full border border-foreground/50'>
                 <Icon className='h-4 w-4 text-foreground/50' />
@@ -134,20 +134,14 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
           ))}
 
           <div
-            className={`flex items-center gap-4 px-2 py-2 my-2 w-full
+            className={`flex items-center gap-4 px-2 py-4 w-full
               rounded-lg border border-dashed`}
           >
-            <div className='w-8 h-8 rounded-full bg-secondary/70 flex items-center justify-center'>
-              {/* <CheckIcon className='h-4 w-4 text-white' /> */}
-              <Typography className='text-secondary-foreground'>
-                {mockData?.length + 1}
-              </Typography>
-            </div>
+            <div className='w-8 h-8 rounded-full border border-dashed bg-accent/50' />
             <div className='flex flex-col gap-1'>
-              <Typography className='capitalize' variant='small-semi'>
+              <Typography className='capitalize text-foreground/50' variant='small-semi'>
                 Next action
               </Typography>
-              {/* <Typography variant='small'>{item.value}</Typography> */}
             </div>
             <Button
               variant='secondary'
