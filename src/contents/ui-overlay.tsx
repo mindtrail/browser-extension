@@ -7,7 +7,7 @@ import { useStorage } from '@plasmohq/storage/hook'
 import { TooltipProvider } from '~/components/ui/tooltip'
 
 import { ClippingOverlay } from '~/components/clipping'
-import { RightSidebar } from '~/components/right-sidebar'
+import { RightSidebar } from '~/components/rpa/sidebar'
 
 import { DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
@@ -27,7 +27,6 @@ const STORAGE_SETTINGS = {
 const UIOverlay = () => {
   const [overlayVisible, setOverlayVisible] = useState(true)
   const [settings, setSettings] = useStorage(STORAGE_SETTINGS, DEFAULT_EXTENSION_SETTINGS)
-
   const { excludeList } = settings
 
   useEffect(() => {
