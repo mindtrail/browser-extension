@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import type { KeyboardEvent } from 'react'
-import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
+import { XIcon, GlobeIcon } from 'lucide-react'
 
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
@@ -136,7 +136,7 @@ export function Settings() {
                       className=' group-hover:visible shrink-0'
                       onClick={() => removeDomainFromExcludeList(item)}
                     >
-                      <Cross1Icon />
+                      <XIcon />
                     </Button>
                   </li>
                 ))}

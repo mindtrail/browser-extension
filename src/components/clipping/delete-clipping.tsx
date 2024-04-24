@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 
-import { TrashIcon } from '@radix-ui/react-icons'
+import { TrashIcon } from 'lucide-react'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { Button } from '~/components/ui/button'
@@ -47,7 +47,7 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
     }
 
     const allHighlightElements = document.querySelectorAll(
-      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
+      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`
     )
 
     const btnCoordinates = getDeleteBtnCoordinates([...allHighlightElements])
@@ -123,7 +123,7 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
       setHoveredClippingId(null)
       onDelete(hoveredClippingId)
     },
-    [hoveredClippingId],
+    [hoveredClippingId]
   )
 
   if (!btnCoorindates) {

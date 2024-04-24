@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import type { MouseEvent } from 'react'
 
-import { ClipboardCopyIcon } from '@radix-ui/react-icons'
+import { HighlighterIcon } from 'lucide-react'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { Button } from '~/components/ui/button'
@@ -111,7 +111,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
               transform transition-transform duration-200 ease-out
               disabled:opacity-80`}
         >
-          <ClipboardCopyIcon width={22} height={22} />
+          <HighlighterIcon width={22} height={22} />
           {loading && (
             <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center rounded-full'>
               <IconSpinner />
