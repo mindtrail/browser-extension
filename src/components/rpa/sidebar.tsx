@@ -2,15 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
-import {
-  XIcon,
-  CheckIcon,
-  CircleDotIcon,
-  MousePointerClickIcon,
-  GlobeIcon,
-  PenLineIcon,
-  TextSelectIcon,
-} from 'lucide-react'
+import { XIcon } from 'lucide-react'
 
 import { getPageData } from '~/lib/page-data'
 import { MESSAGES, STORAGE_KEY } from '~/lib/constants'
@@ -19,43 +11,13 @@ import { Typography } from '~components/typography'
 import { Button } from '~/components/ui/button'
 import { RecordIcon } from '~/components/icons/record'
 
+import { mockData } from './constants'
+import { FlowBuilder } from './builder'
+
 interface SidebarProps {
   settings: SettingsStored
   setSettings: Dispatch<SetStateAction<SettingsStored>>
 }
-
-const mockData = [
-  {
-    type: 'browse',
-    selector: 'url',
-    value: 'https://google.com',
-    icon: GlobeIcon,
-  },
-  {
-    type: 'form-edit',
-    selector: 'input',
-    value: 'Hello, World!',
-    icon: PenLineIcon,
-  },
-  {
-    type: 'click',
-    selector: 'button',
-    value: 'Search',
-    icon: MousePointerClickIcon,
-  },
-  {
-    type: 'click',
-    selector: 'a',
-    value: 'Learn more',
-    icon: MousePointerClickIcon,
-  },
-  {
-    type: 'select',
-    selector: 'p',
-    value: 'first paragraph',
-    icon: TextSelectIcon,
-  },
-]
 
 const SAVED_WEBSITES_CONFIG = {
   key: STORAGE_KEY.SAVED_WEBSITES,
@@ -107,50 +69,7 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         </Button>
       </div>
       <div className='flex flex-1 overflow-auto py-2 w-full'>
-        <div className='flex flex-col w-full px-2 py-2 cursor-default'>
-          {mockData.map(({ type, value, icon: Icon }, index) => (
-            <div
-              key={index}
-              className={`flex items-center gap-4 px-2 py-4 w-full rounded-lg
-                border border-transparent hover:border-border group/row`}
-            >
-              <div className='flex items-center justify-center w-8 h-8 rounded-full border border-foreground/50'>
-                <Icon className='h-4 w-4 text-foreground/50' />
-                {/* <Typography className='text-primary-foreground'>{index + 1}</Typography> */}
-              </div>
-              <div className='flex flex-col gap-1'>
-                <Typography className='capitalize' variant='small-semi'>
-                  {type}
-                </Typography>
-                <Typography variant='small'>{value}</Typography>
-              </div>
-              <Button
-                variant='ghost'
-                className={`invisible group-hover/row:visible absolute right-4`}
-              >
-                <XIcon className='w-4 h-4' />
-              </Button>
-            </div>
-          ))}
-
-          <div
-            className={`flex items-center gap-4 px-2 py-4 w-full
-              rounded-lg border border-dashed`}
-          >
-            <div className='w-8 h-8 rounded-full border border-dashed bg-accent/50' />
-            <div className='flex flex-col gap-1'>
-              <Typography className='capitalize text-foreground/50' variant='small-semi'>
-                Next action
-              </Typography>
-            </div>
-            <Button
-              variant='secondary'
-              className={`invisible group-hover/row:visible absolute right-4`}
-            >
-              <XIcon className='w-4 h-4' />
-            </Button>
-          </div>
-        </div>
+        <FlowBuilder />
       </div>
     </div>
   )
