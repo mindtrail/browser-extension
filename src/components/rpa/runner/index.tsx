@@ -1,10 +1,7 @@
 import React, { useState } from 'react'
 import runEvents from './run-events'
 
-export function FlowRunner() {
-    const [flows, setFlows] = useState(() =>
-        JSON.parse(localStorage.getItem('flows') || '{}'),
-    )
+export function FlowRunner({ flows, setFlows }) {
     const [hoveredFlowId, setHoveredFlowId] = useState(null)
 
     function runFlow(flowId) {
@@ -20,7 +17,7 @@ export function FlowRunner() {
     }
 
     return (
-        <div className="p-5">
+        <div className="px-4">
             {Object.keys(flows).map((flowId, index) => (
                 <div
                     key={flowId}

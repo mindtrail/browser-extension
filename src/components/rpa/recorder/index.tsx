@@ -3,12 +3,9 @@ import { v4 as uuidv4 } from 'uuid'
 import listenEvents from './listen-events'
 import { RecordButton } from './record-button'
 
-export function FlowRecorder() {
+export function FlowRecorder({ flows, setFlows }) {
     const [recording, setRecording] = useState(false)
     const [currentFlowId, setCurrentFlowId] = useState(null)
-    const [flows, setFlows] = useState(() =>
-        JSON.parse(localStorage.getItem('flows') || '{}'),
-    )
 
     useEffect(() => {
         const removeEventListeners = listenEvents(storeEvent)
@@ -36,7 +33,7 @@ export function FlowRecorder() {
     }
 
     return (
-        <div className="p-5">
+        <div>
             <RecordButton onClick={toggleRecording} recording={recording} />
         </div>
     )

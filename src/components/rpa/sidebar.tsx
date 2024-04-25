@@ -29,6 +29,9 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
   const [savedWebsites, setSavedWebsites] = useStorage(SAVED_WEBSITES_CONFIG, [])
   const [loading, toggleLoading] = useReducer((c) => !c, false)
   const [isSidebarOpen, toggleSidebar] = useReducer((c) => !c, false)
+  const [flows, setFlows] = useState(() =>
+    JSON.parse(localStorage.getItem('flows') || '{}'),
+  )
 
   const handlePageSave = useCallback(async () => {
     toggleLoading()
@@ -63,8 +66,8 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         </Button>
         <Typography variant='h5'> Super RPA</Typography>
       </div>
-      <FlowRecorder />
-      <FlowRunner />
+      <FlowRecorder flows={flows} setFlows={setFlows} />
+      <FlowRunner flows={flows} setFlows={setFlows} />
       <div className='flex flex-1 overflow-auto py-2 w-full'>
         <FlowBuilder />
       </div>
