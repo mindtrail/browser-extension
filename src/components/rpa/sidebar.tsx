@@ -9,10 +9,11 @@ import { MESSAGES, STORAGE_KEY } from '~/lib/constants'
 
 import { Typography } from '~components/typography'
 import { Button } from '~/components/ui/button'
-import { RecordIcon } from '~/components/icons/record'
 
 import { mockData } from './constants'
 import { FlowBuilder } from './builder'
+import { FlowRecorder } from './recorder'
+import { FlowRunner } from './runner'
 
 interface SidebarProps {
   settings: SettingsStored
@@ -62,12 +63,8 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         </Button>
         <Typography variant='h5'> Super RPA</Typography>
       </div>
-      <div className='w-full flex px-4 py-4'>
-        <Button variant='outline' size='lg' className='flex gap-4 items-center'>
-          <RecordIcon className='w-5 h-5' />
-          Record Workflow
-        </Button>
-      </div>
+      <FlowRecorder />
+      <FlowRunner />
       <div className='flex flex-1 overflow-auto py-2 w-full'>
         <FlowBuilder />
       </div>
