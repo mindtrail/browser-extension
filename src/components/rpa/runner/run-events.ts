@@ -1,15 +1,10 @@
 import simulateEvent from './simulate-events'
 
 export default function runEvents({ events }) {
-  events.forEach((event, index) => {
-    let delay = 0.5 * index * event.delay
-
-    // if (event.type === 'input') {
-    //   delay = Math.min(delay, 100);
-    // }
-
+  events.forEach((event) => {
     setTimeout(() => {
+      console.log(event)
       simulateEvent(event)
-    }, delay)
+    }, event.delay)
   })
 }
