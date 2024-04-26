@@ -16,7 +16,7 @@ const processQueue = () => {
     }
 
     const { event, callback } = eventQueue.shift()
-    const { type, selector, timeStamp, value, textContent } = event
+    const { type, selector, timeStamp, value, textContent, name } = event
 
     const delay = lastEventTime ? timeStamp - lastEventTime : 0
     console.log(`Processing event: ${type} at ${selector} with delay ${delay}`)
@@ -28,6 +28,7 @@ const processQueue = () => {
       delay,
       ...(value !== null && { value }),
       ...(textContent !== null && { textContent }),
+      ...(name !== null && { name }),
     })
     processNextEvent()
   }
@@ -69,6 +70,7 @@ const eventHandler = (callback, debounceDuration = 300) => {
               timeStamp: currentTimeStamp,
               ...(value !== null && { value }),
               ...(textContent !== null && { textContent }),
+              ...(target.name !== null && { name: target.name }),
             },
             callback,
           })
@@ -80,7 +82,7 @@ const eventHandler = (callback, debounceDuration = 300) => {
   }
 }
 
-export default function listenEvents(callback, shouldListen) {
+export function listenEvents(callback, shouldListen) {
   console.log('listenEvents', shouldListen)
   const handler = eventHandler(callback)
 
