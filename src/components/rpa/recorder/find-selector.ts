@@ -1,21 +1,28 @@
-import { finder as finderLib } from '@medv/finder'
+import { finder } from '@medv/finder'
 
-const ariaAttrs = ['data-testid']
-
-export const finder = finderLib
-
-export default function (element, options = {}) {
-  let selector = finder(element, {
+export function findSelector(
+  element,
+  options = {
+    seedMinLength: 5,
+    optimizedMinLength: 2,
+    threshold: 3000,
+    timeoutMs: 1000,
+  },
+) {
+  const selector = finder(element, {
     tagName: () => true,
-    attr: (name, value) =>
-      (name === 'id' || ariaAttrs.includes(name)) && Boolean(value),
+    className: (value) => {
+      const whitelist = []
+      if (whitelist.includes(value)) return true
+      return false
+    },
+    attr: (name, value) => {
+      const whitelist = ['id', 'label']
+      if (whitelist.includes(name)) return true
+      return false
+    },
     ...options,
   })
-
-  const tag = element.tagName.toLowerCase()
-  if (!selector.startsWith(tag) && !selector.includes(' ')) {
-    selector = `${tag}${selector}`
-  }
 
   return selector
 }

@@ -1,4 +1,4 @@
-import findSelector from './find-selector'
+import { findSelector } from './find-selector'
 
 const eventHandler = (callback) => (event) => {
   const { type, target } = event
@@ -9,8 +9,7 @@ const eventHandler = (callback) => (event) => {
   let value = null
   if (
     type === 'input' &&
-    (target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement)
+    (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)
   ) {
     value = target.value
   }
