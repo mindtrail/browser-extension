@@ -3,8 +3,6 @@ import { findSelector } from './find-selector'
 const eventHandler = (callback) => (event) => {
   const { type, target } = event
   const selector = findSelector(target)
-  console.log(selector)
-  console.log('')
 
   let value = null
   if (
@@ -14,20 +12,19 @@ const eventHandler = (callback) => (event) => {
     value = target.value
   }
 
-  if (selector) {
+  if (selector && !selector.includes('plasmo-csui')) {
     callback({ type, selector, delay: 500, ...(value !== null && { value }) })
   }
 }
 
 export default function listenEvents(callback) {
-  const clickHandler = eventHandler(callback)
-  const inputHandler = eventHandler(callback)
+  const handler = eventHandler(callback)
 
-  document.addEventListener('click', clickHandler)
-  document.addEventListener('input', inputHandler)
+  document.addEventListener('click', handler)
+  document.addEventListener('input', handler)
 
   return () => {
-    document.removeEventListener('click', clickHandler)
-    document.removeEventListener('input', inputHandler)
+    document.removeEventListener('click', handler)
+    document.removeEventListener('input', handler)
   }
 }

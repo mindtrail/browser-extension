@@ -8,11 +8,11 @@ export function FlowRecorder({ flows, setFlows }) {
     const [currentFlowId, setCurrentFlowId] = useState(null)
 
     useEffect(() => {
-        const removeEventListeners = listenEvents(storeEvent)
+        const removeEventListeners = listenEvents(onEvent)
         return () => removeEventListeners()
     }, [recording, currentFlowId, flows])
 
-    function storeEvent(event) {
+    function onEvent(event) {
         if (!recording || !currentFlowId) return
         const updatedEvents = flows[currentFlowId]
             ? [...flows[currentFlowId], event]
