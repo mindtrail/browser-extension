@@ -16,13 +16,19 @@ const processQueue = () => {
     }
 
     const { event, callback } = eventQueue.shift()
-    const { type, selector, timeStamp, value } = event
+    const { type, selector, timeStamp, value, textContent } = event
 
     const delay = lastEventTime ? timeStamp - lastEventTime : 0
     console.log(`Processing event: ${type} at ${selector} with delay ${delay}`)
     lastEventTime = timeStamp
 
-    callback({ type, selector, delay, ...(value !== null && { value }) })
+    callback({
+      type,
+      selector,
+      delay,
+      ...(value !== null && { value }),
+      ...(textContent !== null && { textContent }),
+    })
     processNextEvent()
   }
 
@@ -35,11 +41,14 @@ const eventHandler = (callback, debounceDuration = 300) => {
     const selector = findSelector(target)
 
     let value = null
+    let textContent = null
     if (
       type === 'input' &&
       (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)
     ) {
       value = target.value
+    } else if (type === 'click') {
+      textContent = target.innerText ? target.innerText.trim() : target.tagName
     }
 
     const currentTimeStamp = Date.now()
@@ -59,6 +68,7 @@ const eventHandler = (callback, debounceDuration = 300) => {
               selector,
               timeStamp: currentTimeStamp,
               ...(value !== null && { value }),
+              ...(textContent !== null && { textContent }),
             },
             callback,
           })

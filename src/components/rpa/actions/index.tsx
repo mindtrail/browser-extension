@@ -13,7 +13,7 @@ export function Actions({ events }) {
     return {
       type: event.type,
       selector: event.selector,
-      value: event.value,
+      value: event.value || event.textContent,
       icon: (() => {
         switch (event.type) {
           case 'input':
