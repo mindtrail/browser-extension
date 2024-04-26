@@ -1,12 +1,15 @@
 import React, { useState } from 'react'
 import runEvents from './run-events'
+import { Actions } from '../actions'
 
 export function FlowRunner({ flows, setFlows }) {
     const [hoveredFlowId, setHoveredFlowId] = useState(null)
+    const [currentEvents, setCurrentEvents] = useState([])
 
-    function runFlow(flowId) {
+    async function runFlow(flowId) {
         const events = flows[flowId] || []
-        runEvents({ events })
+        setCurrentEvents([])
+        await runEvents({ events, callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]) })
     }
 
     function removeFlow(flowId) {
@@ -14,6 +17,7 @@ export function FlowRunner({ flows, setFlows }) {
         delete updatedFlows[flowId]
         setFlows(updatedFlows)
         localStorage.setItem('flows', JSON.stringify(updatedFlows))
+        setCurrentEvents([])
     }
 
     return (
@@ -54,6 +58,7 @@ export function FlowRunner({ flows, setFlows }) {
                     </button>
                 </div>
             ))}
+            <Actions events={currentEvents} />
         </div>
     )
 }
