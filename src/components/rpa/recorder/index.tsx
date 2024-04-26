@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import listenEvents from './listen-events'
 import { RecordButton } from './record-button'
+import { mergeInputEvents } from '../utils/merge-input-events'
+import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
 
 export function FlowRecorder({ flows, setFlows }) {
@@ -38,10 +40,14 @@ export function FlowRecorder({ flows, setFlows }) {
         setRecording(!recording)
     }
 
+    let events = flows[currentFlowId] || []
+    events = mergeInputEvents(events)
+    events = discardClickInputEvents(events)
+
     return (
         <div>
             <RecordButton onClick={toggleRecording} recording={recording} />
-            <Actions events={flows[currentFlowId]} debugMode={false} />
+            <Actions events={events} debugMode={false} />
         </div>
     )
 }

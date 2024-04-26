@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { runEvents } from './run-events'
-import { mergeInputEvents } from './merge-input-events'
-import { discardClickInputEvents } from './discard-click-input-events'
+import { mergeInputEvents } from '../utils/merge-input-events'
+import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
 
 export function FlowRunner({ flows, setFlows }) {
