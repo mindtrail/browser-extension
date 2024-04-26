@@ -1,4 +1,4 @@
-export default function simulateEvent(event) {
+export function simulateEvent(event) {
   const element = document.querySelector(event.selector)
   if (!element) return
 

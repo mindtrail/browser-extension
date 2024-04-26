@@ -1,6 +1,6 @@
-import simulateEvent from './simulate-events'
+import { simulateEvent } from './simulate-events'
 
-export default async function runEvents({ events, callback }) {
+export async function runEvents({ events, callback }) {
   console.log('runEvents', events)
   let accumulatedDelay = 0
   for (const event of events) {

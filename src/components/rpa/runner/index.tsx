@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import runEvents from './run-events'
+import { runEvents } from './run-events'
+import { mergeInputEvents } from './merge-input-events'
 import { Actions } from '../actions'
 
 export function FlowRunner({ flows, setFlows }) {
@@ -7,9 +8,9 @@ export function FlowRunner({ flows, setFlows }) {
     const [currentEvents, setCurrentEvents] = useState([])
 
     async function runFlow(flowId) {
-        const events = flows[flowId] || []
-        setCurrentEvents([])
-        await runEvents({ events, callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]) })
+        setCurrentEvents([]);
+        const events = mergeInputEvents(flows[flowId] || [])
+        await runEvents({ events, callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]) });
     }
 
     function removeFlow(flowId) {
