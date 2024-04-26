@@ -8,26 +8,31 @@ export function FlowRecorder({ flows, setFlows }) {
     const [currentFlowId, setCurrentFlowId] = useState(null)
 
     useEffect(() => {
-        const removeEventListeners = listenEvents(onEvent)
-        return () => removeEventListeners()
-    }, [recording, currentFlowId, flows])
+        const removeEventListeners = listenEvents(onEvent, recording);
+        return () => removeEventListeners();
+    }, [recording]);
 
     function onEvent(event) {
+        console.log(event)
         if (!recording || !currentFlowId) return
-        const updatedEvents = flows[currentFlowId]
-            ? [...flows[currentFlowId], event]
-            : [event]
-        const updatedFlows = { ...flows, [currentFlowId]: updatedEvents }
-        setFlows(updatedFlows)
-        localStorage.setItem('flows', JSON.stringify(updatedFlows))
+        setFlows(prevFlows => {
+            const updatedEvents = prevFlows[currentFlowId]
+                ? [...prevFlows[currentFlowId], event]
+                : [event]
+            const updatedFlows = { ...prevFlows, [currentFlowId]: updatedEvents }
+            localStorage.setItem('flows', JSON.stringify(updatedFlows))
+            return updatedFlows
+        });
     }
 
     function toggleRecording() {
         if (!recording) {
             const newFlowId = uuidv4()
             setCurrentFlowId(newFlowId)
+            window.dispatchEvent(new CustomEvent('reset-last-event-time'));
         } else {
             setCurrentFlowId(null)
+            window.dispatchEvent(new CustomEvent('reset-last-event-time'));
         }
         setRecording(!recording)
     }
