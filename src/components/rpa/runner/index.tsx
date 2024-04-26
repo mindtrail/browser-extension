@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { runEvents } from './run-events'
 import { mergeInputEvents } from './merge-input-events'
+import { discardClickInputEvents } from './discard-click-input-events'
 import { Actions } from '../actions'
 
 export function FlowRunner({ flows, setFlows }) {
@@ -8,9 +9,14 @@ export function FlowRunner({ flows, setFlows }) {
     const [currentEvents, setCurrentEvents] = useState([])
 
     async function runFlow(flowId) {
-        setCurrentEvents([]);
-        const events = mergeInputEvents(flows[flowId] || [])
-        await runEvents({ events, callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]) });
+        setCurrentEvents([])
+        let events = flows[flowId] || []
+        events = mergeInputEvents(events)
+        events = discardClickInputEvents(events)
+        await runEvents({
+            events,
+            callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
+        })
     }
 
     function removeFlow(flowId) {
@@ -22,16 +28,16 @@ export function FlowRunner({ flows, setFlows }) {
     }
 
     return (
-        <div className="px-4">
+        <div className='px-4'>
             {Object.keys(flows).map((flowId, index) => (
                 <div
                     key={flowId}
-                    className="relative group block"
+                    className='relative group block'
                     onMouseEnter={() => setHoveredFlowId(flowId)}
                     onMouseLeave={() => setHoveredFlowId(null)}
                 >
                     <button
-                        className="bg-blue-500 text-white px-5 py-2.5 mt-3 rounded w-full"
+                        className='bg-blue-500 text-white px-5 py-2.5 mt-3 rounded w-full'
                         onClick={() => runFlow(flowId)}
                     >
                         Flow {index + 1}
@@ -42,18 +48,18 @@ export function FlowRunner({ flows, setFlows }) {
                         onClick={() => removeFlow(flowId)}
                     >
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                            xmlns='http://www.w3.org/2000/svg'
+                            width='12'
+                            height='12'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
                         >
                             <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
                                 strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
+                                d='M6 18L18 6M6 6l12 12'
                             />
                         </svg>
                     </button>
