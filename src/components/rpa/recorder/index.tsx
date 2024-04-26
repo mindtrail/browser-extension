@@ -5,6 +5,7 @@ import { RecordButton } from './record-button'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
+import { generateFlowName } from '~/lib/llm'
 
 export function FlowRecorder({ flows, setFlows }) {
     const [recording, setRecording] = useState(false)
@@ -19,28 +20,35 @@ export function FlowRecorder({ flows, setFlows }) {
         console.log(event)
         if (!recording || !currentFlowId) return
         setFlows((prevFlows) => {
-            const updatedEvents = prevFlows[currentFlowId]
-                ? [...prevFlows[currentFlowId], event]
+            const updatedEvents = prevFlows[currentFlowId]?.events
+                ? [...prevFlows[currentFlowId].events, event]
                 : [event]
-            const updatedFlows = { ...prevFlows, [currentFlowId]: updatedEvents }
+            const updatedFlow = { ...prevFlows[currentFlowId], events: updatedEvents }
+            const updatedFlows = { ...prevFlows, [currentFlowId]: updatedFlow }
             localStorage.setItem('flows', JSON.stringify(updatedFlows))
             return updatedFlows
         })
     }
 
-    function toggleRecording() {
+    async function toggleRecording() {
         if (!recording) {
             const newFlowId = uuidv4()
             setCurrentFlowId(newFlowId)
-            window.dispatchEvent(new CustomEvent('reset-last-event-time'))
         } else {
+            const metadata = await generateFlowName(JSON.stringify(flows[currentFlowId].events))
+            setFlows((prevFlows) => {
+                const updatedFlow = { ...prevFlows[currentFlowId], name: metadata.name, description: metadata.description }
+                const updatedFlows = { ...prevFlows, [currentFlowId]: updatedFlow }
+                localStorage.setItem('flows', JSON.stringify(updatedFlows))
+                return updatedFlows
+            })
             setCurrentFlowId(null)
-            window.dispatchEvent(new CustomEvent('reset-last-event-time'))
         }
+        window.dispatchEvent(new CustomEvent('reset-last-event-time'))
         setRecording(!recording)
     }
 
-    let events = flows[currentFlowId] || []
+    let events = flows[currentFlowId]?.events || []
     events = mergeInputEvents(events)
     events = discardClickInputEvents(events)
 

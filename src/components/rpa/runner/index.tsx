@@ -4,7 +4,7 @@ import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
 import { buildInputData } from './build-input-data'
-import { llm } from '~/lib/llm'
+import { generateFormData } from '~/lib/llm'
 
 export function FlowRunner({ flows, setFlows }) {
     const [hoveredFlowId, setHoveredFlowId] = useState(null)
@@ -12,7 +12,7 @@ export function FlowRunner({ flows, setFlows }) {
     const [llmQuery, setLlmQuery] = useState('')
 
     function getFlowEvents(flowId) {
-        let events = flows[flowId] || []
+        let events = flows[flowId]?.events || []
         events = mergeInputEvents(events)
         events = discardClickInputEvents(events)
         return events
@@ -21,7 +21,7 @@ export function FlowRunner({ flows, setFlows }) {
     async function runFlow(flowId) {
         setCurrentEvents([])
         const events = getFlowEvents(flowId)
-        const data = llmQuery ? await llm(`${llmQuery} in this format: ${JSON.stringify(buildInputData(events))}`) : {}
+        const data = llmQuery ? await generateFormData(`${llmQuery} in this format: ${JSON.stringify(buildInputData(events))}`) : {}
         await runEvents({
             events,
             data,
@@ -64,7 +64,7 @@ export function FlowRunner({ flows, setFlows }) {
                         className='bg-blue-500 text-white px-5 py-2.5 mt-3 rounded w-full'
                         onClick={() => runFlow(flowId)}
                     >
-                        Flow {index + 1}
+                        {flows[flowId].name}
                     </button>
                     <button
                         className={`absolute top-1 right-[-7px] p-1 rounded-full bg-gray-500 text-white ${hoveredFlowId === flowId ? 'opacity-100' : 'opacity-0'
