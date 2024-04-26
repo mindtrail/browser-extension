@@ -41,7 +41,7 @@ export function FlowRecorder({ flows, setFlows }) {
     return (
         <div>
             <RecordButton onClick={toggleRecording} recording={recording} />
-            <Actions events={flows[currentFlowId]} />
+            <Actions events={flows[currentFlowId]} debugMode={false} />
         </div>
     )
 }

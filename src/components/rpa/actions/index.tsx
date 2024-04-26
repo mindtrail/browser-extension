@@ -6,14 +6,15 @@
 import { Action } from './action'
 import { MousePointerClickIcon, GlobeIcon, PenLineIcon } from 'lucide-react'
 
-export function Actions({ events }) {
+export function Actions({ events, debugMode = false }) {
   if (!events?.length) return null
 
   const actions = events.map((event) => {
+    const value = event.value || event.textContent;
     return {
       type: event.type,
       selector: event.selector,
-      value: event.value || event.textContent,
+      value: debugMode ? `${event.selector}: ${value}` : value,
       icon: (() => {
         switch (event.type) {
           case 'input':
