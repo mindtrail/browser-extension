@@ -3,6 +3,7 @@ import { findSelector } from './find-selector'
 let lastEventTime = 0
 let eventQueue = []
 let processingQueue = false
+let debounceTimers = new Map()
 
 const processQueue = () => {
   if (processingQueue || eventQueue.length === 0) return
@@ -19,7 +20,7 @@ const processQueue = () => {
 
     const delay = lastEventTime ? timeStamp - lastEventTime : 0
     console.log(`Processing event: ${type} at ${selector} with delay ${delay}`)
-    lastEventTime = timeStamp // Update lastEventTime after processing
+    lastEventTime = timeStamp
 
     callback({ type, selector, delay, ...(value !== null && { value }) })
     processNextEvent()
@@ -28,7 +29,7 @@ const processQueue = () => {
   processNextEvent()
 }
 
-const eventHandler = (callback) => {
+const eventHandler = (callback, debounceDuration = 300) => {
   return (event) => {
     const { type, target } = event
     const selector = findSelector(target)
@@ -41,20 +42,30 @@ const eventHandler = (callback) => {
       value = target.value
     }
 
-    // Use Date.now() for the event timeStamp to ensure uniformity and avoid precision issues
     const currentTimeStamp = Date.now()
 
     if (selector && !selector.includes('plasmo-csui')) {
-      eventQueue.push({
-        event: {
-          type,
-          selector,
-          timeStamp: currentTimeStamp,
-          ...(value !== null && { value }),
-        },
-        callback,
-      })
-      processQueue()
+      const eventKey = `${type}-${selector}`
+      if (debounceTimers.has(eventKey)) {
+        clearTimeout(debounceTimers.get(eventKey))
+      }
+
+      debounceTimers.set(
+        eventKey,
+        setTimeout(() => {
+          eventQueue.push({
+            event: {
+              type,
+              selector,
+              timeStamp: currentTimeStamp,
+              ...(value !== null && { value }),
+            },
+            callback,
+          })
+          processQueue()
+          debounceTimers.delete(eventKey)
+        }, debounceDuration),
+      )
     }
   }
 }
