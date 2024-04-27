@@ -1,15 +1,17 @@
-import simulateEvent from './simulate-events'
+import { simulateEvent } from './simulate-events'
 
-export default function runEvents({ events }) {
-  events.forEach((event, index) => {
-    let delay = 0.5 * index * event.delay
-
-    // if (event.type === 'input') {
-    //   delay = Math.min(delay, 100);
-    // }
-
-    setTimeout(() => {
-      simulateEvent(event)
-    }, delay)
-  })
+export async function runEvents({ events, data = {}, callback }) {
+  console.log('runEvents', events)
+  let accumulatedDelay = 0
+  for (const event of events) {
+    const delay = 500 // or event.delay
+    await new Promise((resolve) => setTimeout(resolve, delay))
+    accumulatedDelay += delay
+    if (data[event.name]) {
+      event.value = data[event.name]
+    }
+    console.log(event)
+    simulateEvent(event)
+    callback(event)
+  }
 }

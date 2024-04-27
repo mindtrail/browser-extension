@@ -3,13 +3,13 @@ import { XIcon } from 'lucide-react'
 import { Typography } from '~components/typography'
 import { Button } from '~/components/ui/button'
 
-interface BuilderItemProps {
+interface ActionProps {
   Icon: typeof XIcon
   type: string
   value: string
 }
 
-export function BuilderItem({ Icon, type, value }: BuilderItemProps) {
+export function Action({ Icon, type, value }: ActionProps) {
   return (
     <div
       className={`flex items-center gap-4 px-2 py-4 w-full rounded-lg
