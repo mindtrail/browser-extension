@@ -4,10 +4,9 @@ export function discardClickInputEvents(events) {
 
   events.forEach((event) => {
     if (
-      previousEvent &&
-      previousEvent.type === 'click' &&
-      event.type === 'input' &&
-      previousEvent.selector === event.selector
+      previousEvent?.type === 'click' &&
+      event?.type === 'input' &&
+      previousEvent?.selector === event?.selector
     ) {
       groupedEvents.push({ ...event })
       previousEvent = null
