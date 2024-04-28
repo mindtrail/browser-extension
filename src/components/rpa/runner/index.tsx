@@ -68,7 +68,9 @@ export function FlowRunner({ flows, setFlows }) {
           onMouseLeave={() => setHoveredFlowId(null)}
         >
           <button
-            className='bg-blue-500 text-white px-5 py-2.5 mt-3 rounded w-full'
+            // @TODO: use the button component and move "Creating flow..." to a const
+            className={`${flows[flowId]?.name === 'Creating flow...' && 'bg-primary/70'}
+            bg-primary text-white px-5 py-2.5 mt-3 rounded w-full`}
             onClick={() => runFlow(flowId)}
           >
             {flows[flowId].name}

@@ -10,6 +10,7 @@ import { generateFlowName } from '~/lib/llm'
 export function FlowRecorder({ flows, setFlows }) {
   const [recording, setRecording] = useState(false)
   const [currentFlowId, setCurrentFlowId] = useState(null)
+  const [recordedEvents, setRecordedEvents] = useState([])
 
   useEffect(() => {
     const removeEventListeners = listenEvents(onEvent, recording)
@@ -19,52 +20,53 @@ export function FlowRecorder({ flows, setFlows }) {
   function onEvent(event) {
     if (!recording || !currentFlowId) return
 
-    setFlows((prevFlows) => {
-      console.log(111, prevFlows, currentFlowId)
-      const updatedEvents = prevFlows[currentFlowId]?.events?.length
-        ? [...prevFlows[currentFlowId].events, event]
-        : [event]
-
-      const updatedFlow = { ...prevFlows[currentFlowId], events: updatedEvents }
-      const updatedFlows = { ...prevFlows, [currentFlowId]: updatedFlow }
-
-      localStorage.setItem('flows', JSON.stringify(updatedFlows))
-      return updatedFlows
-    })
+    setRecordedEvents((events) => [...events, event])
   }
 
   async function toggleRecording() {
+    window.dispatchEvent(new CustomEvent('reset-last-event-time'))
+
     if (!recording) {
       const newFlowId = uuidv4()
       setCurrentFlowId(newFlowId)
-      window.dispatchEvent(new CustomEvent('reset-last-event-time'))
       setRecording(true)
+
       return
     }
 
-    setCurrentFlowId(null)
-    window.dispatchEvent(new CustomEvent('reset-last-event-time'))
+    setRecordedEvents([])
     setRecording(false)
 
-    if (flows[currentFlowId]?.events?.length) {
-      const metadata = await generateFlowName(JSON.stringify(flows[currentFlowId].events))
+    // @TODO: handle the edit flow too
+    if (recordedEvents?.length) {
+      const flowToUpdate = {
+        ...flows[currentFlowId],
+        name: 'Creating flow...',
+        description: 'in-progress',
+        events: recordedEvents,
+      }
 
       setFlows((prevFlows) => {
-        const updatedFlow = {
-          ...prevFlows[currentFlowId],
-          name: metadata.name,
-          description: metadata.description,
-        }
-        const updatedFlows = { ...prevFlows, [currentFlowId]: updatedFlow }
+        const updatedFlows = { ...prevFlows, [currentFlowId]: flowToUpdate }
+        localStorage.setItem('flows', JSON.stringify(updatedFlows))
+        return updatedFlows
+      })
+      const metadata = await generateFlowName(JSON.stringify(recordedEvents))
+      flowToUpdate.name = metadata.name
+      flowToUpdate.description = metadata.description
+
+      setFlows((prevFlows) => {
+        const updatedFlows = { ...prevFlows, [currentFlowId]: flowToUpdate }
         localStorage.setItem('flows', JSON.stringify(updatedFlows))
         return updatedFlows
       })
     }
+
+    setCurrentFlowId(null)
   }
 
-  let events = flows[currentFlowId]?.events || []
-  events = mergeInputEvents(events)
-  events = discardClickInputEvents(events)
+  let events = mergeInputEvents(recordedEvents)
+  events = discardClickInputEvents(recordedEvents)
 
   return (
     <div>

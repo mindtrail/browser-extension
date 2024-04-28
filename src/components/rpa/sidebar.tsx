@@ -32,8 +32,8 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         {/* </Button> */}
         <Typography variant='h5'>RPA Copilot</Typography>
       </div>
-      <FlowRecorder flows={flows} setFlows={setFlows} />
       <FlowRunner flows={flows} setFlows={setFlows} />
+      <FlowRecorder flows={flows} setFlows={setFlows} />
     </div>
   )
 }
