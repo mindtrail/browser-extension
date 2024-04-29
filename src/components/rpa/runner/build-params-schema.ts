@@ -1,4 +1,4 @@
-export function buildInputData(events) {
+export function buildParamsSchema(events) {
   const inputData = {}
   events.forEach((event) => {
     if (event.type === 'input' && event.name) {
