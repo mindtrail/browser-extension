@@ -10,15 +10,21 @@ import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { extractParams } from '../utils/openai'
 
-import { SendHorizonal } from 'lucide-react'
+import { SendHorizonalIcon, Trash2Icon } from 'lucide-react'
 import { Button } from '~components/ui/button'
 import { Input } from '~/components/ui/input'
+
+type RunFlowParams = {
+  flowId?: string
+  query?: string
+}
 
 export function FlowRunner() {
   const [hoveredFlowId, setHoveredFlowId] = useState(null)
   const [currentEvents, setCurrentEvents] = useState([])
   const [query, setQuery] = useState('')
   const [flows, setFlows] = useState([])
+  const [runInProgress, setRunInProgress] = useState(false)
 
   useEffect(() => {
     const fetchFlows = async () => {
@@ -36,9 +42,13 @@ export function FlowRunner() {
     return events
   }
 
-  async function runFlow({ id, query }: { id?: string; query?: string }) {
-    let ids = !id && query ? await parseQuery(query, flows) : [{ flowId: id }]
-    for (const { flowId } of ids) {
+  async function runFlow({ flowId, query }: RunFlowParams) {
+    if (runInProgress) return
+
+    setRunInProgress(true)
+    const flowsToRun = flowId ? [{ flowId }] : await parseQuery(query, flows)
+
+    for (const { flowId } of flowsToRun) {
       setCurrentEvents([])
       const events = getFlowEvents(flowId)
       const data = await extractParams(query, buildParamsSchema(events))
@@ -48,6 +58,9 @@ export function FlowRunner() {
         onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
       })
     }
+
+    setRunInProgress(false)
+    setCurrentEvents([])
   }
 
   async function removeFlow(id) {
@@ -56,7 +69,7 @@ export function FlowRunner() {
   }
 
   return (
-    <div className='px-4 py-4 gap-4'>
+    <div className='px-4 py-4 gap-4 flex flex-col'>
       <form
         className='flex items-center'
         onSubmit={(e) => {
@@ -65,56 +78,43 @@ export function FlowRunner() {
         }}
       >
         <Input
-          placeholder='Run a query'
-          className='w-full p-2 border border-gray-300 rounded'
-          value={query}
+          disabled={runInProgress}
+          placeholder='Run a flow'
+          className='w-full pl-4 pr-10 border border-gray-300 rounded'
+          value={`${runInProgress ? 'Running: ' : ''}${query}`}
           onChange={(e) => setQuery(e.target.value)}
         />
         <Button
           variant='ghost'
+          disabled={runInProgress}
           className={`${query?.length > 2 && '!visible'} invisible absolute right-4`}
           type='submit'
         >
-          <SendHorizonal className='w-4 h-4' />
+          <SendHorizonalIcon className='w-4 h-4 text-primary' />
         </Button>
       </form>
-      {flows?.map((flow, index) => (
-        <div
-          key={flow.id}
-          className='relative group block'
-          onMouseEnter={() => setHoveredFlowId(flow.id)}
-          onMouseLeave={() => setHoveredFlowId(null)}
-        >
-          <button
-            className='bg-blue-500 text-white px-5 py-2.5 mt-3 rounded w-full'
-            onClick={() => runFlow({ id: flow.id, query })}
-          >
-            {flow.name}
-          </button>
-          <button
-            className={`absolute top-1 right-[-7px] p-1 rounded-full bg-gray-500 text-white ${
-              hoveredFlowId === flow.id ? 'opacity-100' : 'opacity-0'
-            } transition-opacity duration-300 ease-in-out`}
-            onClick={() => removeFlow(flow.id)}
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='12'
-              height='12'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
+      <div className='flex flex-col gap-2'>
+        {flows?.map(({ id: flowId, name }) => (
+          <div key={flowId} className='flex items-center relative group/runner'>
+            <Button
+              variant='secondary'
+              className='w-full line-clamp-2 h-auto justify-start text-left'
+              onClick={() => runFlow({ flowId: flowId, query })}
             >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M6 18L18 6M6 6l12 12'
-              />
-            </svg>
-          </button>
-        </div>
-      ))}
+              {name}
+            </Button>
+            <Button
+              variant='ghost'
+              className={`absolute right-0 rounded opacity-0
+                group-hover/runner:opacity-100 transition duration-300 ease-in-out`}
+              onClick={() => removeFlow(flowId)}
+            >
+              <Trash2Icon className='w-4 h-4 text-foreground/70' />
+            </Button>
+          </div>
+        ))}
+      </div>
+
       <Actions events={currentEvents} />
     </div>
   )

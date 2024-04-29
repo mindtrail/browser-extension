@@ -18,10 +18,10 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
 
   return (
     <div
-      className={`font-sans z-50 fixed group right-2 drop-shadow-xl w-80 h-[900px]
-        flex flex-col bg-white bottom-4 border rounded-lg ${
-          !isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      className={`font-sans text-foreground fixed right-2 bottom-4 z-50
+        flex flex-col w-80 h-[900px] bg-white border rounded-lg drop-shadow-xl
+        ${!isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+      `}
     >
       <div className='flex items-center py-2 px-4 gap-2 border-b'>
         <Button onClick={toggleSidebar} variant='ghost'>
