@@ -43,7 +43,7 @@ export function FlowRunner() {
             await runEvents({
                 events,
                 data,
-                callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
+                onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
             })
         }
     }
