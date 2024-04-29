@@ -28,6 +28,23 @@ You can start editing the popup by modifying `popup.tsx`. It should auto-update 
 
 For further guidance, [visit our Documentation](https://docs.plasmo.com/)
 
+## Supabase
+
+```
+supabase init
+supabase link
+supabase db pull
+supabase migration up (Apply pending migrations to local database)
+supabase status (Show keys and urls for the local supabase project)
+```
+
+```
+Supabase Studio URL: http://127.0.0.1:54323
+
+PLASMO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+PLASMO_PUBLIC_SUPABASE_KEY=
+```
+
 ## Making production build
 
 Run the following:
