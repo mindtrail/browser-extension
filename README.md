@@ -33,6 +33,7 @@ For further guidance, [visit our Documentation](https://docs.plasmo.com/)
 ```
 supabase init
 supabase link
+supabase start (Start the local supabase server via Docker)
 supabase db pull
 supabase migration up (Apply pending migrations to local database)
 supabase status (Show keys and urls for the local supabase project)
