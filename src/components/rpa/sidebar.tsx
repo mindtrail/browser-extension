@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react'
+import { useReducer } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { XIcon } from 'lucide-react'
 
@@ -15,9 +15,6 @@ interface SidebarProps {
 
 export const RightSidebar = ({ setSettings }: SidebarProps) => {
   const [isSidebarOpen, toggleSidebar] = useReducer((c) => !c, false)
-  const [flows, setFlows] = useState(() =>
-    JSON.parse(localStorage.getItem('flows') || '{}'),
-  )
 
   return (
     <div
@@ -30,8 +27,8 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         </Button>
         <Typography variant='h5'> Super RPA</Typography>
       </div>
-      <FlowRecorder flows={flows} setFlows={setFlows} />
-      <FlowRunner flows={flows} setFlows={setFlows} />
+      <FlowRecorder />
+      <FlowRunner />
     </div>
   )
 }

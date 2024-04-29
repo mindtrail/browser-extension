@@ -1,54 +1,48 @@
 import React, { useState, useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
-import { generateFlowName } from '~/lib/llm'
+import { generateFlowName } from '../utils/groq'
+import { createFlow } from '../utils/supabase'
 
-export function FlowRecorder({ flows, setFlows }) {
+export function FlowRecorder() {
     const [recording, setRecording] = useState(false)
-    const [currentFlowId, setCurrentFlowId] = useState(null)
+    const [currentFlow, setCurrentFlow] = useState(null)
 
-    useEffect(() => {
-        const removeEventListeners = listenEvents(onEvent, recording)
-        return () => removeEventListeners()
-    }, [recording])
+    useEffect(() => listenEvents(onEvent, recording), [recording])
 
     function onEvent(event) {
         console.log(event)
-        if (!recording || !currentFlowId) return
-        setFlows((prevFlows) => {
-            const updatedEvents = prevFlows[currentFlowId]?.events
-                ? [...prevFlows[currentFlowId].events, event]
-                : [event]
-            const updatedFlow = { ...prevFlows[currentFlowId], events: updatedEvents }
-            const updatedFlows = { ...prevFlows, [currentFlowId]: updatedFlow }
-            localStorage.setItem('flows', JSON.stringify(updatedFlows))
-            return updatedFlows
+        if (!recording || !currentFlow) return
+        setCurrentFlow((prevFlow) => {
+            if (!prevFlow) return prevFlow
+            return { ...prevFlow, events: [...prevFlow.events, event] }
         })
     }
 
     async function toggleRecording() {
         if (!recording) {
-            const newFlowId = uuidv4()
-            setCurrentFlowId(newFlowId)
-        } else {
-            const metadata = await generateFlowName(JSON.stringify(flows[currentFlowId].events))
-            setFlows((prevFlows) => {
-                const updatedFlow = { ...prevFlows[currentFlowId], name: metadata.name, description: metadata.description }
-                const updatedFlows = { ...prevFlows, [currentFlowId]: updatedFlow }
-                localStorage.setItem('flows', JSON.stringify(updatedFlows))
-                return updatedFlows
+            setCurrentFlow({
+                name: '',
+                description: '',
+                events: [],
             })
-            setCurrentFlowId(null)
+        } else {
+            const metadata = await generateFlowName(JSON.stringify(currentFlow.events))
+            await createFlow({
+                name: metadata.name,
+                description: metadata.description,
+                events: currentFlow.events,
+            })
+            setCurrentFlow(null)
         }
         window.dispatchEvent(new CustomEvent('reset-last-event-time'))
         setRecording(!recording)
     }
 
-    let events = flows[currentFlowId]?.events || []
+    let events = currentFlow?.events || []
     events = mergeInputEvents(events)
     events = discardClickInputEvents(events)
 

@@ -1,39 +1,55 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { runEvents } from './run-events'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
 import { buildInputData } from './build-input-data'
-import { generateFormData } from '~/lib/llm'
+import { extractParams } from '../utils/openai'
+import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
+import { parseQuery } from './parse-query'
 
-export function FlowRunner({ flows, setFlows }) {
+export function FlowRunner() {
     const [hoveredFlowId, setHoveredFlowId] = useState(null)
     const [currentEvents, setCurrentEvents] = useState([])
-    const [llmQuery, setLlmQuery] = useState('')
+    const [query, setQuery] = useState('')
+    const [flows, setFlows] = useState([])
 
-    function getFlowEvents(flowId) {
-        let events = flows[flowId]?.events || []
+    useEffect(() => {
+        const fetchFlows = async () => {
+            const { data } = await getFlows()
+            setFlows(data)
+        }
+        fetchFlows()
+        return onFlowsChange(fetchFlows)
+    }, [])
+
+    function getFlowEvents(id) {
+        let events = flows.find((flow) => flow.id === id)?.events || []
         events = mergeInputEvents(events)
         events = discardClickInputEvents(events)
         return events
     }
 
-    async function runFlow(flowId) {
-        setCurrentEvents([])
-        const events = getFlowEvents(flowId)
-        const data = llmQuery ? await generateFormData(`${llmQuery} in this format: ${JSON.stringify(buildInputData(events))}`) : {}
-        await runEvents({
-            events,
-            data,
-            callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
-        })
+    async function runFlow({ id, query }: { id?: string; query?: string }) {
+        let ids = !id && query ? await parseQuery(query, flows) : [{ flowId: id }]
+        for (const { flowId } of ids) {
+            setCurrentEvents([])
+            const events = getFlowEvents(flowId)
+            const data = query
+                ? await extractParams(
+                    `${query} in this format: ${JSON.stringify(buildInputData(events))}`,
+                )
+                : {}
+            await runEvents({
+                events,
+                data,
+                callback: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
+            })
+        }
     }
 
-    function removeFlow(flowId) {
-        const updatedFlows = { ...flows }
-        delete updatedFlows[flowId]
-        setFlows(updatedFlows)
-        localStorage.setItem('flows', JSON.stringify(updatedFlows))
+    async function removeFlow(id) {
+        await deleteFlow(id)
         setCurrentEvents([])
     }
 
@@ -42,34 +58,33 @@ export function FlowRunner({ flows, setFlows }) {
             <form
                 onSubmit={(e) => {
                     e.preventDefault()
-                    runFlow(Object.keys(flows)[0])
+                    runFlow({ query })
                 }}
             >
                 <input
-                    name='llm-query'
                     type='text'
                     className='w-full p-2 border border-gray-300 rounded mb-3'
-                    value={llmQuery}
-                    onChange={(e) => setLlmQuery(e.target.value)}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
                 />
             </form>
-            {Object.keys(flows).map((flowId, index) => (
+            {flows?.map((flow, index) => (
                 <div
-                    key={flowId}
+                    key={flow.id}
                     className='relative group block'
-                    onMouseEnter={() => setHoveredFlowId(flowId)}
+                    onMouseEnter={() => setHoveredFlowId(flow.id)}
                     onMouseLeave={() => setHoveredFlowId(null)}
                 >
                     <button
                         className='bg-blue-500 text-white px-5 py-2.5 mt-3 rounded w-full'
-                        onClick={() => runFlow(flowId)}
+                        onClick={() => runFlow({ id: flow.id, query })}
                     >
-                        {flows[flowId].name}
+                        {flow.name}
                     </button>
                     <button
-                        className={`absolute top-1 right-[-7px] p-1 rounded-full bg-gray-500 text-white ${hoveredFlowId === flowId ? 'opacity-100' : 'opacity-0'
+                        className={`absolute top-1 right-[-7px] p-1 rounded-full bg-gray-500 text-white ${hoveredFlowId === flow.id ? 'opacity-100' : 'opacity-0'
                             } transition-opacity duration-300 ease-in-out`}
-                        onClick={() => removeFlow(flowId)}
+                        onClick={() => removeFlow(flow.id)}
                     >
                         <svg
                             xmlns='http://www.w3.org/2000/svg'
