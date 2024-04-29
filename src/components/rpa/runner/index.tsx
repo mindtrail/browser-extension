@@ -3,9 +3,9 @@ import { runEvents } from './run-events'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
-import { buildInputData } from './build-input-data'
 import { extractParams } from '../utils/openai'
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
+import { buildParamsSchema } from './build-params-schema'
 import { parseQuery } from './parse-query'
 
 export function FlowRunner() {
@@ -35,11 +35,7 @@ export function FlowRunner() {
         for (const { flowId } of ids) {
             setCurrentEvents([])
             const events = getFlowEvents(flowId)
-            const data = query
-                ? await extractParams(
-                    `${query} in this format: ${JSON.stringify(buildInputData(events))}`,
-                )
-                : {}
+            const data = await extractParams(query, buildParamsSchema(events))
             await runEvents({
                 events,
                 data,

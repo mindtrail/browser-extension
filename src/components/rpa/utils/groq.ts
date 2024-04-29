@@ -50,7 +50,8 @@ export async function detectFlow(queries, flows) {
   return JSON.parse(completion.choices[0].message.content)
 }
 
-export async function extractParams(query) {
+export async function extractParams(query, schema) {
+  if (!query) return {}
   const completion = await groq.chat.completions.create({
     messages: [
       {
@@ -58,7 +59,7 @@ export async function extractParams(query) {
         content:
           'You are a tool that outputs as JSON the properties extracted from a query to be used in a RPA tool to fill the input fields.',
       },
-      { role: 'user', content: query },
+      { role: 'user', content: `${query} in this format: ${JSON.stringify(schema)}` },
     ],
     model: 'mixtral-8x7b-32768',
   })
