@@ -19,7 +19,7 @@ const eventHandler = (callback) => (event) => {
   }
 }
 
-export default function listenEvents(callback) {
+export function listenEvents(callback) {
   const clickHandler = eventHandler(callback)
   const inputHandler = eventHandler(callback)
 

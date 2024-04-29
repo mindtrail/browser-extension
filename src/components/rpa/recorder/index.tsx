@@ -47,9 +47,9 @@ export function FlowRecorder() {
   events = discardClickInputEvents(events)
 
   return (
-    <div>
-      <RecordButton onClick={toggleRecording} recording={recording} />
+    <div className='flex flex-col absolute bottom-0 w-full max-h-[75%] border bg-slate-50'>
       <Actions events={events} debugMode={false} />
+      <RecordButton onClick={toggleRecording} recording={recording} />
     </div>
   )
 }

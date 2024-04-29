@@ -10,7 +10,7 @@ export function Actions({ events, debugMode = false }) {
   if (!events?.length) return null
 
   const actions = events.map((event) => {
-    const value = event.value || event.textContent;
+    const value = event.value || event.textContent
     return {
       type: event.type,
       selector: event.selector,
@@ -29,7 +29,7 @@ export function Actions({ events, debugMode = false }) {
   })
 
   return (
-    <div className='flex flex-col w-full px-2 py-2 cursor-default'>
+    <div className='flex flex-col w-full px-2 py-2 cursor-default overflow-auto'>
       {actions.map(({ type, value, icon: Icon }, index) => (
         <Action Icon={Icon} type={type} value={value} key={index} />
       ))}

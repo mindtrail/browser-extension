@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import listenEvents from './listen-events'
-import runEvents from '../runner/run-events'
+import { runEvents } from '../runner/run-events'
+import { listenEvents } from './listen-events'
 
 export default function Flow() {
   const [recording, setRecording] = useState(false)
