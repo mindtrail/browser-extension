@@ -23,14 +23,14 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
           !isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
     >
-      {/* <Button onClick={toggleSidebar} variant='ghost'> */}
       <div className='flex items-center py-2 px-4 gap-2 border-b'>
-        {/* <XIcon className='w-4 h-4' /> */}
-        {/* </Button> */}
+        <Button onClick={toggleSidebar} variant='ghost'>
+          <XIcon className='w-4 h-4' />
+        </Button>
         <Typography variant='h5'>RPA Copilot</Typography>
       </div>
-      <FlowRecorder />
       <FlowRunner />
+      <FlowRecorder />
     </div>
   )
 }

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react'
+
 import { runEvents } from './run-events'
-import { mergeInputEvents } from '../utils/merge-input-events'
-import { discardClickInputEvents } from '../utils/discard-click-input-events'
-import { Actions } from '../actions'
-import { extractParams } from '../utils/openai'
-import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
 import { buildParamsSchema } from './build-params-schema'
 import { parseQuery } from './parse-query'
+
+import { Actions } from '../actions'
+import { discardClickInputEvents } from '../utils/discard-click-input-events'
+import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
+import { mergeInputEvents } from '../utils/merge-input-events'
+import { extractParams } from '../utils/openai'
+
+import { SendHorizonal } from 'lucide-react'
+import { Button } from '~components/ui/button'
+import { Input } from '~/components/ui/input'
 
 export function FlowRunner() {
   const [hoveredFlowId, setHoveredFlowId] = useState(null)
@@ -50,19 +56,27 @@ export function FlowRunner() {
   }
 
   return (
-    <div className='px-4'>
+    <div className='px-4 py-4 gap-4'>
       <form
+        className='flex items-center'
         onSubmit={(e) => {
           e.preventDefault()
           runFlow({ query })
         }}
       >
-        <input
-          type='text'
-          className='w-full p-2 border border-gray-300 rounded mb-3'
+        <Input
+          placeholder='Run a query'
+          className='w-full p-2 border border-gray-300 rounded'
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <Button
+          variant='ghost'
+          className={`${query?.length > 2 && '!visible'} invisible absolute right-4`}
+          type='submit'
+        >
+          <SendHorizonal className='w-4 h-4' />
+        </Button>
       </form>
       {flows?.map((flow, index) => (
         <div
