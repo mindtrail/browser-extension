@@ -10,21 +10,31 @@ import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { extractParams } from '../utils/openai'
 
-import { SendHorizonalIcon, Trash2Icon } from 'lucide-react'
+import { SendHorizonalIcon, Trash2Icon, CheckCheckIcon } from 'lucide-react'
 import { Button } from '~components/ui/button'
 import { Input } from '~/components/ui/input'
+import { Typography } from '~components/typography'
 
 type RunFlowParams = {
   flowId?: string
   query?: string
 }
 
+const mock_event = {
+  delay: 0,
+  name: '',
+  selector: 'label > button',
+  textContent: 'BUTTON',
+  type: 'click',
+  value: undefined,
+}
+
 export function FlowRunner() {
-  const [hoveredFlowId, setHoveredFlowId] = useState(null)
   const [currentEvents, setCurrentEvents] = useState([])
   const [query, setQuery] = useState('')
   const [flows, setFlows] = useState([])
-  const [runInProgress, setRunInProgress] = useState(false)
+  const [flowsRunning, setFlowsRunning] = useState([])
+  const [runComplete, setRunComplete] = useState(false)
 
   useEffect(() => {
     const fetchFlows = async () => {
@@ -43,10 +53,11 @@ export function FlowRunner() {
   }
 
   async function runFlow({ flowId, query }: RunFlowParams) {
-    if (runInProgress) return
+    if (flowsRunning?.length > 0) return
 
-    setRunInProgress(true)
     const flowsToRun = flowId ? [{ flowId }] : await parseQuery(query, flows)
+    setFlowsRunning(flowsToRun.map((flow) => flow.flowId))
+    setRunComplete(false)
 
     for (const { flowId } of flowsToRun) {
       setCurrentEvents([])
@@ -59,8 +70,12 @@ export function FlowRunner() {
       })
     }
 
-    setRunInProgress(false)
-    setCurrentEvents([])
+    setRunComplete(true)
+
+    setTimeout(() => {
+      setFlowsRunning([])
+      setCurrentEvents([])
+    }, 2500)
   }
 
   async function removeFlow(id) {
@@ -69,53 +84,67 @@ export function FlowRunner() {
   }
 
   return (
-    <div className='px-4 py-4 gap-4 flex flex-col'>
-      <form
-        className='flex items-center'
-        onSubmit={(e) => {
-          e.preventDefault()
-          runFlow({ query })
-        }}
-      >
-        <Input
-          disabled={runInProgress}
-          placeholder='Run a flow'
-          className='w-full pl-4 pr-10 border border-gray-300 rounded'
-          value={`${runInProgress ? 'Running: ' : ''}${query}`}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <Button
-          variant='ghost'
-          disabled={runInProgress}
-          className={`${query?.length > 2 && '!visible'} invisible absolute right-4`}
-          type='submit'
+    <>
+      <div className=' flex flex-col gap-4 px-4 py-4 overflow-auto'>
+        <form
+          className='flex items-center'
+          onSubmit={(e) => {
+            e.preventDefault()
+            runFlow({ query })
+          }}
         >
-          <SendHorizonalIcon className='w-4 h-4 text-primary' />
-        </Button>
-      </form>
-      <div className='flex flex-col gap-2'>
-        {flows?.map(({ id: flowId, name }) => (
-          <div key={flowId} className='flex items-center relative group/runner'>
-            <Button
-              variant='secondary'
-              className='w-full line-clamp-2 h-auto justify-start text-left'
-              onClick={() => runFlow({ flowId: flowId, query })}
-            >
-              {name}
-            </Button>
-            <Button
-              variant='ghost'
-              className={`absolute right-0 rounded opacity-0
-                group-hover/runner:opacity-100 transition duration-300 ease-in-out`}
-              onClick={() => removeFlow(flowId)}
-            >
-              <Trash2Icon className='w-4 h-4 text-foreground/70' />
-            </Button>
-          </div>
-        ))}
+          <Input
+            disabled={flowsRunning?.length > 0}
+            placeholder='Type flow to run'
+            className='w-full pl-4 pr-10 border border-gray-300 rounded'
+            value={`${flowsRunning?.length ? 'Running ' : ''}${query}`}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <Button
+            variant='ghost'
+            disabled={flowsRunning?.length > 0}
+            className={`${query?.length > 2 && '!visible'} invisible absolute right-4`}
+            type='submit'
+          >
+            <SendHorizonalIcon className='w-4 h-4 text-primary' />
+          </Button>
+        </form>
+        <div className='flex flex-col gap-2'>
+          {flows?.map(({ id: flowId, name }) => (
+            <div key={flowId} className='flex items-center relative group/runner'>
+              <Button
+                variant={flowsRunning?.includes(flowId) ? 'default' : 'secondary'}
+                className='w-full line-clamp-2 h-auto justify-start text-left'
+                onClick={() => runFlow({ flowId: flowId, query })}
+              >
+                {name}
+              </Button>
+              <Button
+                variant='ghost'
+                className={`absolute right-0 rounded opacity-0
+                group-hover/runner:opacity-100 transition ease-in-out`}
+                onClick={() => removeFlow(flowId)}
+              >
+                <Trash2Icon className='w-4 h-4 text-foreground/70' />
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <Actions events={currentEvents} />
-    </div>
+      <div className='flex flex-col max-h-[50%] overflow-auto'>
+        <Actions events={currentEvents} readOnly={true} />
+      </div>
+
+      {runComplete && flowsRunning?.length > 0 && (
+        <Typography
+          variant='small-semi'
+          className='flex items-center gap-2 px-6 text-primary'
+        >
+          <CheckCheckIcon className='w-5 h-5' />
+          Run complete
+        </Typography>
+      )}
+    </>
   )
 }

@@ -48,7 +48,9 @@ export function FlowRecorder() {
 
   return (
     <div className='flex flex-col absolute bottom-0 w-full max-h-[75%] border bg-slate-50'>
-      <Actions events={events} debugMode={false} />
+      <div className='flex flex-col px-2 py-2'>
+        <Actions events={events} debugMode={false} />
+      </div>
       <RecordButton onClick={toggleRecording} recording={recording} />
     </div>
   )

@@ -6,7 +6,7 @@
 import { Action } from './action'
 import { MousePointerClickIcon, GlobeIcon, PenLineIcon } from 'lucide-react'
 
-export function Actions({ events, debugMode = false }) {
+export function Actions({ events, debugMode = false, readOnly = false }) {
   if (!events?.length) return null
 
   const actions = events.map((event) => {
@@ -29,9 +29,9 @@ export function Actions({ events, debugMode = false }) {
   })
 
   return (
-    <div className='flex flex-col w-full px-2 py-2 cursor-default overflow-auto'>
+    <div className='flex flex-col w-full cursor-default overflow-auto'>
       {actions.map(({ type, value, icon: Icon }, index) => (
-        <Action Icon={Icon} type={type} value={value} key={index} />
+        <Action Icon={Icon} type={type} value={value} key={index} readOnly={readOnly} />
       ))}
 
       {/* <div

@@ -29,7 +29,7 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
         </Button>
         <Typography variant='h5'>RPA Copilot</Typography>
       </div>
-      <div className='flex flex-col justify-between flex-1 overflow-auto'>
+      <div className='flex flex-col flex-1'>
         <FlowRunner />
         <FlowRecorder />
       </div>

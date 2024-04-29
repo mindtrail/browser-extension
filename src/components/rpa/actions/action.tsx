@@ -7,9 +7,10 @@ interface ActionProps {
   Icon: typeof XIcon
   type: string
   value: string
+  readOnly: boolean
 }
 
-export function Action({ Icon, type, value }: ActionProps) {
+export function Action({ Icon, type, value, readOnly }: ActionProps) {
   return (
     <div
       className={`flex items-center gap-4 px-4 py-4 w-full rounded-lg
@@ -27,12 +28,14 @@ export function Action({ Icon, type, value }: ActionProps) {
           {value}
         </Typography>
       </div>
-      <Button
-        variant='ghost'
-        className={`invisible group-hover/row:visible absolute right-4`}
-      >
-        <XIcon className='w-4 h-4' />
-      </Button>
+      {!readOnly && (
+        <Button
+          variant='ghost'
+          className={`invisible group-hover/row:visible absolute right-4`}
+        >
+          <XIcon className='w-4 h-4' />
+        </Button>
+      )}
     </div>
   )
 }
