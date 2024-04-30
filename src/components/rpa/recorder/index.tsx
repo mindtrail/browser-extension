@@ -4,7 +4,7 @@ import { RecordButton } from './record-button'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
-import { generateFlowName } from '../utils/groq'
+import { generateFlowName } from '../utils/openai'
 import { createFlow } from '../utils/supabase'
 
 export function FlowRecorder() {

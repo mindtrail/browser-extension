@@ -1,4 +1,5 @@
 import { findSelector } from './find-selector'
+import { findHref } from './find-href'
 
 let lastEventTime = 0
 let eventQueue = []
@@ -16,19 +17,21 @@ const processQueue = () => {
     }
 
     const { event, callback } = eventQueue.shift()
-    const { type, selector, timeStamp, value, textContent, name } = event
+    const { type, selector, timeStamp, value, textContent, name, baseURI, href } = event
 
-    const delay = lastEventTime ? timeStamp - lastEventTime : 0
-    console.log(`Processing event: ${type} at ${selector} with delay ${delay}`)
-    lastEventTime = timeStamp
+    // const delay = lastEventTime ? timeStamp - lastEventTime : 0
+    // console.log(`Processing event: ${type} at ${selector} with delay ${delay}`)
+    // lastEventTime = timeStamp
 
     callback({
       type,
       selector,
-      delay,
+      // delay,
       ...(value !== null && { value }),
       ...(textContent !== null && { textContent }),
       ...(name !== null && { name }),
+      ...(baseURI !== null && { baseURI }),
+      ...(href !== null && { href }),
     })
     processNextEvent()
   }
@@ -41,6 +44,7 @@ const eventHandler = (callback, debounceDuration = 300) => {
     const { type, target } = event
     const selector = findSelector(target)
 
+    let href = null
     let value = null
     let textContent = null
     if (
@@ -50,6 +54,7 @@ const eventHandler = (callback, debounceDuration = 300) => {
       value = target.value
     } else if (type === 'click') {
       textContent = target.innerText ? target.innerText.trim() : target.tagName
+      href = findHref(target)
     }
 
     const currentTimeStamp = Date.now()
@@ -71,6 +76,8 @@ const eventHandler = (callback, debounceDuration = 300) => {
               ...(value !== null && { value }),
               ...(textContent !== null && { textContent }),
               ...(target.name !== null && { name: target.name }),
+              ...(target.baseURI !== null && { baseURI: target.baseURI }),
+              ...(href !== null && { href }),
             },
             callback,
           })
