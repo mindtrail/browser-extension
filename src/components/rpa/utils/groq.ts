@@ -7,7 +7,7 @@ import {
   splitQueryPrompt,
   detectFlowPrompt,
   extractParamsPrompt,
-  generateFlowNamePrompt,
+  generateMetadataPrompt,
 } from './prompts'
 
 export async function splitQuery(query) {
@@ -35,10 +35,11 @@ export async function extractParams(query, schema) {
   return JSON.parse(completion.choices[0].message.content)
 }
 
-export async function generateFlowName(query) {
+export async function generateMetadata(query) {
   const completion = await groq.chat.completions.create({
-    messages: generateFlowNamePrompt(query),
-    model: 'mixtral-8x7b-32768',
+    messages: generateMetadataPrompt(query),
+    // model: 'mixtral-8x7b-32768',
+    model: 'llama3-70b-8192',
   })
   return JSON.parse(completion.choices[0].message.content)
 }

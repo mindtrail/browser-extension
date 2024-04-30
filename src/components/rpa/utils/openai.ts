@@ -7,7 +7,7 @@ import {
   splitQueryPrompt,
   detectFlowPrompt,
   extractParamsPrompt,
-  generateFlowNamePrompt,
+  generateMetadataPrompt,
 } from './prompts'
 
 export async function splitQuery(query) {
@@ -52,9 +52,9 @@ export async function extractParams(query, schema) {
   return JSON.parse(completion.choices[0].message.content)
 }
 
-export async function generateFlowName(query) {
+export async function generateMetadata(query) {
   const completion = await openai.chat.completions.create({
-    messages: generateFlowNamePrompt(
+    messages: generateMetadataPrompt(
       query,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4',
