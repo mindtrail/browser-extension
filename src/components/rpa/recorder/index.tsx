@@ -9,46 +9,37 @@ import { createFlow } from '../utils/supabase'
 
 export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
-  const [currentFlow, setCurrentFlow] = useState(null)
+  const [eventsRecorded, setEventsRecorded] = useState([])
 
-  useEffect(() => listenEvents(onEvent, recording), [recording])
+  useEffect(() => listenEvents(recordEvent, recording), [recording])
 
-  function onEvent(event) {
-    console.log(event)
-    if (!recording || !currentFlow) return
-    setCurrentFlow((prevFlow) => {
-      if (!prevFlow) return prevFlow
-      let events = prevFlow.events || []
-      events = [...events, event]
-      events = mergeInputEvents(events)
-      events = discardClickInputEvents(events)
-      return { ...prevFlow, events }
-    })
+  function recordEvent(event) {
+    setEventsRecorded((prevEvents) =>
+      discardClickInputEvents(mergeInputEvents([...prevEvents, event])),
+    )
   }
 
   async function toggleRecording() {
-    if (!recording) {
-      setCurrentFlow({
-        name: '',
-        description: '',
-        events: [],
-      })
-    } else {
-      const metadata = await generateFlowName(JSON.stringify(currentFlow.events))
-      await createFlow({
-        name: metadata.name,
-        description: metadata.description,
-        events: currentFlow.events,
-      })
-      setCurrentFlow(null)
-    }
+    // Async setters. Will update only in the next render, so we can call them here.
     setRecording(!recording)
+    setEventsRecorded([])
+
+    if (!recording || !eventsRecorded.length) {
+      return
+    }
+
+    const metadata = await generateFlowName(JSON.stringify(eventsRecorded))
+    createFlow({
+      name: metadata?.name,
+      description: metadata?.description,
+      events: eventsRecorded,
+    })
   }
 
   return (
     <div className='flex flex-col absolute bottom-0 w-full max-h-[75%] border bg-slate-50'>
-      <div className='flex flex-col px-2 py-2'>
-        <Actions events={currentFlow?.events} debugMode={false} />
+      <div className={`${eventsRecorded?.length ? 'flex' : 'hidden'} flex-col px-2 py-2`}>
+        <Actions events={eventsRecorded} debugMode={false} />
       </div>
       <RecordButton onClick={toggleRecording} recording={recording} />
     </div>
