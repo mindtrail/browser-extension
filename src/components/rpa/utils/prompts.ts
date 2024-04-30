@@ -41,18 +41,20 @@ export const extractParamsPrompt = (query, schema) => [
   { role: 'user', content: `${query} in this format: ${JSON.stringify(schema)}` },
 ]
 
-export const generateFlowNamePrompt = (query) => [
+export const generateMetadataPrompt = (query) => [
   {
     role: 'system',
     content: `Role: You are a tool that outputs as JSON the name and description of a flow used in a RPA tool. 
         Tasks: 
-          1. You will generate a name and description based on the events in the flow. 
+          1. You will generate name and description: 
+              1.1 for the flow in general
+              1.2 for each event
           2. Pay close atention to the baseURI and corelate it with the rest of the event properties to generate a meaningful name and description.
         Output Requirements: 
           1. Only respond with JSON format and absolutely no explanation.
           2. Pay attention to baseURI when it comes to the infering the type of action: create vs update. Details from baseURI could lead to what action is being performed. Example: item/<id> means UPDATE of item with id <id> not CREATE !
           3. If selector is part of a navigation section OR if the baseURI is changing as an effect of the event then use words as "Navigate to <variable>" as the name.
-        Output: Response should always be a JSON object in this format: {name: string, description: string}`,
+        Output: Response should always be a JSON object in this format: {name: string, description: string, events: [{event_name: string, event_description: string}]}`,
   },
-  { role: 'user', content: query },
+  { role: 'user', content: JSON.stringify(query) },
 ]

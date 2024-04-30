@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react'
 
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
-import { generateFlowName } from '../utils/openai'
+import { generateMetadata } from '../utils/groq'
 import { createFlow } from '../utils/supabase'
 import { Events } from '../events'
 
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
 import { CancelRecordingButton } from './cancel-recording-button'
+
 import { Typography } from '~components/typography'
 
 export function FlowRecorder() {
@@ -52,7 +53,6 @@ export function FlowRecorder() {
   }
 
   async function toggleRecording() {
-    // Async setters. Will update only in the next render, so we can call them here.
     setRecording(!recording)
     setEventsRecorded([])
 
@@ -60,14 +60,14 @@ export function FlowRecorder() {
       return
     }
 
-    const metadata = await generateFlowName(JSON.stringify(eventsRecorded))
-    createFlow({
-      name: metadata?.name,
-      description: metadata?.description,
-      events: eventsRecorded,
-    })
+    const flow = await generateMetadata(eventsRecorded)
+    flow.events = eventsRecorded.map((event, index) => ({
+      ...event,
+      event_name: flow.events[index]?.event_name,
+      event_description: flow.events[index]?.event_description,
+    }))
+    createFlow(flow)
   }
-  console.log(11, eventsRecorded)
 
   return (
     <div
