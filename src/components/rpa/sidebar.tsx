@@ -20,8 +20,8 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
   return (
     <div
       className={`font-sans text-foreground fixed right-2 bottom-4 z-50
-        flex flex-col w-80 bg-white border rounded-lg drop-shadow-xl
-        ${isSidebarOpen ? 'h-[70vh]' : 'h-[50px]'}
+        flex flex-col bg-white border rounded-lg drop-shadow-xl
+        ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-[50px] w-auto'}
       `}
     >
       <div className='flex items-center py-2 px-4 gap-2 border-b'>
