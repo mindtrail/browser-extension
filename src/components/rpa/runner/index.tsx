@@ -4,7 +4,7 @@ import { runEvents } from './run-events'
 import { buildParamsSchema } from './build-params-schema'
 import { parseQuery } from './parse-query'
 
-import { Actions } from '../actions'
+import { Events } from '../events'
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
 import { extractParams } from '../utils/openai'
 
@@ -128,7 +128,7 @@ export function FlowRunner() {
       </div>
 
       <div className='flex flex-col max-h-[50%] overflow-auto'>
-        <Actions events={currentEvents} readOnly={true} />
+        <Events events={currentEvents} readOnly={true} />
       </div>
 
       {runComplete && flowsRunning?.length > 0 && (

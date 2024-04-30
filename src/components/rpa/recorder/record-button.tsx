@@ -9,15 +9,13 @@ export function RecordButton({
   recording: boolean
 }) {
   return (
-    <div className='w-full flex px-4 py-4'>
-      <Button
-        variant={recording ? 'destructive' : 'outline'}
-        className='flex w-full gap-4 items-center'
-        onClick={onClick}
-      >
-        <RecordIcon className='w-5 h-5' />
-        {recording ? 'Stop Recording' : 'Record New Workflow'}
-      </Button>
-    </div>
+    <Button
+      className='flex w-full gap-4 items-center'
+      variant={recording ? 'destructive' : 'outline'}
+      onClick={onClick}
+    >
+      <RecordIcon className='w-5 h-5' />
+      {recording ? 'Stop Recording' : 'Record New Workflow'}
+    </Button>
   )
 }
