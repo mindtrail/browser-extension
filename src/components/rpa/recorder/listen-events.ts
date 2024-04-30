@@ -11,11 +11,12 @@ function eventHandler(callback) {
     const href = type === 'click' ? getHref(target) : null
     const value = getValue({ type, target })
     const textContent = getContent({ type, target })
-    // const timeStamp = Date.now()
+    const timeStamp = Date.now()
 
     if (selector && !selector.includes('plasmo-csui')) {
-      const eventKey = `${type}-${selector}`
+      const eventKey = `${type}-${selector}-${timeStamp}`
       const eventDetails = {
+        id: `${timeStamp}`,
         type,
         selector,
         // timeStamp,
