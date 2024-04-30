@@ -1,4 +1,4 @@
-export function findHref(element) {
+export function getHref(element) {
   let href = null
   let currentElement = element
   for (let i = 0; i < 3; i++) {

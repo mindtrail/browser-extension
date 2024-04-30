@@ -1,23 +1,16 @@
-import { findSelector } from './find-selector'
-import { findHref } from './find-href'
+import { getSelector } from './find-selector'
+import { getHref } from './find-href'
+import { getValue } from './get-value'
+import { getContent } from './get-content'
 import { debounceEvent } from './process-queue'
 
 function eventHandler(callback) {
   return (event) => {
     const { type, target } = event
-    const selector = findSelector(target)
-    const href = type === 'click' ? findHref(target) : null
-    const value =
-      type === 'input' &&
-      (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)
-        ? target.value
-        : null
-    const textContent =
-      type === 'click'
-        ? target.innerText
-          ? target.innerText.trim()
-          : target.tagName
-        : null
+    const selector = getSelector(target)
+    const href = type === 'click' ? getHref(target) : null
+    const value = getValue({ type, target })
+    const textContent = getContent({ type, target })
     const currentTimeStamp = Date.now()
 
     if (selector && !selector.includes('plasmo-csui')) {
