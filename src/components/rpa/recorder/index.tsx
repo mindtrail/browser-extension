@@ -23,7 +23,6 @@ export function FlowRecorder() {
     // Async setters. Will update only in the next render, so we can call them here.
     setRecording(!recording)
     setEventsRecorded([])
-    window.dispatchEvent(new CustomEvent('reset-last-event-time'))
 
     if (!recording || !eventsRecorded.length) {
       return
