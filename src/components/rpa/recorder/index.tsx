@@ -38,7 +38,6 @@ export function FlowRecorder() {
       })
       setCurrentFlow(null)
     }
-    window.dispatchEvent(new CustomEvent('reset-last-event-time'))
     setRecording(!recording)
   }
 
