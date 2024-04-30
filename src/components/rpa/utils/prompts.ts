@@ -17,16 +17,16 @@ export const detectFlowPrompt = (queries, flows) => [
     role: 'system',
     content: `
         Role: You are a tool that detects the intended flow from a query. 
-        Task: For each query in this array of queries detect the flow with most similarity based on the query.
+        Task: For each query in this array of queries detect the flow and the eventIds with most similarity based on the query.
         Output Requirement: Only respond with JSON format and absolute no explanation.
-        Output: Response should always be a JSON array in this format: [{query: string, flowId: string}]`,
+        Output: Response should always be a JSON array in this format: [{query: string, flowId: string, eventIds: [string]}]`,
   },
   {
     role: 'user',
     content: `
         For each query in this array of queries <queries>${JSON.stringify(
           queries,
-        )}</queries>, detect the related flow from this array of flows: <flows>${JSON.stringify(
+        )}</queries>, detect the related flow and the eventIds from this array of flows: <flows>${JSON.stringify(
           flows,
         )}</flows>`,
   },

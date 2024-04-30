@@ -13,3 +13,14 @@ export async function parseQuery(query, flows) {
   }
   return flowIds
 }
+
+const mock_response = [
+  {
+    flowId: 'flow1',
+    eventIds: ['event1', 'event2'],
+  },
+  {
+    flowId: 'flow2',
+    eventIds: ['event2', 'event4'],
+  },
+]
