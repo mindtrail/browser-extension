@@ -18,6 +18,7 @@ export function FlowRecorder() {
   useEffect(() => listenEvents(recordEvent, recording), [recording])
   useEffect(() => {
     if (!recording) return
+    console.log(222)
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && recording) {
@@ -41,6 +42,12 @@ export function FlowRecorder() {
   function recordEvent(event) {
     setEventsRecorded((prevEvents) =>
       discardClickInputEvents(mergeInputEvents([...prevEvents, event])),
+    )
+  }
+
+  function removeEvent(event) {
+    setEventsRecorded((prevEvents) =>
+      prevEvents.filter((e) => e?.timeStamp !== event?.timeStamp),
     )
   }
 
@@ -74,7 +81,7 @@ export function FlowRecorder() {
       {eventsRecorded?.length > 0 && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={cancelRecording} />
-          <Events events={eventsRecorded} />
+          <Events events={eventsRecorded} removeEvent={removeEvent} />
         </div>
       )}
       <RecordButton onClick={toggleRecording} recording={recording} />

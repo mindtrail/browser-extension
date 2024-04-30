@@ -7,7 +7,16 @@ const EVENT_ICONS = {
   default: GlobeIcon,
 }
 
-export function Events({ events, debugMode = false, readOnly = false }) {
+interface EventProps {
+  events: any[]
+  removeEvent: (event: any) => void
+  debugMode?: boolean
+  readOnly?: boolean
+}
+
+export function Events(props: EventProps) {
+  const { events, removeEvent, debugMode = false, readOnly = false } = props
+
   if (!events?.length) return
 
   const eventList = events.map((event) => {
@@ -23,7 +32,13 @@ export function Events({ events, debugMode = false, readOnly = false }) {
   return (
     <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
       {eventList.map((event, index) => (
-        <Event key={index} event={event} readOnly={readOnly} index={index} />
+        <Event
+          key={index}
+          event={event}
+          readOnly={readOnly}
+          index={index}
+          removeEvent={removeEvent}
+        />
       ))}
     </div>
   )
