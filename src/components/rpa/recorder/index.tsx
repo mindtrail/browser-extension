@@ -18,7 +18,11 @@ export function FlowRecorder() {
     if (!recording || !currentFlow) return
     setCurrentFlow((prevFlow) => {
       if (!prevFlow) return prevFlow
-      return { ...prevFlow, events: [...prevFlow.events, event] }
+      let events = prevFlow.events || []
+      events = [...events, event]
+      events = mergeInputEvents(events)
+      events = discardClickInputEvents(events)
+      return { ...prevFlow, events }
     })
   }
 
@@ -41,14 +45,10 @@ export function FlowRecorder() {
     setRecording(!recording)
   }
 
-  let events = currentFlow?.events || []
-  events = mergeInputEvents(events)
-  events = discardClickInputEvents(events)
-
   return (
     <div className='flex flex-col absolute bottom-0 w-full max-h-[75%] border bg-slate-50'>
       <div className='flex flex-col px-2 py-2'>
-        <Actions events={events} debugMode={false} />
+        <Actions events={currentFlow?.events} debugMode={false} />
       </div>
       <RecordButton onClick={toggleRecording} recording={recording} />
     </div>
