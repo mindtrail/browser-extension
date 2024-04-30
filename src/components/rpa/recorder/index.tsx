@@ -8,6 +8,8 @@ import { Events } from '../events'
 
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
+import { CancelRecordingButton } from './cancel-recording-button'
+import { Typography } from '~components/typography'
 
 export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
@@ -19,8 +21,7 @@ export function FlowRecorder() {
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && recording) {
-        setRecording(false)
-        setEventsRecorded([])
+        cancelRecording()
       }
     }
 
@@ -31,6 +32,11 @@ export function FlowRecorder() {
       window.removeEventListener('keydown', handleEscape)
     }
   }, [recording])
+
+  function cancelRecording() {
+    setRecording(false)
+    setEventsRecorded([])
+  }
 
   function recordEvent(event) {
     setEventsRecorded((prevEvents) =>
@@ -54,10 +60,23 @@ export function FlowRecorder() {
       events: eventsRecorded,
     })
   }
+  console.log(11, eventsRecorded)
 
   return (
-    <div className='flex flex-col absolute bottom-0 w-full max-h-[75%] border bg-slate-50 px-4 py-2'>
-      <Events events={eventsRecorded} />
+    <div
+      className={`${recording ? 'h-[calc(100%-52px)]' : 'h-auto'}
+        flex flex-col justify-end gap-2 px-4 py-2
+        w-full absolute bottom-0 border bg-slate-50`}
+    >
+      {recording && !eventsRecorded?.length && (
+        <Typography className='w-full text-center mb-5'>Recording events...</Typography>
+      )}
+      {eventsRecorded?.length > 0 && (
+        <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
+          <CancelRecordingButton onClick={cancelRecording} />
+          <Events events={eventsRecorded} />
+        </div>
+      )}
       <RecordButton onClick={toggleRecording} recording={recording} />
     </div>
   )

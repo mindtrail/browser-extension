@@ -15,7 +15,7 @@ export function RecordButton({
       onClick={onClick}
     >
       <RecordIcon className='w-5 h-5' />
-      {recording ? 'Stop Recording' : 'Record New Workflow'}
+      {recording ? 'Save Recording' : 'Record New Workflow'}
     </Button>
   )
 }

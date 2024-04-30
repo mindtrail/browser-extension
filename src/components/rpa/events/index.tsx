@@ -21,7 +21,7 @@ export function Events({ events, debugMode = false, readOnly = false }) {
   })
 
   return (
-    <div className='flex flex-col w-full cursor-default overflow-auto'>
+    <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
       {eventList.map((event, index) => (
         <Event key={index} event={event} readOnly={readOnly} index={index} />
       ))}
