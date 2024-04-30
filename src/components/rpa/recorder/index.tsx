@@ -4,7 +4,7 @@ import { RecordButton } from './record-button'
 import { mergeInputEvents } from '../utils/merge-input-events'
 import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
-import { generateFlowName } from '../utils/groq'
+import { generateFlowName } from '../utils/openai'
 import { createFlow } from '../utils/supabase'
 
 export function FlowRecorder() {
@@ -14,11 +14,13 @@ export function FlowRecorder() {
   useEffect(() => listenEvents(recordEvent, recording), [recording])
 
   function recordEvent(event) {
-    setEventsRecorded((prevEvents) => [...prevEvents, event])
+    setEventsRecorded((prevEvents) =>
+      discardClickInputEvents(mergeInputEvents([...prevEvents, event])),
+    )
   }
 
   async function toggleRecording() {
-    // Async setters. Will update only in the next render, so we can call this here.
+    // Async setters. Will update only in the next render, so we can call them here.
     setRecording(!recording)
     setEventsRecorded([])
     window.dispatchEvent(new CustomEvent('reset-last-event-time'))
@@ -34,9 +36,6 @@ export function FlowRecorder() {
       events: eventsRecorded,
     })
   }
-
-  let events = mergeInputEvents(eventsRecorded)
-  events = discardClickInputEvents(events)
 
   return (
     <div className='flex flex-col absolute bottom-0 w-full max-h-[75%] border bg-slate-50'>

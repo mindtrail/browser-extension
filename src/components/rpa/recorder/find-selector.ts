@@ -1,6 +1,6 @@
 import { finder } from '@medv/finder'
 
-export function findSelector(
+export function getSelector(
   element,
   options = {
     seedMinLength: 5,

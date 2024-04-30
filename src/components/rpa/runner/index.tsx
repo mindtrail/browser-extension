@@ -5,9 +5,7 @@ import { buildParamsSchema } from './build-params-schema'
 import { parseQuery } from './parse-query'
 
 import { Actions } from '../actions'
-import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
-import { mergeInputEvents } from '../utils/merge-input-events'
 import { extractParams } from '../utils/openai'
 
 import { SendHorizonalIcon, Trash2Icon, CheckCheckIcon } from 'lucide-react'
@@ -46,10 +44,7 @@ export function FlowRunner() {
   }, [])
 
   function getFlowEvents(id) {
-    let events = flows.find((flow) => flow.id === id)?.events || []
-    events = mergeInputEvents(events)
-    events = discardClickInputEvents(events)
-    return events
+    return flows.find((flow) => flow.id === id)?.events || []
   }
 
   async function runFlow({ flowId, query }: RunFlowParams) {

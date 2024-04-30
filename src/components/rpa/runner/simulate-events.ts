@@ -1,6 +1,9 @@
 export function simulateEvent(event) {
   const element = document.querySelector(event.selector)
-  if (!element) return
+  if (!element) {
+    if (event.href) window.location.href = event.href
+    return
+  }
 
   try {
     if (event.type === 'input') {
