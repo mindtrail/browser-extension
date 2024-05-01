@@ -1,12 +1,12 @@
 export function mergeInputEvents(events) {
   const mergedEvents = []
   let lastEvent = null
+
   events.forEach((event) => {
     if (
-      event.type === 'input' &&
-      lastEvent &&
-      lastEvent.type === 'input' &&
-      lastEvent.selector === event.selector
+      event?.type === 'input' &&
+      lastEvent?.type === 'input' &&
+      lastEvent?.selector === event?.selector
     ) {
       lastEvent = { ...event }
     } else {
@@ -16,6 +16,7 @@ export function mergeInputEvents(events) {
       lastEvent = { ...event }
     }
   })
+
   if (lastEvent) {
     mergedEvents.push(lastEvent)
   }

@@ -19,7 +19,6 @@ export function FlowRecorder() {
   useEffect(() => listenEvents(recordEvent, recording), [recording])
   useEffect(() => {
     if (!recording) return
-    console.log(222)
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && recording) {

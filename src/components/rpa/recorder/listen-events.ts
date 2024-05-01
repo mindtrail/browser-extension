@@ -6,6 +6,7 @@ import { debounceEvent } from './process-queue'
 
 function eventHandler(callback) {
   return (event) => {
+    console.log(event)
     const { type, target } = event
     const selector = getSelector(target)
     const href = type === 'click' ? getHref(target) : null
