@@ -1,29 +1,25 @@
-/**
- * Groups queries by their flowId into a single array.
- * Each element in the resulting array is an object containing a flowId and an array of associated queries.
- * If multiple queries share the same flowId, they are grouped together under the same object.
- *
- * @param {Array} queries - Array of query objects, each containing a flowId and a query.
- * @returns {Array} An array of objects, each containing a unique flowId and an array of queries associated with that flowId.
- */
-export function groupByFlow(queries) {
-  return queries.reduce((acc, current) => {
-    const last = acc[acc.length - 1]
-    if (last && last.flowId === current.flowId) {
-      if (!Array.isArray(last.queries)) {
-        last.queries = []
+export function groupByFlowAndQuery(queries) {
+  const grouped = queries.reduce((acc, current) => {
+    const flowEntry = acc.find((entry) => entry.flowId === current.flowId)
+    if (flowEntry) {
+      const queryEntry = flowEntry.queries.find((q) => q.query === current.query)
+      if (queryEntry) {
+        queryEntry.eventIds = [...new Set([...queryEntry.eventIds, ...current.eventIds])]
+      } else {
+        flowEntry.queries.push({ query: current.query, eventIds: current.eventIds })
       }
-      if (!Array.isArray(last.eventIds)) {
-        last.eventIds = []
-      }
-      last.queries.push(current.query)
-      last.eventIds = [...last.eventIds, ...current.eventIds]
-      return acc
     } else {
-      return [
-        ...acc,
-        { flowId: current.flowId, queries: [current.query], eventIds: current.eventIds },
-      ]
+      acc.push({
+        flowId: current.flowId,
+        queries: [{ query: current.query, eventIds: current.eventIds }],
+      })
     }
+    return acc
   }, [])
+
+  // Flatten the structure to [{flowId: string, eventIds: [string]}]
+  return grouped.map((flow) => ({
+    flowId: flow.flowId,
+    eventIds: flow.queries.reduce((allIds, query) => [...allIds, ...query.eventIds], []),
+  }))
 }
