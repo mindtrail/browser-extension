@@ -6,7 +6,6 @@ import { debounceEvent } from './process-queue'
 
 function eventHandler(callback) {
   return (event) => {
-    console.log(event)
     const { type, target } = event
     const selector = getSelector(target)
     const href = type === 'click' ? getHref(target) : null
@@ -31,8 +30,12 @@ function eventHandler(callback) {
   }
 }
 
+let handler = null
+
 export function listenEvents(callback, shouldListen) {
-  const handler = eventHandler(callback)
+  if (!handler) {
+    handler = eventHandler(callback)
+  }
 
   if (shouldListen) {
     document.addEventListener('click', handler)
@@ -45,5 +48,6 @@ export function listenEvents(callback, shouldListen) {
   return () => {
     document.removeEventListener('click', handler)
     document.removeEventListener('input', handler)
+    handler = null // Reset handler after removing listeners
   }
 }
