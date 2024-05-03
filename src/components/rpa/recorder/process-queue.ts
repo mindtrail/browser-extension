@@ -34,6 +34,7 @@ export function debounceEvent(eventKey, event, callback, debounceDuration = 300)
   if (debounceTimers.has(eventKey)) {
     clearTimeout(debounceTimers.get(eventKey))
   }
+
   debounceTimers.set(
     eventKey,
     setTimeout(() => {

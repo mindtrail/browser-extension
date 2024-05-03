@@ -1,7 +1,9 @@
-export function mergeInputEvents(events) {
-  const mergedEvents = []
+export function mergeInputEvents(events = []) {
+  const filteredEvents = []
   let lastEvent = null
 
+  // @Todo input add value & initialValue => value !== initialValue
+  events = events.filter(({ type, value }) => type !== 'input' || value)
   events.forEach((event) => {
     if (
       event?.type === 'input' &&
@@ -11,14 +13,14 @@ export function mergeInputEvents(events) {
       lastEvent = { ...event }
     } else {
       if (lastEvent) {
-        mergedEvents.push(lastEvent)
+        filteredEvents.push(lastEvent)
       }
       lastEvent = { ...event }
     }
   })
 
   if (lastEvent) {
-    mergedEvents.push(lastEvent)
+    filteredEvents.push(lastEvent)
   }
-  return mergedEvents
+  return filteredEvents
 }
