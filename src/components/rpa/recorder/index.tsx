@@ -6,6 +6,7 @@ import { discardClickInputEvents } from '../utils/discard-click-input-events'
 import { Actions } from '../actions'
 import { generateMetadata } from '../utils/openai'
 import { createFlow } from '../utils/supabase'
+import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
@@ -14,9 +15,18 @@ export function FlowRecorder() {
   useEffect(() => listenEvents(recordEvent, recording), [recording])
 
   function recordEvent(event) {
-    setEventsRecorded((prevEvents) =>
-      discardClickInputEvents(mergeInputEvents([...prevEvents, event])),
-    )
+    setEventsRecorded((prevEvents) => {
+      const start_dependencies = getStartDependencies(prevEvents, event)
+      return discardClickInputEvents(
+        mergeInputEvents([
+          ...prevEvents,
+          {
+            ...event,
+            start_dependencies,
+          },
+        ]),
+      )
+    })
   }
 
   async function toggleRecording() {
@@ -28,11 +38,15 @@ export function FlowRecorder() {
     }
 
     const flow = await generateMetadata(eventsRecorded)
-    flow.events = eventsRecorded.map((event, index) => ({
-      ...event,
-      event_name: flow.events[index]?.event_name,
-      event_description: flow.events[index]?.event_description,
-    }))
+    flow.events = eventsRecorded.map((event, index) => {
+      const end_dependencies = getEndDependencies(eventsRecorded, event)
+      return {
+        ...event,
+        end_dependencies,
+        event_name: flow.events[index]?.event_name,
+        event_description: flow.events[index]?.event_description,
+      }
+    })
     createFlow(flow)
   }
 

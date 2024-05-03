@@ -1,5 +1,5 @@
-import { getFlowEvents } from './get-flow-events'
-import { extractParams } from '../utils/openai'
+import { getFlowEvents } from '../../utils/get-flow-events'
+import { extractParams } from '../../utils/openai'
 import { buildParamsSchema } from './build-params-schema'
 import { runEvents } from './run-events'
 

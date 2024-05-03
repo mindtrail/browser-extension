@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-import { getFlowsToRun } from './get-flows-to-run'
-import { runFlows } from './run-flows'
+import { getFlowsToRun } from './retrieval/get-flows-to-run'
+import { runFlows } from './execution/run-flows'
 import { Actions } from '../actions'
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
 
