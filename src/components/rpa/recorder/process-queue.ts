@@ -1,5 +1,3 @@
-import { detectRageClicks } from '../utils/filter-events'
-
 let eventQueue = []
 let processingQueue = false
 let debounceTimers = new Map()
@@ -28,8 +26,6 @@ export function processQueue() {
 }
 
 export function debounceEvent(eventKey, event, callback, debounceDuration = 300) {
-  const detectedRageClick = detectRageClicks(eventKey)
-
   if (debounceTimers.has(eventKey)) {
     clearTimeout(debounceTimers.get(eventKey))
   }

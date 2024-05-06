@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 
-import { filterInputEvents } from '../utils/filter-events'
 import { generateMetadata } from '../utils/groq'
 import { createFlow } from '../utils/supabase'
 import { Events } from '../events'
