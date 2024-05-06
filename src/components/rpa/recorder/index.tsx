@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { LoaderCircleIcon } from 'lucide-react'
 
+import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
 
 import { Events } from '../events'
@@ -15,6 +17,7 @@ export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
   const [eventsMap, setEventsMap] = useState(new Map())
   const [paused, setPaused] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => listenEvents(recordEvent, recording && !paused), [recording, paused])
 
@@ -69,6 +72,7 @@ export function FlowRecorder() {
       return
     }
 
+    setSaving(true)
     const eventsRecorded = Array.from(eventsMap.values()).flat()
     const flow = await generateMetadata(eventsRecorded)
 
@@ -82,6 +86,7 @@ export function FlowRecorder() {
       }
     })
 
+    setSaving(false)
     console.log(flow)
     createFlow(flow)
   }
@@ -101,12 +106,24 @@ export function FlowRecorder() {
           <Events eventsMap={eventsMap} removeEvent={removeEvent} />
         </div>
       )}
-      <RecordButton
-        onToggle={toggleRecording}
-        onPause={() => setPaused(!paused)}
-        recording={recording}
-        paused={paused}
-      />
+
+      {saving ? (
+        <Button
+          className='flex w-full gap-4 items-center !opacity-75'
+          variant='outline'
+          disabled
+        >
+          <LoaderCircleIcon className='w-5 h-5 animate-spin' />
+          <Typography>Saving Workflow...</Typography>
+        </Button>
+      ) : (
+        <RecordButton
+          onToggle={toggleRecording}
+          onPause={() => setPaused(!paused)}
+          recording={recording}
+          paused={paused}
+        />
+      )}
     </div>
   )
 }
