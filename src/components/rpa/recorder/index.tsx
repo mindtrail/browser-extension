@@ -3,17 +3,18 @@ import React, { useState, useEffect } from 'react'
 import { Typography } from '~components/typography'
 
 import { Events } from '../events'
+import { generateMetadata } from '../utils/openai'
+import { createFlow } from '../utils/supabase'
+
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
-import { generateMetadata } from '../utils/openai'
-import { createFlow } from '../utils/supabase'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
-  // const [eventsRecorded, setEventsRecorded] = useState([])
   const [eventsMap, setEventsMap] = useState(new Map())
+  const [paused, setPaused] = useState(false)
 
   useEffect(() => listenEvents(recordEvent, recording), [recording])
   useEffect(() => {
@@ -98,7 +99,11 @@ export function FlowRecorder() {
           <Events eventsMap={eventsMap} removeEvent={removeEvent} />
         </div>
       )}
-      <RecordButton onClick={toggleRecording} recording={recording} />
+      <RecordButton
+        onToggle={toggleRecording}
+        onPause={() => setPaused(!paused)}
+        recording={recording}
+      />
     </div>
   )
 }
