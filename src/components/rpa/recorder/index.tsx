@@ -12,7 +12,7 @@ import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
-  const [eventsRecorded, setEventsRecorded] = useState([])
+  // const [eventsRecorded, setEventsRecorded] = useState([])
   const [eventsMap, setEventsMap] = useState(new Map())
 
   useEffect(() => listenEvents(recordEvent, recording), [recording])
@@ -35,7 +35,7 @@ export function FlowRecorder() {
 
   function cancelRecording() {
     setRecording(false)
-    setEventsRecorded([])
+    setEventsMap(new Map())
   }
 
   function recordEvent(event) {
@@ -52,20 +52,23 @@ export function FlowRecorder() {
   }
 
   function removeEvent(event) {
-    setEventsRecorded((prevEvents) =>
-      prevEvents.filter((e) => e?.timeStamp !== event?.timeStamp),
-    )
+    setEventsMap((prevMap) => {
+      prevMap.delete(event?.selector)
+      return new Map(prevMap)
+    })
   }
 
   async function toggleRecording() {
     setRecording(!recording)
-    setEventsRecorded([])
+    setEventsMap(new Map())
 
-    if (!recording || !eventsRecorded.length) {
+    if (!recording || !eventsMap.size) {
       return
     }
 
+    const eventsRecorded = Array.from(eventsMap.values()).flat()
     const flow = await generateMetadata(eventsRecorded)
+
     flow.events = eventsRecorded.map((event, index) => {
       const end_dependencies = getEndDependencies(eventsRecorded, event)
       return {
@@ -75,6 +78,8 @@ export function FlowRecorder() {
         event_description: flow.events[index]?.event_description,
       }
     })
+
+    console.log(flow)
     createFlow(flow)
   }
 

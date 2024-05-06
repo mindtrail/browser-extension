@@ -3,7 +3,6 @@ import { getHref } from './find-href'
 import { getValue } from './get-value'
 import { getContent } from './get-content'
 import { debounceEvent } from './process-queue'
-import { detectRageClicks } from '../utils/filter-events'
 
 function eventHandler(callback) {
   return (event) => {
@@ -26,7 +25,7 @@ function eventHandler(callback) {
     const value = getValue({ type, target })
     const textContent = getContent({ type, target })
     const timeStamp = Date.now()
-    const eventKey = `${type}-${selector}-${timeStamp}`
+    const eventKey = `${type}-${selector}`
 
     const eventDetails = {
       id: `${timeStamp}`,
