@@ -16,7 +16,8 @@ export function FlowRecorder() {
   const [eventsMap, setEventsMap] = useState(new Map())
   const [paused, setPaused] = useState(false)
 
-  useEffect(() => listenEvents(recordEvent, recording), [recording])
+  useEffect(() => listenEvents(recordEvent, recording && !paused), [recording, paused])
+
   useEffect(() => {
     if (!recording) return
 
@@ -37,6 +38,7 @@ export function FlowRecorder() {
   function cancelRecording() {
     setRecording(false)
     setEventsMap(new Map())
+    setPaused(false)
   }
 
   function recordEvent(event) {
@@ -103,6 +105,7 @@ export function FlowRecorder() {
         onToggle={toggleRecording}
         onPause={() => setPaused(!paused)}
         recording={recording}
+        paused={paused}
       />
     </div>
   )
