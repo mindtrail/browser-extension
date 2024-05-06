@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import { runEvents } from './run-events'
-import { buildParamsSchema } from './build-params-schema'
-import { parseQuery } from './parse-query'
-
+import { getFlowsToRun } from './retrieval/get-flows-to-run'
+import { runFlows } from './execution/run-flows'
 import { Events } from '../events'
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
-import { extractParams } from '../utils/openai'
 
 import { SendHorizonalIcon, Trash2Icon, CheckCheckIcon } from 'lucide-react'
 import { Button } from '~components/ui/button'
@@ -19,6 +16,7 @@ type RunFlowParams = {
 }
 
 const mock_event = {
+  id: Date.now(),
   delay: 0,
   name: '',
   selector: 'label > button',
@@ -43,28 +41,19 @@ export function FlowRunner() {
     return onFlowsChange(fetchFlows)
   }, [])
 
-  function getFlowEvents(id) {
-    return flows.find((flow) => flow.id === id)?.events || []
-  }
-
   async function runFlow({ flowId, query }: RunFlowParams) {
     if (flowsRunning?.length > 0) return
 
-    const flowsToRun = flowId ? [{ flowId }] : await parseQuery(query, flows)
+    const flowsToRun = await getFlowsToRun({ flows, flowId, query })
     setFlowsRunning(flowsToRun.map((flow) => flow.flowId))
+
     setRunComplete(false)
-
-    for (const { flowId } of flowsToRun) {
-      setCurrentEvents([])
-      const events = getFlowEvents(flowId)
-      const data = await extractParams(query, buildParamsSchema(events))
-      await runEvents({
-        events,
-        data,
-        onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
-      })
-    }
-
+    await runFlows({
+      flows,
+      flowsToRun,
+      query,
+      onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
+    })
     setRunComplete(true)
 
     setTimeout(() => {

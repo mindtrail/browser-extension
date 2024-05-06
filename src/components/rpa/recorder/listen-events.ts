@@ -6,16 +6,6 @@ import { debounceEvent } from './process-queue'
 import { detectRageClicks } from '../utils/filter-events'
 
 function eventHandler(callback) {
-
-  // const rageClickDetector = detectRageClicks(event, (target, unsubscribe) => {
-  //   // Handle rage click detection
-  //   console.log('Rage click detected on:', target)
-  //   unsubscribe()
-  // })
-
-  // rageClickDetector()
-
-
   return (event) => {
     const { type, target } = event
     const selector = getSelector(target)
@@ -36,12 +26,12 @@ function eventHandler(callback) {
     const value = getValue({ type, target })
     const textContent = getContent({ type, target })
     const timeStamp = Date.now()
-    const eventKey = `${type}-${selector}`
+    const eventKey = `${type}-${selector}-${timeStamp}`
 
     const eventDetails = {
+      id: `${timeStamp}`,
       type,
       selector,
-      timeStamp, // added this back for now to use as "id", for delete
       ...(value !== null && { value }),
       ...(textContent !== null && { textContent }),
       ...(target.name !== null && { name: target.name }),

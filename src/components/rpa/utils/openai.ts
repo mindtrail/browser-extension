@@ -16,9 +16,7 @@ export async function splitQuery(query) {
       messages: splitQueryPrompt(
         query,
       ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-      model: 'gpt-3.5-turbo-0125',
-      response_format: { type: 'json_object' },
-      temperature: 0.1,
+      model: 'gpt-4',
     })
     return JSON.parse(completion.choices[0].message.content)
   } catch (error) {
@@ -32,9 +30,7 @@ export async function detectFlow(queries, flows) {
       queries,
       flows,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-3.5-turbo-0125',
-    response_format: { type: 'json_object' },
-    temperature: 0.1,
+    model: 'gpt-4',
   })
   return JSON.parse(completion.choices[0].message.content)
 }
@@ -46,8 +42,7 @@ export async function extractParams(query, schema) {
       query,
       schema,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-3.5-turbo-0125',
-    response_format: { type: 'json_object' },
+    model: 'gpt-4',
   })
   return JSON.parse(completion.choices[0].message.content)
 }
