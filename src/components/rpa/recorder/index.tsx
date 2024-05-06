@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { mergeInputEvents } from '../utils/merge-input-events'
-import { discardClickInputEvents } from '../utils/discard-click-input-events'
+import { filterInputEvents } from '../utils/filter-events'
 import { generateMetadata } from '../utils/groq'
 import { createFlow } from '../utils/supabase'
 import { Events } from '../events'
@@ -15,6 +14,7 @@ import { Typography } from '~components/typography'
 export function FlowRecorder() {
   const [recording, setRecording] = useState(false)
   const [eventsRecorded, setEventsRecorded] = useState([])
+  const [eventsMap, setEventsMap] = useState(new Map())
 
   useEffect(() => listenEvents(recordEvent, recording), [recording])
   useEffect(() => {
@@ -40,9 +40,14 @@ export function FlowRecorder() {
   }
 
   function recordEvent(event) {
-    setEventsRecorded((prevEvents) =>
-      discardClickInputEvents(mergeInputEvents([...prevEvents, event])),
-    )
+    const { selector, type } = event
+
+    setEventsMap((prevMap) => {
+      const prevEvents = prevMap.get(selector) || []
+      const newEvents = type === 'input' ? [event] : [...prevEvents, event]
+
+      return new Map(prevMap).set(selector, newEvents)
+    })
   }
 
   function removeEvent(event) {
@@ -74,13 +79,13 @@ export function FlowRecorder() {
         flex flex-col justify-end gap-2 px-4 py-2
         w-full absolute bottom-0 border bg-slate-50`}
     >
-      {recording && !eventsRecorded?.length && (
+      {recording && !eventsMap?.size && (
         <Typography className='w-full text-center mb-5'>Recording events...</Typography>
       )}
-      {eventsRecorded?.length > 0 && (
+      {eventsMap?.size > 0 && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={cancelRecording} />
-          <Events events={eventsRecorded} removeEvent={removeEvent} />
+          <Events eventsMap={eventsMap} removeEvent={removeEvent} />
         </div>
       )}
       <RecordButton onClick={toggleRecording} recording={recording} />

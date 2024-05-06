@@ -3,10 +3,20 @@ import { getHref } from './find-href'
 import { getValue } from './get-value'
 import { getContent } from './get-content'
 import { debounceEvent } from './process-queue'
+import { detectRageClicks } from '../utils/filter-events'
 
 function eventHandler(callback) {
+
+  // const rageClickDetector = detectRageClicks(event, (target, unsubscribe) => {
+  //   // Handle rage click detection
+  //   console.log('Rage click detected on:', target)
+  //   unsubscribe()
+  // })
+
+  // rageClickDetector()
+
+
   return (event) => {
-    // console.log(222, event)
     const { type, target } = event
     const selector = getSelector(target)
 
