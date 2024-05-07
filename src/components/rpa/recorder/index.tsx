@@ -49,10 +49,7 @@ export function FlowRecorder() {
 
     setEventsMap((prevMap) => {
       const prevEvents = prevMap.get(selector) || []
-      const start_dependencies = getStartDependencies(prevEvents, event)
-      const newEvents =
-        type === 'input' ? [event] : [...prevEvents, { ...event, start_dependencies }]
-
+      const newEvents = [...prevEvents, event]
       return new Map(prevMap).set(selector, newEvents)
     })
   }
@@ -77,9 +74,11 @@ export function FlowRecorder() {
     const flow = await generateMetadata(eventsRecorded)
 
     flow.events = eventsRecorded.map((event, index) => {
+      const start_dependencies = getStartDependencies(eventsRecorded, event)
       const end_dependencies = getEndDependencies(eventsRecorded, event)
       return {
         ...event,
+        start_dependencies,
         end_dependencies,
         event_name: flow.events[index]?.event_name,
         event_description: flow.events[index]?.event_description,

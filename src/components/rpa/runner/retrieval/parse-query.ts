@@ -33,7 +33,7 @@ export async function parseQuery(query, flows) {
 function addFlowDependencies(flowIds, flows) {
   return flowIds.map((flow) => {
     const eventDependencies = {}
-    flow.eventIds.forEach((eventId) => {
+    flow.eventIds?.forEach((eventId) => {
       const event = flows
         .find((f) => f.id === flow.flowId)
         .events.find((e) => e.id === eventId)
@@ -55,9 +55,9 @@ function addFlowDependencies(flowIds, flows) {
 function getFlowStartEventIds(eventIds) {
   const flowStartEventIds = []
   const eventIdsSet = new Set()
-  eventIds.forEach((event) => {
+  eventIds?.forEach((event) => {
     if (event.type === 'flow_start') {
-      event.eventIds.forEach((eventId) => {
+      event.eventIds?.forEach((eventId) => {
         if (!eventIdsSet.has(eventId)) {
           flowStartEventIds.push(eventId)
           eventIdsSet.add(eventId)
@@ -70,7 +70,7 @@ function getFlowStartEventIds(eventIds) {
 
 function getMiddleEvents(eventIds) {
   const middleEvents = []
-  eventIds.forEach((event) => {
+  eventIds?.forEach((event) => {
     if (typeof event === 'string') {
       middleEvents.push(event)
     } else if (event.type === 'event_start' || event.type === 'event_end') {
@@ -83,7 +83,7 @@ function getMiddleEvents(eventIds) {
 function getFlowEndEventIds(eventIds) {
   const flowEndEventIds = []
   const eventIdsSet = new Set()
-  eventIds.forEach((event) => {
+  eventIds?.forEach((event) => {
     if (event.type === 'flow_end') {
       event.eventIds.forEach((eventId) => {
         if (eventIdsSet.has(eventId)) {
