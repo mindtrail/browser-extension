@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { getFlowsToRun } from './retrieval/get-flows-to-run'
 import { runFlows } from './execution/run-flows'
-import { Actions } from '../actions'
+import { Events } from '../events'
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
 
 import { SendHorizonalIcon, Trash2Icon, CheckCheckIcon } from 'lucide-react'
@@ -35,6 +35,7 @@ export function FlowRunner() {
   useEffect(() => {
     const fetchFlows = async () => {
       const { data } = await getFlows()
+      console.log(data)
       setFlows(data)
     }
     fetchFlows()
@@ -117,7 +118,7 @@ export function FlowRunner() {
       </div>
 
       <div className='flex flex-col max-h-[50%] overflow-auto'>
-        <Actions events={currentEvents} readOnly={true} />
+        <Events eventsList={currentEvents} readOnly={true} />
       </div>
 
       {runComplete && flowsRunning?.length > 0 && (

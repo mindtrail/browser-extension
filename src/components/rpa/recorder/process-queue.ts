@@ -1,11 +1,6 @@
-// let lastEventTime = 0
 let eventQueue = []
 let processingQueue = false
 let debounceTimers = new Map()
-
-// export function resetTime() {
-//   lastEventTime = 0
-// }
 
 export function processEvent(event, callback) {
   // const delay = lastEventTime ? event.timeStamp - lastEventTime : 0
@@ -34,6 +29,7 @@ export function debounceEvent(eventKey, event, callback, debounceDuration = 300)
   if (debounceTimers.has(eventKey)) {
     clearTimeout(debounceTimers.get(eventKey))
   }
+
   debounceTimers.set(
     eventKey,
     setTimeout(() => {

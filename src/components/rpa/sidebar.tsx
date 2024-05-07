@@ -1,6 +1,6 @@
 import { useReducer } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { XIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 
 import { Typography } from '~components/typography'
 import { Button } from '~/components/ui/button'
@@ -14,25 +14,28 @@ interface SidebarProps {
 }
 
 export const RightSidebar = ({ setSettings }: SidebarProps) => {
-  const [isSidebarOpen, toggleSidebar] = useReducer((c) => !c, false)
+  const [isSidebarOpen, toggleSidebar] = useReducer((c) => !c, true)
+  const VisibilityIcon = isSidebarOpen ? ChevronDownIcon : ChevronUpIcon
 
   return (
     <div
       className={`font-sans text-foreground fixed right-2 bottom-4 z-50
-        flex flex-col w-80 h-[900px] bg-white border rounded-lg drop-shadow-xl
-        ${!isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+        flex flex-col bg-white border rounded-lg drop-shadow-xl
+        ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-[50px] w-auto'}
       `}
     >
       <div className='flex items-center py-2 px-4 gap-2 border-b'>
         <Button onClick={toggleSidebar} variant='ghost'>
-          <XIcon className='w-4 h-4' />
+          <VisibilityIcon className='w-4 h-4' />
         </Button>
         <Typography variant='h5'>RPA Copilot</Typography>
       </div>
-      <div className='flex flex-col flex-1'>
-        <FlowRunner />
-        <FlowRecorder />
-      </div>
+      {isSidebarOpen && (
+        <div className='flex flex-col flex-1'>
+          <FlowRunner />
+          <FlowRecorder />
+        </div>
+      )}
     </div>
   )
 }

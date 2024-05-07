@@ -8,31 +8,46 @@ function eventHandler(callback) {
   return (event) => {
     const { type, target } = event
     const selector = getSelector(target)
+
+    if (!target || (selector && selector?.includes('plasmo-csui'))) {
+      return
+    }
+
+    // Skip click events in input fields
+    if (
+      type === 'click' &&
+      (target?.nodeName === 'INPUT' || target?.nodeName === 'TEXTAREA')
+    ) {
+      return
+    }
+
     const href = type === 'click' ? getHref(target) : null
     const value = getValue({ type, target })
     const textContent = getContent({ type, target })
     const timeStamp = Date.now()
+    const eventKey = `${type}-${selector}`
 
-    if (selector && !selector.includes('plasmo-csui')) {
-      const eventKey = `${type}-${selector}-${timeStamp}`
-      const eventDetails = {
-        id: `${timeStamp}`,
-        type,
-        selector,
-        // timeStamp,
-        ...(value !== null && { value }),
-        ...(textContent !== null && { textContent }),
-        ...(target.name !== null && { name: target.name }),
-        ...(target.baseURI !== null && { baseURI: target.baseURI }),
-        ...(href !== null && { href }),
-      }
-      debounceEvent(eventKey, eventDetails, callback)
+    const eventDetails = {
+      id: `${timeStamp}`,
+      type,
+      selector,
+      ...(value !== null && { value }),
+      ...(textContent !== null && { textContent }),
+      ...(target.name !== null && { name: target.name }),
+      ...(target.baseURI !== null && { baseURI: target.baseURI }),
+      ...(href !== null && { href }),
     }
+
+    debounceEvent(eventKey, eventDetails, callback)
   }
 }
 
+let handler = null
+
 export function listenEvents(callback, shouldListen) {
-  const handler = eventHandler(callback)
+  if (!handler) {
+    handler = eventHandler(callback)
+  }
 
   if (shouldListen) {
     document.addEventListener('click', handler)
@@ -40,10 +55,12 @@ export function listenEvents(callback, shouldListen) {
   } else {
     document.removeEventListener('click', handler)
     document.removeEventListener('input', handler)
+    handler = null
   }
 
   return () => {
     document.removeEventListener('click', handler)
     document.removeEventListener('input', handler)
+    handler = null // Reset handler after removing listeners
   }
 }
