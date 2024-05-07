@@ -16,7 +16,7 @@ export function onFlowsChange(onChange) {
 }
 
 export async function getFlows() {
-  return supabase.from('flows').select('*')
+  return supabase.from('flows').select('*').order('created_at', { ascending: false })
 }
 
 export async function createFlow(flow) {
@@ -25,4 +25,8 @@ export async function createFlow(flow) {
 
 export async function deleteFlow(id) {
   return supabase.from('flows').delete().match({ id })
+}
+
+export async function updateFlow(id, flow) {
+  return supabase.from('flows').update(flow).match({ id })
 }

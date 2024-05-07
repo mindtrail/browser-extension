@@ -21,7 +21,7 @@ interface RunItemProps {
   runnerContainerRef: React.RefObject<HTMLDivElement>
   runFlow: (flowId: string) => Promise<void>
   removeFlow: (flowId: string) => void
-  updateFlowName: (flowId: string, name: string) => Promise<void>
+  updateFlowName: (flowId: string, flow: any) => any
 }
 
 export function RunItem(props: RunItemProps) {
@@ -70,7 +70,7 @@ export function RunItem(props: RunItemProps) {
 
   const handleUpdateFlowName = useCallback(async () => {
     setIsSaving(true)
-    await updateFlowName(flowId, flowName)
+    await updateFlowName(flowId, { ...flow, name: flowName })
     setIsRenaming(false)
     setIsSaving(false)
   }, [flowId, flowName, updateFlowName])
@@ -82,9 +82,10 @@ export function RunItem(props: RunItemProps) {
       {!isRenaming ? (
         <Typography
           variant='small'
-          className={`w-full line-clamp-2 h-auto justify-start text-left px-4 py-4 cursor-default bg-slate-50 rounded
-        ${flowsRunning?.includes(flowId) ? 'text-primary' : 'text-foreground/70'}
-        `}
+          className={`w-full line-clamp-2 h-auto justify-start text-left
+            px-4 py-4 cursor-default bg-slate-50 rounded
+            ${flowsRunning?.includes(flowId) ? 'text-primary' : 'text-foreground/70'}
+          `}
         >
           {name}
         </Typography>
@@ -96,6 +97,7 @@ export function RunItem(props: RunItemProps) {
             className='pr-12 my-2'
             value={flowName}
             onChange={(e) => setFlowName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleUpdateFlowName()}
           />
           <Button
             variant='ghost'
