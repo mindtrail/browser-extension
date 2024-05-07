@@ -73,3 +73,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+#plasmo-shadow-container {
+  z-index: 999 !important;
+}
