@@ -8,36 +8,42 @@ const EVENT_ICONS = {
 }
 
 interface EventProps {
-  eventsMap: Map<string, any[]>
-  removeEvent: (event: any) => void
+  eventsMap?: Map<string, any[]>
+  eventsList?: any[]
+  removeEvent?: (event: any) => void
   debugMode?: boolean
   readOnly?: boolean
 }
 
 export function Events(props: EventProps) {
-  const { eventsMap, removeEvent, debugMode = false, readOnly = false } = props
+  const {
+    eventsMap,
+    eventsList = [],
+    removeEvent,
+    debugMode = false,
+    readOnly = false,
+  } = props
 
-  if (!eventsMap?.size) return
+  if (!eventsMap?.size && !eventsList?.length) return
 
-  const eventList = []
+  const eventsToDisplay = []
+  const collectionToIterate = readOnly ? eventsList : eventsMap
 
-  eventsMap.forEach((eventsArray) => {
-    const event = eventsArray[0]
+  collectionToIterate.forEach((eventsArray) => {
+    const event = readOnly ? eventsArray : eventsArray[0]
     const value = event.value || event.textContent
 
-    eventList.push({
+    eventsToDisplay.push({
       ...event,
       value: debugMode ? `${event.selector}: ${value}` : value,
       icon: EVENT_ICONS[event.type] || EVENT_ICONS.default,
-      count: eventsArray.length,
+      count: readOnly ? eventsArray.length : undefined,
     })
   })
 
-  // console.log(222, eventList)
-
   return (
     <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
-      {eventList.map((event, index) => (
+      {eventsToDisplay.map((event, index) => (
         <Event
           key={index}
           event={event}

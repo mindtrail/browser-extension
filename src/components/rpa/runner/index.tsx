@@ -35,6 +35,7 @@ export function FlowRunner() {
   useEffect(() => {
     const fetchFlows = async () => {
       const { data } = await getFlows()
+      console.log(data)
       setFlows(data)
     }
     fetchFlows()
@@ -117,7 +118,7 @@ export function FlowRunner() {
       </div>
 
       <div className='flex flex-col max-h-[50%] overflow-auto'>
-        <Events events={currentEvents} readOnly={true} />
+        <Events eventsList={currentEvents} readOnly={true} />
       </div>
 
       {runComplete && flowsRunning?.length > 0 && (

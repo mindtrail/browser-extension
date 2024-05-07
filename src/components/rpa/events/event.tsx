@@ -7,7 +7,7 @@ interface Event {
   type: string
   value: string
   icon: typeof Trash2Icon
-  count: number
+  count?: number
 }
 
 interface EventProps {
@@ -76,7 +76,7 @@ function rageClick(event) {
     console.log('rage click on element ' + clickedObject)
     //newrelic.addPageAction(clickedObject, 1);
   }
-  
+
   secondLastClick = lastClick
   lastClick = now
   console.log(event.type + ' ' + now)
