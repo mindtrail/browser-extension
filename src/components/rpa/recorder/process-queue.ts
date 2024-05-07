@@ -25,7 +25,7 @@ export function processQueue() {
   processNextEvent()
 }
 
-export function debounceEvent(eventKey, event, callback, debounceDuration = 300) {
+export function debounceEvent(eventKey, event, callback, debounceDuration = 1000) {
   if (debounceTimers.has(eventKey)) {
     clearTimeout(debounceTimers.get(eventKey))
   }
