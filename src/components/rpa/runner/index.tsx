@@ -1,25 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { SearchIcon } from 'lucide-react'
 
-import { SendHorizonalIcon, SearchIcon, CheckCheckIcon } from 'lucide-react'
-import { Button } from '~components/ui/button'
 import { Input } from '~/components/ui/input'
-import { Typography } from '~components/typography'
 
 import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
-import { Events } from '../events'
 import { getFlowsToRun } from './retrieval/get-flows-to-run'
 import { runFlows } from './execution/run-flows'
-import { FlowItem } from './flow-item'
-
-const mock_event = {
-  id: Date.now(),
-  delay: 0,
-  name: '',
-  selector: 'label > button',
-  textContent: 'BUTTON',
-  type: 'click',
-  value: undefined,
-}
+import { RunItem } from './run-item'
 
 export function FlowRunner() {
   const [currentEvents, setCurrentEvents] = useState([])
@@ -27,6 +14,8 @@ export function FlowRunner() {
   const [flows, setFlows] = useState([])
   const [flowsRunning, setFlowsRunning] = useState([])
   const [runComplete, setRunComplete] = useState(false)
+
+  const runnerContainerRef = useRef(null)
 
   useEffect(() => {
     const fetchFlows = async () => {
@@ -65,7 +54,10 @@ export function FlowRunner() {
 
   return (
     <>
-      <div className=' flex flex-col gap-4 px-4 py-4 overflow-auto'>
+      <div
+        ref={runnerContainerRef}
+        className=' flex flex-col gap-4 px-4 py-4 overflow-auto'
+      >
         <form
           className='flex items-center'
           onSubmit={(e) => {
@@ -85,30 +77,18 @@ export function FlowRunner() {
         </form>
         <div className='flex flex-col gap-2'>
           {flows?.map((flow, index) => (
-            <FlowItem
+            <RunItem
               key={index}
               flow={flow}
               flowsRunning={flowsRunning}
+              runComplete={runComplete}
               runFlow={runFlow}
               removeFlow={removeFlow}
+              runnerContainerRef={runnerContainerRef}
             />
           ))}
         </div>
       </div>
-
-      <div className='flex flex-col max-h-[50%] overflow-auto'>
-        <Events eventsList={currentEvents} readOnly={true} />
-      </div>
-
-      {runComplete && flowsRunning?.length > 0 && (
-        <Typography
-          variant='small-semi'
-          className='flex items-center gap-2 px-6 text-primary'
-        >
-          <CheckCheckIcon className='w-5 h-5' />
-          Run complete
-        </Typography>
-      )}
     </>
   )
 }

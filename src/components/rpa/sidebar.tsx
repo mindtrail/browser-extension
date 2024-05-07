@@ -19,7 +19,7 @@ export const RightSidebar = ({ setSettings }: SidebarProps) => {
 
   return (
     <div
-      className={`font-sans text-foreground fixed right-2 bottom-4 z-50
+      className={`font-sans text-foreground fixed right-2 bottom-4
         flex flex-col bg-white border rounded-lg drop-shadow-xl
         ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-[50px] w-auto'}
       `}

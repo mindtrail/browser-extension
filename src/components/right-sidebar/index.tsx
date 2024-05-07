@@ -98,7 +98,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
 
   return (
     <div
-      className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12
+      className={`z-20 fixed group -right-8 drop-shadow-xl w-12 h-12
         flex flex-col justify-center ${YPos}`}
     >
       <div

@@ -1,4 +1,5 @@
 import cssText from 'data-text:~style.css'
+import type { PlasmoGetStyle } from 'plasmo'
 
 import { useEffect, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
@@ -13,7 +14,7 @@ import { DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
 
 // Needed to inject the CSS into the page
-export const getStyle = () => {
+export const getStyle: PlasmoGetStyle = () => {
   const style = document.createElement('style')
   style.textContent = cssText
   return style
