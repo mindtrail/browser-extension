@@ -50,17 +50,17 @@ export function listenEvents(callback, shouldListen) {
   }
 
   if (shouldListen) {
-    document.addEventListener('click', handler)
-    document.addEventListener('input', handler)
+    document.addEventListener('click', handler, true)
+    document.addEventListener('input', handler, true)
   } else {
-    document.removeEventListener('click', handler)
-    document.removeEventListener('input', handler)
+    document.removeEventListener('click', handler, true)
+    document.removeEventListener('input', handler, true)
     handler = null
   }
 
   return () => {
-    document.removeEventListener('click', handler)
-    document.removeEventListener('input', handler)
+    document.removeEventListener('click', handler, true)
+    document.removeEventListener('input', handler, true)
     handler = null // Reset handler after removing listeners
   }
 }
