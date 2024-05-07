@@ -97,14 +97,17 @@ export function FlowRecorder() {
         flex flex-col justify-end gap-2 px-4 py-2
         w-full absolute bottom-0 border bg-slate-50`}
     >
-      {recording && !eventsMap?.size && (
-        <Typography className='w-full text-center mb-5'>Recording events...</Typography>
-      )}
-      {eventsMap?.size > 0 && (
+      {recording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={cancelRecording} />
           <Events eventsMap={eventsMap} removeEvent={removeEvent} />
         </div>
+      )}
+
+      {recording && !eventsMap?.size && (
+        <Typography className='w-full text-center mb-6'>
+          {paused ? 'Paused Recording' : 'Recording Workflow...'}
+        </Typography>
       )}
 
       {saving ? (

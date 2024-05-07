@@ -1,6 +1,6 @@
-import { CirclePauseIcon } from 'lucide-react'
+import { CirclePauseIcon, SaveIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
-import { RecordIcon, SaveRecordingIcon } from '~/components/icons/record'
+import { RecordIcon } from '~/components/icons/record'
 
 interface RecordButtonProps {
   onToggle: () => void
@@ -30,7 +30,7 @@ export function RecordButton(props: RecordButtonProps) {
         variant='default'
         onClick={onToggle}
       >
-        <SaveRecordingIcon className='w-5 h-5 ' />
+        <SaveIcon className='w-5 h-5 ' />
         Save
       </Button>
     </div>
