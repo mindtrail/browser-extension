@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 import { EllipsisVerticalIcon, CirclePlayIcon, SaveIcon } from 'lucide-react'
 import { Button } from '~components/ui/button'
@@ -39,6 +39,34 @@ export function RunItem(props: RunItemProps) {
   const [isRenaming, setIsRenaming] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [flowName, setFlowName] = useState(name)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!isRenaming) return
+
+    const shadowRoot = inputRef.current.getRootNode() as ShadowRoot
+    const handleClickOutsideOrEscape = (event: KeyboardEvent | MouseEvent) => {
+      if (
+        (event instanceof KeyboardEvent && event.key === 'Escape') ||
+        (event instanceof MouseEvent &&
+          event.target !== inputRef.current &&
+          (event.target as HTMLElement).nodeName !== 'PLASMO-CSUI')
+      ) {
+        setIsRenaming(false)
+        setFlowName(name)
+      }
+    }
+
+    window.addEventListener('keydown', handleClickOutsideOrEscape)
+    window.addEventListener('click', handleClickOutsideOrEscape)
+    shadowRoot.addEventListener('click', handleClickOutsideOrEscape)
+
+    return () => {
+      window.removeEventListener('keydown', handleClickOutsideOrEscape)
+      window.removeEventListener('click', handleClickOutsideOrEscape)
+      shadowRoot.removeEventListener('click', handleClickOutsideOrEscape)
+    }
+  }, [isRenaming])
 
   const handleUpdateFlowName = useCallback(async () => {
     setIsSaving(true)
@@ -63,7 +91,9 @@ export function RunItem(props: RunItemProps) {
       ) : (
         <>
           <Input
-            className='pr-12'
+            ref={inputRef}
+            autoFocus
+            className='pr-12 my-2'
             value={flowName}
             onChange={(e) => setFlowName(e.target.value)}
           />
