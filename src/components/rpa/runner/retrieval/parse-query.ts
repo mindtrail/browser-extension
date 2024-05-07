@@ -1,4 +1,4 @@
-import { detectFlow, splitQuery } from '../../utils/openai'
+import { detectFlow, splitQuery } from '../../utils/groq'
 import { groupByFlowAndQuery } from './group-by-flow'
 
 export async function parseQuery(query, flows) {

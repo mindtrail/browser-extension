@@ -17,6 +17,7 @@ export async function splitQuery(query) {
         query,
       ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
       model: 'gpt-4',
+      temperature: 0.1,
     })
     return JSON.parse(completion.choices[0].message.content)
   } catch (error) {
@@ -31,6 +32,7 @@ export async function detectFlow(queries, flows) {
       flows,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4',
+    temperature: 0.1,
   })
   return JSON.parse(completion.choices[0].message.content)
 }
@@ -43,6 +45,7 @@ export async function extractParams(query, schema) {
       schema,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4',
+    temperature: 0.1,
   })
   return JSON.parse(completion.choices[0].message.content)
 }
@@ -53,6 +56,7 @@ export async function generateMetadata(query) {
       query,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4',
+    temperature: 0.1,
   })
   return JSON.parse(completion.choices[0].message.content)
 }
