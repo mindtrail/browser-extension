@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react'
 
-import { getFlowsToRun } from './retrieval/get-flows-to-run'
-import { runFlows } from './execution/run-flows'
-import { Events } from '../events'
-import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
-
-import { SendHorizonalIcon, Trash2Icon, CheckCheckIcon } from 'lucide-react'
+import { SendHorizonalIcon, SearchIcon, CheckCheckIcon } from 'lucide-react'
 import { Button } from '~components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Typography } from '~components/typography'
 
-type RunFlowParams = {
-  flowId?: string
-  query?: string
-}
+import { getFlows, onFlowsChange, deleteFlow } from '../utils/supabase'
+import { Events } from '../events'
+import { getFlowsToRun } from './retrieval/get-flows-to-run'
+import { runFlows } from './execution/run-flows'
+import { FlowItem } from './flow-item'
 
 const mock_event = {
   id: Date.now(),
@@ -35,18 +31,17 @@ export function FlowRunner() {
   useEffect(() => {
     const fetchFlows = async () => {
       const { data } = await getFlows()
-      console.log(data)
       setFlows(data)
     }
     fetchFlows()
     return onFlowsChange(fetchFlows)
   }, [])
 
-  async function runFlow({ flowId, query }: RunFlowParams) {
+  async function runFlow(flowId: string) {
     if (flowsRunning?.length > 0) return
 
     const flowsToRun = await getFlowsToRun({ flows, flowId, query })
-    setFlowsRunning(flowsToRun.map((flow) => flow.flowId))
+    setFlowsRunning(flowsToRun.map((flow) => flow?.flowId))
 
     setRunComplete(false)
     await runFlows({
@@ -75,44 +70,28 @@ export function FlowRunner() {
           className='flex items-center'
           onSubmit={(e) => {
             e.preventDefault()
-            runFlow({ query })
+            // runFlow({ query })
           }}
         >
           <Input
             disabled={flowsRunning?.length > 0}
-            placeholder='Type flow to run'
+            placeholder='Search Flow'
             className='w-full pl-4 pr-10 border border-gray-300 rounded'
             value={`${flowsRunning?.length ? 'Running ' : ''}${query}`}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button
-            variant='ghost'
-            disabled={flowsRunning?.length > 0}
-            className={`${query?.length > 2 && '!visible'} invisible absolute right-4`}
-            type='submit'
-          >
-            <SendHorizonalIcon className='w-4 h-4 text-primary' />
-          </Button>
+
+          <SearchIcon className='w-4 h-4 absolute right-8 text-foreground/50' />
         </form>
         <div className='flex flex-col gap-2'>
-          {flows?.map(({ id: flowId, name }) => (
-            <div key={flowId} className='flex items-center relative group/runner'>
-              <Button
-                variant={flowsRunning?.includes(flowId) ? 'default' : 'secondary'}
-                className='w-full line-clamp-2 h-auto justify-start text-left'
-                onClick={() => runFlow({ flowId: flowId, query })}
-              >
-                {name}
-              </Button>
-              <Button
-                variant='ghost'
-                className={`absolute right-0 rounded opacity-0
-                group-hover/runner:opacity-100 transition ease-in-out`}
-                onClick={() => removeFlow(flowId)}
-              >
-                <Trash2Icon className='w-4 h-4 text-foreground/70' />
-              </Button>
-            </div>
+          {flows?.map((flow, index) => (
+            <FlowItem
+              key={index}
+              flow={flow}
+              flowsRunning={flowsRunning}
+              runFlow={runFlow}
+              removeFlow={removeFlow}
+            />
           ))}
         </div>
       </div>
