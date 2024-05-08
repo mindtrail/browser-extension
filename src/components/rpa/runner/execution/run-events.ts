@@ -4,6 +4,7 @@ const delay = 1000 // or event.delay
 
 export async function runEvents({ flowId, events, data = {}, onEvent }) {
   console.log('runEvents', flowId, events, data)
+  events = structuredClone(events)
   for (const event of events) {
     event.value = data[event.name] || event.value
 
