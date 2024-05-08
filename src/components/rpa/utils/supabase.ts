@@ -16,7 +16,7 @@ export function onFlowsChange(onChange) {
 }
 
 export async function getFlows() {
-  return supabase.from('flows').select('*').order('created_at', { ascending: false })
+  return supabase.from('flows').select('*').order('created_at', { ascending: true })
 }
 
 export async function createFlow(flow) {
