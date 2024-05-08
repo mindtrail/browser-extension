@@ -12,6 +12,7 @@ export function FlowRunner() {
   const [query, setQuery] = useState('')
   const [flows, setFlows] = useState([])
   const [flowsRunning, setFlowsRunning] = useState([])
+  const [eventsRunning, setEventsRunning] = useState(new Map())
 
   const runnerContainerRef = useRef(null)
 
@@ -34,12 +35,16 @@ export function FlowRunner() {
       flows,
       flowsToRun,
       query,
-      onEvent: (event) => console.log('success', event),
-      // onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
+      onEvent: (flowId, event) =>
+        setEventsRunning((prevEventsMap) => {
+          const prevEvents = prevEventsMap.get(flowId) || []
+          return new Map(prevEventsMap).set(flowId, [...prevEvents, event])
+        }),
     })
 
     setTimeout(() => {
       setFlowsRunning([])
+      setEventsRunning(new Map())
     }, 2500)
   }
 
@@ -80,6 +85,7 @@ export function FlowRunner() {
               removeFlow={removeFlow}
               runnerContainerRef={runnerContainerRef}
               updateFlowName={updateFlow}
+              eventsRunning={eventsRunning}
             />
           ))}
         </div>

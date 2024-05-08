@@ -56,7 +56,7 @@ async function initAutoSave() {
     const savedWebsites = (await storage.get(STORAGE_KEY.SAVED_WEBSITES)) as string[]
     const pageBaseURL = getBaseResourceURL(window.location.href)
 
-    if (savedWebsites.includes(pageBaseURL)) {
+    if (savedWebsites?.includes(pageBaseURL)) {
       return
     }
 

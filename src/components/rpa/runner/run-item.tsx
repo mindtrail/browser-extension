@@ -26,17 +26,27 @@ interface RunItemProps {
   runFlow: (flowId: string) => Promise<void>
   removeFlow: (flowId: string) => void
   updateFlowName: (flowId: string, flow: any) => any
+  eventsRunning: Map<string, any[]>
 }
 
 export function RunItem(props: RunItemProps) {
-  const { flow, flowsRunning, runnerContainerRef, runFlow, removeFlow, updateFlowName } =
-    props
+  const {
+    flow,
+    flowsRunning,
+    runnerContainerRef,
+    eventsRunning,
+    runFlow,
+    removeFlow,
+    updateFlowName,
+  } = props
 
   const { id: flowId, name: initialName, events } = flow
   const [isRenaming, setIsRenaming] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [flowName, setFlowName] = useState(initialName)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const eventsList = eventsRunning.get(flowId)
 
   useEffect(() => {
     if (!isRenaming) return
@@ -78,7 +88,7 @@ export function RunItem(props: RunItemProps) {
   if (!flowId) return null
 
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex flex-col gap-2 overflow-auto'>
       <div className='flex items-center relative group/runner'>
         {!isRenaming ? (
           <Typography
@@ -157,13 +167,11 @@ export function RunItem(props: RunItemProps) {
           </div>
         )}
       </div>
-      {flowsRunning?.length > 0 && (
+      {flowsRunning?.includes(flowId) && (
         <>
-          <div className='flex flex-col max-h-[50%] overflow-auto'>
-            <Events eventsList={events} readOnly={true} />
-          </div>
+          <Events eventsList={eventsList} readOnly={true} />
 
-          {flowsRunning?.length > 0 && (
+          {eventsList?.length === events?.length && (
             <Typography
               variant='small-semi'
               className='flex items-center gap-2 px-6 text-primary'

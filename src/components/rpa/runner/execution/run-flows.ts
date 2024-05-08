@@ -13,6 +13,7 @@ export async function runFlows({ flows, flowsToRun, query, onEvent }) {
 
     const data = await extractParams(query, buildParamsSchema(events))
     await runEvents({
+      flowId,
       events,
       data,
       onEvent,
