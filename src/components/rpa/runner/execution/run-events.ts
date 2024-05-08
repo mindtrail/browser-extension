@@ -1,6 +1,6 @@
 import { simulateEvent } from './simulate-events'
 
-const delay = 1000 // or event.delay
+const delay = 500 // or event.delay
 
 export async function runEvents({ flowId, events, data = {}, onEvent }) {
   console.log('runEvents', flowId, events, data)

@@ -1,9 +1,11 @@
 export function buildParamsSchema(events) {
-  const inputData = {}
+  const schema = {}
   events.forEach((event) => {
     if (event.type === 'input' && event.name) {
-      inputData[event.name] = ''
+      const type = event.targetType === 'number' ? event.targetType : 'string'
+      schema[event.name] = type
     }
   })
-  return inputData
+  console.log('schema', schema)
+  return schema
 }

@@ -38,7 +38,7 @@ export const extractParamsPrompt = (query, schema) => [
     content: `You are a tool that outputs as JSON the properties extracted from a query to be used in a RPA tool to fill the input fields. Always respond in this JSON array format: [${JSON.stringify(
       schema,
     )}]
-      Output Requirement: Only respond with JSON array format and absolute no explanation.
+      Output Requirement: Only respond with JSON array format and absolute no explanation. If there is no data to extract generate data based on query.
       Output: Response should always be a JSON array object in this format: [{property1: value1, property2: value2, etc.}]
     `,
   },

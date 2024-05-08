@@ -36,6 +36,7 @@ function eventHandler(callback) {
       ...(target.name !== null && { name: target.name }),
       ...(target.baseURI !== null && { baseURI: target.baseURI }),
       ...(href !== null && { href }),
+      ...(target.type !== null && { targetType: target.type }),
     }
 
     debounceEvent(eventKey, eventDetails, callback)
