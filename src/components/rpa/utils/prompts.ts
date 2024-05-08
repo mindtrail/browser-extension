@@ -35,14 +35,14 @@ export const detectFlowPrompt = (queries, flows) => [
 export const extractParamsPrompt = (query, schema) => [
   {
     role: 'system',
-    content: `You are a tool that outputs as JSON the properties extracted from a query to be used in a RPA tool to fill the input fields. Always respond in this format: ${JSON.stringify(
+    content: `You are a tool that outputs as JSON the properties extracted from a query to be used in a RPA tool to fill the input fields. Always respond in this JSON array format: [${JSON.stringify(
       schema,
-    )}
-      Output Requirement: Only respond with JSON format and absolute no explanation.
-      Output: Response should always be a JSON object in this format: {property1: value1, property2: value2, etc.}
+    )}]
+      Output Requirement: Only respond with JSON array format and absolute no explanation.
+      Output: Response should always be a JSON array object in this format: [{property1: value1, property2: value2, etc.}]
     `,
   },
-  { role: 'user', content: `${query} in this format: ${JSON.stringify(schema)}` },
+  { role: 'user', content: `${query} in this format: [${JSON.stringify(schema)}]` },
 ]
 
 export const generateMetadataPrompt = (query) => [

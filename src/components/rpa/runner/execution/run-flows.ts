@@ -11,12 +11,14 @@ export async function runFlows({ flows, flowsToRun, query, onEvent }) {
 
     events.sort((a, b) => eventIds.indexOf(a.id) - eventIds.indexOf(b.id))
 
-    const data = await extractParams(query, buildParamsSchema(events))
-    await runEvents({
-      flowId,
-      events,
-      data,
-      onEvent,
-    })
+    const dataArr = await extractParams(query, buildParamsSchema(events))
+    for (const data of dataArr) {
+      await runEvents({
+        flowId,
+        events,
+        data,
+        onEvent,
+      })
+    }
   }
 }
