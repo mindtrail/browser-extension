@@ -9,11 +9,9 @@ import { runFlows } from './execution/run-flows'
 import { RunItem } from './run-item'
 
 export function FlowRunner() {
-  const [currentEvents, setCurrentEvents] = useState([])
   const [query, setQuery] = useState('')
   const [flows, setFlows] = useState([])
   const [flowsRunning, setFlowsRunning] = useState([])
-  const [runComplete, setRunComplete] = useState(false)
 
   const runnerContainerRef = useRef(null)
 
@@ -32,24 +30,21 @@ export function FlowRunner() {
     const flowsToRun = await getFlowsToRun({ flows, flowId, query })
     setFlowsRunning(flowsToRun.map((flow) => flow?.flowId))
 
-    setRunComplete(false)
     await runFlows({
       flows,
       flowsToRun,
       query,
-      onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
+      onEvent: (event) => console.log('success', event),
+      // onEvent: (event) => setCurrentEvents((prevEvents) => [...prevEvents, event]),
     })
-    setRunComplete(true)
 
     setTimeout(() => {
       setFlowsRunning([])
-      setCurrentEvents([])
     }, 2500)
   }
 
   async function removeFlow(id) {
     await deleteFlow(id)
-    setCurrentEvents([])
   }
 
   return (
@@ -81,7 +76,6 @@ export function FlowRunner() {
               key={index}
               flow={flow}
               flowsRunning={flowsRunning}
-              runComplete={runComplete}
               runFlow={runFlow}
               removeFlow={removeFlow}
               runnerContainerRef={runnerContainerRef}
