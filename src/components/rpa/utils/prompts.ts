@@ -32,17 +32,51 @@ export const detectFlowPrompt = (queries, flows) => [
   },
 ]
 
-export const extractParamsPrompt = (query, schema) => [
+export const extractParamsPrompt = ({ query, schema, entities }) => [
   {
     role: 'system',
     content: `You are a tool that outputs as JSON the properties extracted from a query to be used in a RPA tool to fill the input fields. Always respond in this JSON array format: [${JSON.stringify(
       schema,
     )}]
-      Output Requirement: Only respond with JSON array format and absolute no explanation. If there is no data to extract generate data based on query.
+      Output Requirement: Only respond with JSON array format and absolute no explanation. If there is no data to extract generate data based on query and entities: ${JSON.stringify(
+        entities,
+      )}
       Output: Response should always be a JSON array object in this format: [{property1: value1, property2: value2, etc.}]
     `,
   },
   { role: 'user', content: `${query} in this format: [${JSON.stringify(schema)}]` },
+]
+
+export const searchPrompt = ({ query, entities }) => [
+  {
+    role: 'system',
+    content: `You are a tool that filters an array based on the given query.
+      Output Requirement: Only respond with JSON array format and absolute no explanation. Array should contain indexes of the entities that match the query.
+      Output: Response should always be a JSON array in this format: [index, index, etc.]
+    `,
+  },
+  {
+    role: 'user',
+    content: `Filter this array: ${JSON.stringify(
+      entities,
+    )} based on this query: ${query}`,
+  },
+]
+
+export const extractPropertiesPrompt = ({ entities }) => [
+  {
+    role: 'system',
+    content: `You are a tool that generates relevant, generic (not specific to any entity) property keys based on the given JSON array. The keys will be used for extracting data from the JSON array. If no better alternative then default key name should be: "name".
+      Output Requirement: Only respond with JSON array of strings and absolute no explanation. Array should contain relevant, generic (not specific to any entity), generated key names as replacements only for this pattern: "__unknown_property_<propertyIndex>__". Skip those keys that don't have this pattern: "__unknown_property_<propertyIndex>__".
+      Output: Response should always be a JSON array in this format: ["string", "string", etc.]
+    `,
+  },
+  {
+    role: 'user',
+    content: `Generate relevant, generic (not specific to any entity) property keys for this JSON array: ${JSON.stringify(
+      entities,
+    )}`,
+  },
 ]
 
 export const generateMetadataPrompt = (query) => [

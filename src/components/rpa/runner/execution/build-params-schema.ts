@@ -6,6 +6,5 @@ export function buildParamsSchema(events) {
       schema[event.name] = type
     }
   })
-  console.log('schema', schema)
   return schema
 }

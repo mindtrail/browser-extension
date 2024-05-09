@@ -26,6 +26,8 @@ export function simulateEvent(event) {
       }
     } else if (event.type === 'click') {
       element.click()
+      // const clickEvent = new MouseEvent('click', { bubbles: true, composed: true })
+      // element.dispatchEvent(clickEvent)
     }
   } catch (error) {
     console.error('Error simulating event:', error)

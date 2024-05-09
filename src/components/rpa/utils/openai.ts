@@ -8,6 +8,8 @@ import {
   detectFlowPrompt,
   extractParamsPrompt,
   generateMetadataPrompt,
+  searchPrompt,
+  extractPropertiesPrompt,
 } from './prompts'
 
 export async function splitQuery(query) {
@@ -37,13 +39,39 @@ export async function detectFlow(queries, flows) {
   return JSON.parse(completion.choices[0].message.content)
 }
 
-export async function extractParams(query, schema) {
+export async function extractParams({ query, schema, entities }) {
   if (!query) return {}
   const completion = await openai.chat.completions.create({
-    messages: extractParamsPrompt(
+    messages: extractParamsPrompt({
       query,
       schema,
-    ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+      entities,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4',
+    temperature: 0.1,
+  })
+  return JSON.parse(completion.choices[0].message.content)
+}
+
+export async function search({ query, entities }) {
+  if (!query) return []
+  const completion = await openai.chat.completions.create({
+    messages: searchPrompt({
+      query,
+      entities,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4',
+    temperature: 0.1,
+  })
+  return JSON.parse(completion.choices[0].message.content).map((index) => entities[index])
+}
+
+export async function extractProperties({ entities }) {
+  if (!entities) return []
+  const completion = await openai.chat.completions.create({
+    messages: extractPropertiesPrompt({
+      entities,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4',
     temperature: 0.1,
   })
