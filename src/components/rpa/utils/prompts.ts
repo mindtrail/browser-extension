@@ -12,6 +12,24 @@ export const splitQueryPrompt = (query) => [
   { role: 'user', content: query },
 ]
 
+export const splitNQLPrompt = (query) => [
+  {
+    role: 'system',
+    content: `
+        Role: You are a tool that receives a user query in a custom format (hybrid between SQL and Natural Language = NQL).
+        Task: Split the query and assign each subquery to a category based on NQL syntax: SELECT, UPDATE|CREATE|DELETE. 
+        Output Requirement: Only respond with JSON format and absolute no explanation.
+        Output: Response should always be a JSON array in this format: [{
+          SELECT: [string, string, etc.],
+          UPDATE: [string, string, etc.],
+          CREATE: [string, string, etc.],
+          DELETE: [string, string, etc.]
+        }]
+        `,
+  },
+  { role: 'user', content: query },
+]
+
 export const detectFlowPrompt = (queries, flows) => [
   {
     role: 'system',

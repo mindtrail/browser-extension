@@ -31,7 +31,17 @@ export async function runFlows({ flows, flowsToRun, query, onEvent }) {
       // Update selector for first event to use the entity selector
       const entityEvents = filteredEntities.map((entity) => {
         return events.map((event, index) => {
-          if (index === 0) {
+          if (index === 0 && event.selector.includes('table')) {
+            console.log(
+              'prev Selector',
+              event.selector,
+              document.querySelector(event.selector),
+            )
+            console.log(
+              'new Selector',
+              entity.selector,
+              document.querySelector(entity.selector),
+            )
             return { ...event, selector: entity.selector }
           }
           return event

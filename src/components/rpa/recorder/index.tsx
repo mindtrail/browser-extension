@@ -5,7 +5,7 @@ import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
 
 import { Events } from '../events'
-import { generateMetadata } from '../utils/groq'
+import { generateMetadata } from '../utils/openai'
 import { createFlow } from '../utils/supabase'
 
 import { CancelRecordingButton } from './cancel-recording-button'

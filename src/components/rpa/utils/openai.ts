@@ -10,12 +10,28 @@ import {
   generateMetadataPrompt,
   searchPrompt,
   extractPropertiesPrompt,
+  splitNQLPrompt,
 } from './prompts'
 
 export async function splitQuery(query) {
   try {
     const completion = await openai.chat.completions.create({
       messages: splitQueryPrompt(
+        query,
+      ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+      model: 'gpt-4',
+      temperature: 0.1,
+    })
+    return JSON.parse(completion.choices[0].message.content)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function splitNQL(query) {
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: splitNQLPrompt(
         query,
       ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
       model: 'gpt-4',
@@ -50,7 +66,9 @@ export async function extractParams({ query, schema, entities }) {
     model: 'gpt-4',
     temperature: 0.1,
   })
-  return JSON.parse(completion.choices[0].message.content)
+  const result = completion.choices[0].message.content
+  console.log('extractParams', result)
+  return JSON.parse(result)
 }
 
 export async function search({ query, entities }) {
@@ -75,7 +93,9 @@ export async function extractProperties({ entities }) {
     model: 'gpt-4',
     temperature: 0.1,
   })
-  return JSON.parse(completion.choices[0].message.content)
+  const result = completion.choices[0].message.content
+  console.log('extractProperties', result)
+  return JSON.parse(result)
 }
 
 export async function generateMetadata(query) {
