@@ -1,29 +1,43 @@
-import { useState } from "react"
+import '~style.css'
 
-function IndexSidePanel() {
-  const [data, setData] = useState("")
+import { useEffect, useState } from 'react'
+import { Storage } from '@plasmohq/storage'
+import { useStorage } from '@plasmohq/storage/hook'
+
+import { TooltipProvider } from '~/components/ui/tooltip'
+
+import { ClippingOverlay } from '~/components/clipping'
+import { SidebarRPA } from '~components/rpa/sidebar'
+
+import { DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
+import { isHostExcluded } from '~/lib/utils'
+
+const STORAGE_SETTINGS = {
+  key: STORAGE_KEY.SETTINGS,
+  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+}
+
+const SidePanelRPA = () => {
+  const [overlayVisible, setOverlayVisible] = useState(true)
+  const [settings, setSettings] = useStorage(STORAGE_SETTINGS, DEFAULT_EXTENSION_SETTINGS)
+
+  const { excludeList } = settings
+
+  useEffect(() => {
+    const hostExcluded = isHostExcluded(excludeList)
+    setOverlayVisible(!hostExcluded)
+  }, [excludeList])
+
+  if (!overlayVisible) {
+    return null
+  }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        padding: 16
-      }}>
-      <h2>
-        Welcome to your
-        <a href="https://www.plasmo.com" target="_blank">
-          {" "}
-          Plasmo
-        </a>{" "}
-        Extension!
-      </h2>
-      <input onChange={(e) => setData(e.target.value)} value={data} />
-      <a href="https://docs.plasmo.com" target="_blank">
-        View Docs
-      </a>
-    </div>
+    <TooltipProvider>
+      <ClippingOverlay />
+      <SidebarRPA />
+    </TooltipProvider>
   )
 }
 
-export default IndexSidePanel
+export default SidePanelRPA

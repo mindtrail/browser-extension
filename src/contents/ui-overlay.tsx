@@ -1,5 +1,4 @@
 import cssText from 'data-text:~style.css'
-import type { PlasmoGetStyle } from 'plasmo'
 
 import { useEffect, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
@@ -8,13 +7,14 @@ import { useStorage } from '@plasmohq/storage/hook'
 import { TooltipProvider } from '~/components/ui/tooltip'
 
 import { ClippingOverlay } from '~/components/clipping'
-import { SidebarRPA } from '~/components/rpa/sidebar'
+import { RightSidebar } from '~/components/right-sidebar'
+import { SidebarRPA } from '~components/rpa/sidebar'
 
 import { DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
 
 // Needed to inject the CSS into the page
-export const getStyle: PlasmoGetStyle = () => {
+export const getStyle = () => {
   const style = document.createElement('style')
   style.textContent = cssText
   return style
@@ -28,6 +28,7 @@ const STORAGE_SETTINGS = {
 const UIOverlay = () => {
   const [overlayVisible, setOverlayVisible] = useState(true)
   const [settings, setSettings] = useStorage(STORAGE_SETTINGS, DEFAULT_EXTENSION_SETTINGS)
+
   const { excludeList } = settings
 
   useEffect(() => {
@@ -42,7 +43,8 @@ const UIOverlay = () => {
   return (
     <TooltipProvider>
       <ClippingOverlay />
-      <SidebarRPA settings={settings} setSettings={setSettings} />
+      <RightSidebar settings={settings} setSettings={setSettings} />
+      <SidebarRPA />
     </TooltipProvider>
   )
 }
