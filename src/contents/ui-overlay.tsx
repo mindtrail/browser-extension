@@ -8,7 +8,7 @@ import { useStorage } from '@plasmohq/storage/hook'
 import { TooltipProvider } from '~/components/ui/tooltip'
 
 import { ClippingOverlay } from '~/components/clipping'
-import { RightSidebar } from '~/components/rpa/sidebar'
+import { SidebarRPA } from '~/components/rpa/sidebar'
 
 import { DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
@@ -42,7 +42,7 @@ const UIOverlay = () => {
   return (
     <TooltipProvider>
       <ClippingOverlay />
-      <RightSidebar settings={settings} setSettings={setSettings} />
+      <SidebarRPA settings={settings} setSettings={setSettings} />
     </TooltipProvider>
   )
 }

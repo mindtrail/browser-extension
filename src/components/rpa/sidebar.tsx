@@ -8,12 +8,12 @@ import { Button } from '~/components/ui/button'
 import { FlowRecorder } from './recorder'
 import { FlowRunner } from './runner'
 
-interface SidebarProps {
+interface SidebarRPAProps {
   settings: SettingsStored
   setSettings: Dispatch<SetStateAction<SettingsStored>>
 }
 
-export const RightSidebar = ({ setSettings }: SidebarProps) => {
+export const SidebarRPA = ({ setSettings }: SidebarRPAProps) => {
   const [isSidebarOpen, toggleSidebar] = useReducer((c) => !c, true)
   const VisibilityIcon = isSidebarOpen ? ChevronDownIcon : ChevronUpIcon
 
