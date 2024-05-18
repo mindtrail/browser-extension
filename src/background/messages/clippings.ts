@@ -2,6 +2,16 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 
 // just dummy handler does nothing
-const handler: PlasmoMessaging.MessageHandler = async (req, res) => {}
+
+const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
+  console.log(444, req)
+
+  const message = 'success'
+  res.send({
+    message,
+  })
+}
 
 export default handler
+
+// iklcfefmepaoighpffiniigiehfcdihk

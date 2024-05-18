@@ -82,4 +82,6 @@ declare global {
     html: string
     metadata: Partial<PageData>
   }
+
+  type ContentScriptResponse = (resp: any) => void
 }

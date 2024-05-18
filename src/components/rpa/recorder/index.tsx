@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { sendToBackground } from '@plasmohq/messaging'
+
 import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
@@ -38,10 +40,21 @@ export function FlowRecorder() {
     }
   }, [recording])
 
-  function cancelRecording() {
+  async function cancelRecording() {
     setRecording(false)
     setEventsMap(new Map())
     setPaused(false)
+
+    const resp = await sendToBackground({
+      name: 'clippings',
+      body: {
+        id: 123,
+        message: 'cancel',
+      },
+      extensionId: 'iklcfefmepaoighpffiniigiehfcdihk',
+    })
+
+    console.log('resp', resp)
   }
 
   function recordEvent(event) {
