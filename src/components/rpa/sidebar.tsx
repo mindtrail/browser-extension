@@ -13,9 +13,12 @@ interface SidebarRPAProps {
   setSettings: Dispatch<SetStateAction<SettingsStored>>
 }
 
-export const SidebarRPA = () => {
-  const [isSidebarOpen, toggleSidebar] = useReducer((c) => !c, true)
+export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
+  const { isSidebarOpen } = settings
   const VisibilityIcon = isSidebarOpen ? ChevronDownIcon : ChevronUpIcon
+
+  const toggleSidebar = () =>
+    setSettings((s) => ({ ...s, isSidebarOpen: !s.isSidebarOpen }))
 
   return (
     <div

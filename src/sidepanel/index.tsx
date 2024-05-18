@@ -35,7 +35,7 @@ const SidePanelRPA = () => {
   return (
     <TooltipProvider>
       <ClippingOverlay />
-      <SidebarRPA />
+      <SidebarRPA settings={settings} setSettings={setSettings} />
     </TooltipProvider>
   )
 }

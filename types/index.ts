@@ -12,7 +12,9 @@ declare global {
     saveDelay: number
     excludeList: string[]
     overlayPosition?: OverlayPosition
+    isSidebarOpen?: boolean
   }
+
   interface ClippingRange {
     startContainer: string
     startOffset: number
