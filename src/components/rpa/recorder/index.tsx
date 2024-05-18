@@ -6,7 +6,7 @@ import { Typography } from '~components/typography'
 
 import { Events } from '../events'
 import { generateMetadata } from '../utils/openai'
-import { createFlow } from '../utils/supabase'
+import { createFlow } from '../../../lib/supabase'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
