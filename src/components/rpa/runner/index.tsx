@@ -7,6 +7,10 @@ import { getFlows, onFlowsChange, deleteFlow, updateFlow } from '../utils/supaba
 import { getFlowsToRun } from './retrieval/get-flows-to-run'
 import { runFlows } from './execution/run-flows'
 import { RunItem } from './run-item'
+import { onTaskStart } from './execution/on-task-start'
+import { onEventStart } from './execution/on-event-start'
+import { onEventEnd } from './execution/on-event-end'
+import { onTaskEnd } from './execution/on-task-end'
 
 export function FlowRunner() {
   const [query, setQuery] = useState('')
@@ -22,7 +26,7 @@ export function FlowRunner() {
       setFlows(data)
     }
     fetchFlows()
-    return onFlowsChange(fetchFlows)
+    return onFlowsChange(fetchFlows, 'extension-flows-channel')
   }, [])
 
   async function runFlow(flowId: string) {
@@ -31,20 +35,27 @@ export function FlowRunner() {
     const flowsToRun = await getFlowsToRun({ flows, flowId, query })
     setFlowsRunning(flowsToRun.map((flow) => flow?.flowId))
 
+    const newTask = await onTaskStart(flowId)
     await runFlows({
       flows,
       flowsToRun,
       query,
-      onEvent: (flowId, event) =>
+      onEventStart: async (flowId, event) => {
+        await onEventStart(flowId, event, newTask.id)
+      },
+      onEventEnd: async (flowId, event) => {
+        await onEventEnd(flowId, event, newTask.id)
         setEventsRunning((prevEventsMap) => {
           const prevEvents = prevEventsMap.get(flowId) || []
           return new Map(prevEventsMap).set(flowId, [...prevEvents, event])
-        }),
+        })
+      },
     })
 
-    setTimeout(() => {
+    setTimeout(async () => {
       setFlowsRunning([])
       setEventsRunning(new Map())
+      await onTaskEnd(flowId, newTask.id)
     }, 2500)
   }
 

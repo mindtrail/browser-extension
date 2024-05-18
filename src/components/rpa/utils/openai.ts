@@ -19,8 +19,9 @@ export async function splitQuery(query) {
       messages: splitQueryPrompt(
         query,
       ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-      model: 'gpt-4',
+      model: 'gpt-4o',
       temperature: 0.1,
+      response_format: { type: 'json_object' },
     })
     return JSON.parse(completion.choices[0].message.content)
   } catch (error) {
@@ -34,8 +35,9 @@ export async function splitNQL(query) {
       messages: splitNQLPrompt(
         query,
       ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-      model: 'gpt-4',
+      model: 'gpt-4o',
       temperature: 0.1,
+      response_format: { type: 'json_object' },
     })
     return JSON.parse(completion.choices[0].message.content)
   } catch (error) {
@@ -49,8 +51,9 @@ export async function detectFlow(queries, flows) {
       queries,
       flows,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.1,
+    response_format: { type: 'json_object' },
   })
   return JSON.parse(completion.choices[0].message.content)
 }
@@ -63,8 +66,9 @@ export async function extractParams({ query, schema, entities }) {
       schema,
       entities,
     }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.1,
+    response_format: { type: 'json_object' },
   })
   const result = completion.choices[0].message.content
   console.log('extractParams', result)
@@ -78,10 +82,15 @@ export async function search({ query, entities }) {
       query,
       entities,
     }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.1,
   })
-  return JSON.parse(completion.choices[0].message.content).map((index) => entities[index])
+  const result = JSON.parse(completion.choices[0].message.content)
+  console.log('search', result)
+  if (Array.isArray(result)) {
+    return result.map((index) => entities[index])
+  }
+  return []
 }
 
 export async function extractProperties({ entities }) {
@@ -90,8 +99,9 @@ export async function extractProperties({ entities }) {
     messages: extractPropertiesPrompt({
       entities,
     }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.1,
+    response_format: { type: 'json_object' },
   })
   const result = completion.choices[0].message.content
   console.log('extractProperties', result)
@@ -103,8 +113,11 @@ export async function generateMetadata(query) {
     messages: generateMetadataPrompt(
       query,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.1,
+    response_format: { type: 'json_object' },
   })
-  return JSON.parse(completion.choices[0].message.content)
+  const result = completion.choices[0].message.content
+  console.log('generateMetadata', typeof result, result)
+  return JSON.parse(result)
 }
