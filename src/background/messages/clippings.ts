@@ -5,8 +5,6 @@ import { MESSAGES, STORAGE_KEY } from '~/lib/constants'
 import * as api from '~/lib/api'
 import { getStorage } from '~/background/initialize'
 
-// just dummy handler does nothing
-
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   console.log(444, req)
 
@@ -21,8 +19,9 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       res.send(newClipping)
       break
     case MESSAGES.DELETE_CLIPPING:
-      // await deleteClipping(payload, sendResponse)
-      // fetchClippingList() // Update storage data after a delete
+      const deletedClipping = await deleteClipping(payload)
+      fetchClippingList() // Update storage data after a delete
+      res.send(deletedClipping)
       break
     default:
       break
@@ -77,4 +76,11 @@ export const fetchClippingList = async () => {
     console.error('error Clippings', error, error?.cause)
     return []
   }
+}
+
+export const deleteClipping = async ({ clippingId }) => {
+  const deletedClipping = await api.deleteClippingAPICall(clippingId)
+
+  console.log('deleted Clipping', deletedClipping)
+  return deletedClipping
 }

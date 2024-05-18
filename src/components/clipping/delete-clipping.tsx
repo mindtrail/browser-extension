@@ -8,6 +8,7 @@ import { Button } from '~/components/ui/button'
 
 import { IconSpinner } from '~components/icons/spinner'
 
+import { sendMessageToBg } from '~/lib/bg-messaging'
 import { MESSAGES, HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getDeleteBtnCoordinates } from '~/lib/clipping/delete'
 
@@ -47,7 +48,7 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
     }
 
     const allHighlightElements = document.querySelectorAll(
-      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`
+      `.${HIGHLIGHT_CLASS}[data-highlight-id="${clippingId}"]`,
     )
 
     const btnCoordinates = getDeleteBtnCoordinates([...allHighlightElements])
@@ -105,9 +106,12 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
       toggleLoading()
       const payload = { clippingId: hoveredClippingId }
 
-      const response = await chrome.runtime.sendMessage({
-        message: MESSAGES.DELETE_CLIPPING,
-        payload,
+      const response = await sendMessageToBg({
+        name: 'clippings',
+        body: {
+          type: MESSAGES.DELETE_CLIPPING,
+          payload,
+        },
       })
 
       toggleLoading()
@@ -123,7 +127,7 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
       setHoveredClippingId(null)
       onDelete(hoveredClippingId)
     },
-    [hoveredClippingId]
+    [hoveredClippingId],
   )
 
   if (!btnCoorindates) {

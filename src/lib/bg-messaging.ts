@@ -10,6 +10,6 @@ type Message = {
 export const sendMessageToBg = async ({ name, body }: Message) =>
   await sendToBackground({
     name,
-    body,
-    // extensionId: 'iklcfefmepaoighpffiniigiehfcdihk',
+    body, // @TODO: test if the extensionId is actually needed.
+    extensionId: 'iklcfefmepaoighpffiniigiehfcdihk',
   })
