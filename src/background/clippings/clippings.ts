@@ -27,3 +27,39 @@ export const fetchClippingList = async (
     return []
   }
 }
+
+export const saveClipping = async (
+  payload: SavedClipping,
+  sendResponse: ContentScriptResponse,
+) => {
+  const { pageData, ...rest } = payload
+
+  const { dataSource } = await api.savePageAPICall(pageData)
+  console.log('dataSource', dataSource)
+
+  if (!dataSource) {
+    throw new Error('No dataSource', { cause: { error: 'No dataSource' } })
+  }
+
+  const saveClippingPayload = {
+    ...rest,
+    dataSourceId: dataSource.id,
+  }
+
+  console.log('payload', saveClippingPayload)
+
+  const newClipping = await api.saveClippingAPICall(saveClippingPayload)
+  console.log('newClipping', newClipping)
+
+  sendResponse(newClipping)
+}
+
+export const deleteClipping = async (
+  { clippingId },
+  sendResponse: ContentScriptResponse,
+) => {
+  const deletedClipping = await api.deleteClippingAPICall(clippingId)
+
+  console.log('deleted Clipping', deletedClipping)
+  sendResponse(deletedClipping)
+}

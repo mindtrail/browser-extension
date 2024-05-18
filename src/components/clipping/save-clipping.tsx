@@ -7,7 +7,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip
 import { Button } from '~/components/ui/button'
 import { IconSpinner } from '~components/icons/spinner'
 
-import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
+import { sendMessageToBg } from '~/lib/bg-messaging'
+import { MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import {
   getClippingData,
   getSaveClippingBtnPosition,
@@ -71,9 +72,9 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     const payload = getClippingData(range)
     console.log('Clipping To Save', payload)
 
-    const response = await chrome.runtime.sendMessage({
-      message: MESSAGES.SAVE_CLIPPING,
-      payload,
+    const response = await sendMessageToBg({
+      name: 'clippings',
+      body: payload,
     })
 
     toggleLoading()

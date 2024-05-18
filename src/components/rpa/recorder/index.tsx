@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { sendToBackground } from '@plasmohq/messaging'
-
 import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
@@ -8,7 +6,8 @@ import { Typography } from '~components/typography'
 
 import { Events } from '../events'
 import { generateMetadata } from '../utils/openai'
-import { createFlow } from '../../../lib/supabase'
+import { createFlow } from '~/lib/supabase'
+import { sendMessageToBg } from '~/lib/bg-messaging'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
@@ -44,17 +43,6 @@ export function FlowRecorder() {
     setRecording(false)
     setEventsMap(new Map())
     setPaused(false)
-
-    const resp = await sendToBackground({
-      name: 'clippings',
-      body: {
-        id: 123,
-        message: 'cancel',
-      },
-      extensionId: 'iklcfefmepaoighpffiniigiehfcdihk',
-    })
-
-    console.log('resp', resp)
   }
 
   function recordEvent(event) {
