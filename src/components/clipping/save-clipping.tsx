@@ -8,7 +8,7 @@ import { Button } from '~/components/ui/button'
 import { IconSpinner } from '~components/icons/spinner'
 
 import { sendMessageToBg } from '~/lib/bg-messaging'
-import { MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
+import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import {
   getClippingData,
   getSaveClippingBtnPosition,
@@ -74,7 +74,10 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
 
     const response = await sendMessageToBg({
       name: 'clippings',
-      body: payload,
+      body: {
+        type: MESSAGES.SAVE_CLIPPING,
+        payload,
+      },
     })
 
     toggleLoading()

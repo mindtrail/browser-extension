@@ -11,8 +11,12 @@ import * as api from '~/lib/api'
 
 let storage: Storage
 
+export const getStorage = async () => {
+  return storage || new Storage({ area: 'local' })
+}
+
 export const initializeExtension = async (): Promise<Storage> => {
-  storage = storage || new Storage({ area: 'local' })
+  storage = await getStorage()
 
   const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
   if (!settings) {
