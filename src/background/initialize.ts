@@ -1,6 +1,3 @@
-import autoModeIcon from 'url:~assets/icon.development-32.png'
-import savedIcon from 'url:~assets/saved-32.png'
-
 import { Storage } from '@plasmohq/storage'
 
 import { fetchClippingList } from './messages/clippings'

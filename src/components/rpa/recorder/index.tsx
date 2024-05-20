@@ -42,8 +42,6 @@ export function FlowRecorder() {
     }
 
     window.addEventListener('keydown', handleEscape)
-    listenEvents(recordEvent, isRecording)
-
     return () => {
       window.removeEventListener('keydown', handleEscape)
     }
@@ -56,7 +54,7 @@ export function FlowRecorder() {
   }
 
   function recordEvent(event) {
-    const { selector, type } = event
+    const { selector } = event
 
     setEventsMap((prevMap) => {
       const prevEvents = prevMap.get(selector) || []

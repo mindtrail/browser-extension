@@ -48,7 +48,6 @@ export const useRecorderState = () => {
     }
   }, [isRecording, eventsMap, paused, saving])
 
-  console.log(isRecording)
   return {
     isRecording,
     setIsRecording,
