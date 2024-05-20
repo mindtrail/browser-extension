@@ -1,16 +1,36 @@
-import { simulateEvent } from './simulate-events'
+import { loopComponent } from './components/loop'
+import { defaultComponent } from './components/default'
+import { extractComponent } from './components/extract'
 
-const delay = 500 // or event.delay
+// considering using "components" instead of "events" as name
+const components = {
+  loop: loopComponent,
+  default: defaultComponent,
+  extract: extractComponent,
+}
 
-export async function runEvents({ flowId, events, data = {}, onEventStart, onEventEnd }) {
+export async function runEvents({
+  task,
+  flowId,
+  events,
+  data = {},
+  onEventStart,
+  onEventEnd,
+}) {
+  task = structuredClone(task)
   events = structuredClone(events)
+
   for (const event of events) {
-    await onEventStart(flowId, event)
-
-    event.value = data[event.name] || event.value
-    simulateEvent(event)
-    await new Promise((resolve) => setTimeout(resolve, delay))
-
-    await onEventEnd(flowId, event)
+    const component = components[event.type] || components.default
+    await component({
+      task,
+      flowId,
+      event,
+      data,
+      onEventStart,
+      onEventEnd,
+      runEvents,
+      events,
+    })
   }
 }

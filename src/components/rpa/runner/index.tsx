@@ -35,16 +35,17 @@ export function FlowRunner() {
     const flowsToRun = await getFlowsToRun({ flows, flowId, query })
     setFlowsRunning(flowsToRun.map((flow) => flow?.flowId))
 
-    const newTask = await onTaskStart(flowId)
+    const task = await onTaskStart(flowId)
     await runFlows({
+      task,
       flows,
       flowsToRun,
       query,
       onEventStart: async (flowId, event) => {
-        await onEventStart(flowId, event, newTask.id)
+        await onEventStart(flowId, event, task.id)
       },
       onEventEnd: async (flowId, event) => {
-        await onEventEnd(flowId, event, newTask.id)
+        await onEventEnd(flowId, event, task.id)
         setEventsRunning((prevEventsMap) => {
           const prevEvents = prevEventsMap.get(flowId) || []
           return new Map(prevEventsMap).set(flowId, [...prevEvents, event])
@@ -55,7 +56,7 @@ export function FlowRunner() {
     setTimeout(async () => {
       setFlowsRunning([])
       setEventsRunning(new Map())
-      await onTaskEnd(flowId, newTask.id)
+      await onTaskEnd(flowId, task.id)
     }, 2500)
   }
 
