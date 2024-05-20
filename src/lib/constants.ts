@@ -10,6 +10,7 @@ export const MESSAGES = {
   DELETE_CLIPPING: 'delete-clipping',
   AUTH_REDIRECT: 'auth-redirect',
   CLIPPING_LIST_UPDATED: 'clipping-list-updated',
+  CREATE_FLOW: 'create-flow',
 }
 
 export const DEFAULT_EXCLUDE_LIST = [
