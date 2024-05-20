@@ -13,12 +13,19 @@ import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
+import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 export function FlowRecorder() {
-  const [isRecording, setIsRecording] = useState(false)
-  const [eventsMap, setEventsMap] = useState(new Map())
-  const [paused, setPaused] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const {
+    isRecording,
+    setIsRecording,
+    eventsMap,
+    setEventsMap,
+    paused,
+    setPaused,
+    saving,
+    setSaving,
+  } = useRecorderState()
 
   useEffect(
     () => listenEvents(recordEvent, isRecording && !paused),
