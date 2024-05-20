@@ -1,4 +1,4 @@
-import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
+import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
 import { log } from '~/lib/utils'
 import { updateExtensionIcon } from '~/lib/update-icon'
 import * as api from '~/lib/api'
@@ -93,7 +93,7 @@ async function searchHistory(
 
 async function fetchSavedDSList() {
   const savedDsList = await api.fetchSavedDSListAPICall()
-  await storage.set(STORAGE_KEY.SAVED_WEBSITES, savedDsList)
+  await storage.set(STORAGE_AREA.SAVED_WEBSITES, savedDsList)
 }
 
 async function processMessage(request: any, sendResponse: ContentScriptResponse) {

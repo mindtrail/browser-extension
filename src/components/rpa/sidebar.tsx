@@ -18,7 +18,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const VisibilityIcon = isSidebarOpen ? ChevronDownIcon : ChevronUpIcon
 
   const toggleSidebar = () =>
-    setSettings((s) => ({ ...s, isSidebarOpen: !s.isSidebarOpen }))
+    setSettings((settings) => ({ ...settings, isSidebarOpen: !settings.isSidebarOpen }))
 
   return (
     <div

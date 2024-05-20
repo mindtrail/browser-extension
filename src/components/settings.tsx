@@ -12,10 +12,10 @@ import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
 
 import { addHttpsIfMissing } from '~/lib/utils'
-import { MESSAGES, STORAGE_KEY, DEFAULT_SETTINGS, URL_REGEX } from '~/lib/constants'
+import { MESSAGES, STORAGE_AREA, DEFAULT_SETTINGS, URL_REGEX } from '~/lib/constants'
 
 const SETTINGS_CONFIG = {
-  key: STORAGE_KEY.SETTINGS,
+  key: STORAGE_AREA.SETTINGS,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 

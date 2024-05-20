@@ -7,11 +7,11 @@ import { DeleteClipping } from '~components/clipping/delete-clipping'
 
 import { highlightClipping } from '~/lib/clipping/highlight'
 import { removeHighlightClassAndAttr } from '~/lib/clipping/delete'
-import { HIGHLIGHT_CLASS, STORAGE_KEY } from '~/lib/constants'
+import { HIGHLIGHT_CLASS, STORAGE_AREA } from '~/lib/constants'
 import { getBaseResourceURL } from '~/lib/utils'
 
 const CLIPPINGS_CONFIG = {
-  key: STORAGE_KEY.CLIPPINGS_BY_DS,
+  key: STORAGE_AREA.CLIPPINGS_BY_DS,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 const pageBaseURL = getBaseResourceURL(window.location.href)

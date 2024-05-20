@@ -1,7 +1,7 @@
 // This fixes error from build for async message passing from bg to content script
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 
-import { MESSAGES, STORAGE_KEY } from '~/lib/constants'
+import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
 import * as api from '~/lib/api'
 import { getStorage } from '~/background/initialize'
 
@@ -69,7 +69,7 @@ export const fetchClippingList = async () => {
     }, {})
 
     const storage = await getStorage()
-    await storage.set(STORAGE_KEY.CLIPPINGS_BY_DS, clippingsMap)
+    await storage.set(STORAGE_AREA.CLIPPINGS_BY_DS, clippingsMap)
 
     return clippingList
   } catch (error) {

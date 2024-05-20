@@ -6,7 +6,7 @@ import { Storage } from '@plasmohq/storage'
 import { fetchClippingList } from './messages/clippings'
 import { updateExtensionIcon } from '~/lib/update-icon'
 
-import { API, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
+import { API, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
 import * as api from '~/lib/api'
 
 let storage: Storage
@@ -18,9 +18,9 @@ export const getStorage = async () => {
 export const initializeExtension = async (): Promise<Storage> => {
   storage = await getStorage()
 
-  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
+  const settings = (await storage.get(STORAGE_AREA.SETTINGS)) as SettingsStored
   if (!settings) {
-    await storage.set(STORAGE_KEY.SETTINGS, DEFAULT_EXTENSION_SETTINGS)
+    await storage.set(STORAGE_AREA.SETTINGS, DEFAULT_EXTENSION_SETTINGS)
   }
 
   updateExtensionIcon(storage)

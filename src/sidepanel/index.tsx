@@ -9,11 +9,11 @@ import { TooltipProvider } from '~/components/ui/tooltip'
 import { ClippingOverlay } from '~/components/clipping'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
-import { DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
+import { DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
 
 const STORAGE_SETTINGS = {
-  key: STORAGE_KEY.SETTINGS,
+  key: STORAGE_AREA.SETTINGS,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 

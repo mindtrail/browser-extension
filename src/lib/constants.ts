@@ -75,7 +75,7 @@ export const API = {
 export const HIGHLIGHT_CLASS = 'mindtrail-clipping'
 export const SPLIT_TEXTNODE_CLASS = 'mindtrail-split-textNode'
 
-export const STORAGE_KEY = {
+export const STORAGE_AREA = {
   SETTINGS: 'settings',
   CLIPPINGS_BY_DS: 'clippings-by-ds',
   SAVED_WEBSITES: 'saved-websites',

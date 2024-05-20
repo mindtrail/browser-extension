@@ -9,7 +9,7 @@ import { useStorage } from '@plasmohq/storage/hook'
 import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST, STORAGE_KEY } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST, STORAGE_AREA } from '~/lib/constants'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 const DEFAULT_TAB = 'settings'
@@ -21,7 +21,7 @@ const defaultSettings: SettingsStored = {
 }
 
 const STORAGE_SETTINGS = {
-  key: STORAGE_KEY.SETTINGS,
+  key: STORAGE_AREA.SETTINGS,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 

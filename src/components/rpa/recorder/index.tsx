@@ -15,32 +15,35 @@ import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
-  const [recording, setRecording] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
   const [eventsMap, setEventsMap] = useState(new Map())
   const [paused, setPaused] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => listenEvents(recordEvent, recording && !paused), [recording, paused])
+  useEffect(
+    () => listenEvents(recordEvent, isRecording && !paused),
+    [isRecording, paused],
+  )
 
   useEffect(() => {
-    if (!recording) return
+    if (!isRecording) return
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && recording) {
+      if (event.key === 'Escape' && isRecording) {
         cancelRecording()
       }
     }
 
     window.addEventListener('keydown', handleEscape)
-    listenEvents(recordEvent, recording)
+    listenEvents(recordEvent, isRecording)
 
     return () => {
       window.removeEventListener('keydown', handleEscape)
     }
-  }, [recording])
+  }, [isRecording])
 
   async function cancelRecording() {
-    setRecording(false)
+    setIsRecording(false)
     setEventsMap(new Map())
     setPaused(false)
   }
@@ -63,10 +66,10 @@ export function FlowRecorder() {
   }
 
   async function toggleRecording() {
-    setRecording(!recording)
+    setIsRecording(!isRecording)
     setEventsMap(new Map())
 
-    if (!recording || !eventsMap.size) {
+    if (!isRecording || !eventsMap.size) {
       return
     }
 
@@ -93,18 +96,18 @@ export function FlowRecorder() {
 
   return (
     <div
-      className={`${recording ? 'h-[calc(100%-52px)]' : 'h-auto'}
+      className={`${isRecording ? 'h-[calc(100%-52px)]' : 'h-auto'}
         flex flex-col justify-end gap-2 px-4 py-2
         w-full absolute bottom-0 border bg-slate-50`}
     >
-      {recording && (
+      {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={cancelRecording} />
           <Events eventsMap={eventsMap} removeEvent={removeEvent} />
         </div>
       )}
 
-      {recording && !eventsMap?.size && (
+      {isRecording && !eventsMap?.size && (
         <Typography className='w-full text-center mb-6'>
           {paused ? 'Paused Recording' : 'Recording Workflow...'}
         </Typography>
@@ -121,9 +124,9 @@ export function FlowRecorder() {
         </Button>
       ) : (
         <RecordButton
-          onToggle={toggleRecording}
+          onToggleRecording={toggleRecording}
           onPause={() => setPaused(!paused)}
-          recording={recording}
+          isRecording={isRecording}
           paused={paused}
         />
       )}

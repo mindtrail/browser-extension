@@ -3,11 +3,11 @@ import { Storage } from '@plasmohq/storage'
 import autoModeIcon from 'url:~assets/icon.development-32.png'
 import savedIcon from 'url:~assets/saved-32.png'
 
-import { STORAGE_KEY } from '~/lib/constants'
+import { STORAGE_AREA } from '~/lib/constants'
 
 // Based on Auto/Manual save, update the extension icon
 async function updateExtensionIcon(storage: Storage = undefined) {
-  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
+  const settings = (await storage.get(STORAGE_AREA.SETTINGS)) as SettingsStored
   const autoSave = settings?.autoSave
 
   chrome?.action?.setIcon({

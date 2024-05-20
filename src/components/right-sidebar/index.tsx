@@ -12,7 +12,7 @@ import { getBaseResourceURL } from '~lib/utils'
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
-  STORAGE_KEY,
+  STORAGE_AREA,
   MoveDirection,
   OverlayPosition,
 } from '~/lib/constants'
@@ -45,7 +45,7 @@ const OVERLAY_NEXT_POS = {
 const DEFAULT_OVERLAY_POS = DEFAULT_EXTENSION_SETTINGS.overlayPosition
 
 const SAVED_WEBSITES_CONFIG = {
-  key: STORAGE_KEY.SAVED_WEBSITES,
+  key: STORAGE_AREA.SAVED_WEBSITES,
   instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
 }
 
