@@ -6,55 +6,46 @@ import { Typography } from '~components/typography'
 
 import { Events } from '../events'
 import { generateMetadata } from '../utils/openai'
-import { createFlow } from '~/lib/supabase'
-import { sendMessageToBg } from '~/lib/bg-messaging'
+import { createFlow } from '../utils/supabase'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
-import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 export function FlowRecorder() {
-  const {
-    isRecording,
-    setIsRecording,
-    eventsMap,
-    setEventsMap,
-    paused,
-    setPaused,
-    saving,
-    setSaving,
-  } = useRecorderState()
+  const [recording, setRecording] = useState(false)
+  const [eventsMap, setEventsMap] = useState(new Map())
+  const [paused, setPaused] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  useEffect(
-    () => listenEvents(recordEvent, isRecording && !paused),
-    [isRecording, paused],
-  )
+  useEffect(() => listenEvents(recordEvent, recording && !paused), [recording, paused])
 
   useEffect(() => {
-    if (!isRecording) return
+    if (!recording) return
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isRecording) {
+      if (event.key === 'Escape' && recording) {
         cancelRecording()
       }
     }
 
     window.addEventListener('keydown', handleEscape)
+    listenEvents(recordEvent, recording)
+
     return () => {
       window.removeEventListener('keydown', handleEscape)
     }
-  }, [isRecording])
+  }, [recording])
 
-  async function cancelRecording() {
-    setIsRecording(false)
+  function cancelRecording() {
+    setRecording(false)
     setEventsMap(new Map())
     setPaused(false)
   }
 
   function recordEvent(event) {
-    const { selector } = event
+    const { selector, type } = event
 
     setEventsMap((prevMap) => {
       const prevEvents = prevMap.get(selector) || []
@@ -71,10 +62,10 @@ export function FlowRecorder() {
   }
 
   async function toggleRecording() {
-    setIsRecording(!isRecording)
+    setRecording(!recording)
     setEventsMap(new Map())
 
-    if (!isRecording || !eventsMap.size) {
+    if (!recording || !eventsMap.size) {
       return
     }
 
@@ -101,18 +92,18 @@ export function FlowRecorder() {
 
   return (
     <div
-      className={`${isRecording ? 'h-[calc(100%-52px)]' : 'h-auto'}
+      className={`${recording ? 'h-[calc(100%-52px)]' : 'h-auto'}
         flex flex-col justify-end gap-2 px-4 py-2
         w-full absolute bottom-0 border bg-slate-50`}
     >
-      {isRecording && (
+      {recording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={cancelRecording} />
           <Events eventsMap={eventsMap} removeEvent={removeEvent} />
         </div>
       )}
 
-      {isRecording && !eventsMap?.size && (
+      {recording && !eventsMap?.size && (
         <Typography className='w-full text-center mb-6'>
           {paused ? 'Paused Recording' : 'Recording Workflow...'}
         </Typography>
@@ -129,9 +120,9 @@ export function FlowRecorder() {
         </Button>
       ) : (
         <RecordButton
-          onToggleRecording={toggleRecording}
+          onToggle={toggleRecording}
           onPause={() => setPaused(!paused)}
-          isRecording={isRecording}
+          recording={recording}
           paused={paused}
         />
       )}

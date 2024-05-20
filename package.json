@@ -1,9 +1,9 @@
 {
-  "name": "ez-rpa",
-  "displayName": "EZ RPA",
-  "version": "0.0.3",
-  "description": "Your AI Coworker",
-  "author": "ez-rpa",
+  "name": "mind-trail",
+  "displayName": "Mind Trail",
+  "version": "0.0.2",
+  "description": "Your AI memory",
+  "author": "Indie AI",
   "scripts": {
     "dev": "plasmo dev",
     "dev-verbose": "plasmo dev --verbose",

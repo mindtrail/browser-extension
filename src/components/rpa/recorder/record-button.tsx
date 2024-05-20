@@ -3,15 +3,15 @@ import { Button } from '~/components/ui/button'
 import { RecordIcon } from '~/components/icons/record'
 
 interface RecordButtonProps {
-  onToggleRecording: () => void
+  onToggle: () => void
   onPause: () => void
-  isRecording: boolean
+  recording: boolean
   paused: boolean
 }
 export function RecordButton(props: RecordButtonProps) {
-  const { onPause, onToggleRecording, isRecording, paused } = props
+  const { onPause, onToggle, recording, paused } = props
 
-  return isRecording ? (
+  return recording ? (
     <div className='flex w-full gap-2 items-center'>
       <Button
         className='flex w-full gap-2 items-center'
@@ -28,7 +28,7 @@ export function RecordButton(props: RecordButtonProps) {
       <Button
         className='flex w-full gap-2 items-center'
         variant='default'
-        onClick={onToggleRecording}
+        onClick={onToggle}
       >
         <SaveIcon className='w-5 h-5 ' />
         Save
@@ -38,7 +38,7 @@ export function RecordButton(props: RecordButtonProps) {
     <Button
       className='flex w-full gap-4 items-center'
       variant='outline'
-      onClick={onToggleRecording}
+      onClick={onToggle}
     >
       <RecordIcon className='w-5 h-5' />
       Record New Workflow

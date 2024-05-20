@@ -1,4 +1,4 @@
-import { createTask } from '~/lib/supabase'
+import { createTask } from '../../utils/supabase'
 
 export async function onTaskStart(flowId) {
   const newTaskRes = await createTask({

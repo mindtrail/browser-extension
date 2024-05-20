@@ -75,14 +75,10 @@ export const API = {
 export const HIGHLIGHT_CLASS = 'mindtrail-clipping'
 export const SPLIT_TEXTNODE_CLASS = 'mindtrail-split-textNode'
 
-export const STORAGE_AREA = {
+export const STORAGE_KEY = {
+  SETTINGS: 'settings',
   CLIPPINGS_BY_DS: 'clippings-by-ds',
   SAVED_WEBSITES: 'saved-websites',
-  SETTINGS: 'settings',
-  RECORDER: 'recorder',
-  RUNNER: 'runner',
-  EVENTS: 'events',
-  TASKS: 'tasks',
 }
 
 export const CLIPPING_BTN_OFFSET = 16
@@ -95,10 +91,3 @@ export const DEFAULT_SETTINGS = {
 
 export const URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]+)?(\/[\w.-]*)*\/?$/
-
-export const DEFAULT_RECORDER_STATE = {
-  isRecording: false,
-  eventsMap: new Map(),
-  paused: false,
-  saving: false,
-}

@@ -3,7 +3,7 @@ import { SearchIcon } from 'lucide-react'
 
 import { Input } from '~/components/ui/input'
 
-import { getFlows, onFlowsChange, deleteFlow, updateFlow } from '../../../lib/supabase'
+import { getFlows, onFlowsChange, deleteFlow, updateFlow } from '../utils/supabase'
 import { getFlowsToRun } from './retrieval/get-flows-to-run'
 import { runFlows } from './execution/run-flows'
 import { RunItem } from './run-item'
