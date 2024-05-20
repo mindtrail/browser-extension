@@ -5,7 +5,7 @@ import { buildParamsSchema } from './build-params-schema'
 import { runEvents } from './run-events'
 import { extractTableEntities } from './extract-entities'
 
-export async function runFlows({ flows, flowsToRun, query, onEvent }) {
+export async function runFlows({ flows, flowsToRun, query, onEventStart, onEventEnd }) {
   for (const { flowId, eventIds } of flowsToRun) {
     const events = getFlowEvents(flows, flowId).filter((event) =>
       eventIds.includes(event.id),
@@ -73,7 +73,8 @@ export async function runFlows({ flows, flowsToRun, query, onEvent }) {
             flowId,
             events: arr,
             data: entityData[index],
-            onEvent,
+            onEventStart,
+            onEventEnd,
           }
           console.log('v1 runData', runData)
           await runEvents(runData)
@@ -85,7 +86,8 @@ export async function runFlows({ flows, flowsToRun, query, onEvent }) {
             flowId,
             events,
             data,
-            onEvent,
+            onEventStart,
+            onEventEnd,
           }
           console.log('v2 runData', runData)
           await runEvents(runData)
@@ -97,7 +99,8 @@ export async function runFlows({ flows, flowsToRun, query, onEvent }) {
         flowId,
         events,
         data: {},
-        onEvent,
+        onEventStart,
+        onEventEnd,
       }
       console.log('v3 runData', runData)
       await runEvents(runData)
