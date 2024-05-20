@@ -1,17 +1,14 @@
 import cssText from 'data-text:~style.css'
 
 import { useEffect, useState } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
-
 import { TooltipProvider } from '~/components/ui/tooltip'
 
 import { ClippingOverlay } from '~/components/clipping'
 import { RightSidebar } from '~/components/right-sidebar'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
-import { DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
+import { useSettingsStorage } from '~/lib/hooks/storage'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
@@ -20,14 +17,9 @@ export const getStyle = () => {
   return style
 }
 
-const STORAGE_SETTINGS = {
-  key: STORAGE_AREA.SETTINGS,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
-
 const UIOverlay = () => {
   const [overlayVisible, setOverlayVisible] = useState(true)
-  const [settings, setSettings] = useStorage(STORAGE_SETTINGS, DEFAULT_EXTENSION_SETTINGS)
+  const [settings, setSettings] = useSettingsStorage()
 
   const { excludeList } = settings
 

@@ -1,29 +1,12 @@
 // import { CountButton } from "~features/store-button"
-
 import '~style.css'
 
-import { useCallback } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
-
-import { Search } from '~/components/search'
 import { Settings } from '~/components/settings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { AUTO_SAVE_DELAY, DEFAULT_EXCLUDE_LIST, STORAGE_AREA } from '~/lib/constants'
-import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
+// import { Search } from '~/components/search'
+// import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 const DEFAULT_TAB = 'settings'
-
-const defaultSettings: SettingsStored = {
-  autoSave: true,
-  saveDelay: AUTO_SAVE_DELAY,
-  excludeList: DEFAULT_EXCLUDE_LIST,
-}
-
-const STORAGE_SETTINGS = {
-  key: STORAGE_AREA.SETTINGS,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
 
 function IndexPopup() {
   return (

@@ -1,25 +1,17 @@
 import '~style.css'
 
 import { useEffect, useState } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
 
 import { TooltipProvider } from '~/components/ui/tooltip'
-
 import { ClippingOverlay } from '~/components/clipping'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
-import { DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
 import { isHostExcluded } from '~/lib/utils'
-
-const STORAGE_SETTINGS = {
-  key: STORAGE_AREA.SETTINGS,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
+import { useSettingsStorage } from '~/lib/hooks/storage'
 
 const SidePanelRPA = () => {
   const [overlayVisible, setOverlayVisible] = useState(true)
-  const [settings, setSettings] = useStorage(STORAGE_SETTINGS, DEFAULT_EXTENSION_SETTINGS)
+  const [settings, setSettings] = useSettingsStorage()
 
   const { excludeList } = settings
 

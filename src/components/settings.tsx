@@ -2,9 +2,6 @@ import { useCallback } from 'react'
 import type { KeyboardEvent } from 'react'
 import { XIcon, GlobeIcon } from 'lucide-react'
 
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
-
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
@@ -12,15 +9,12 @@ import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
 
 import { addHttpsIfMissing } from '~/lib/utils'
-import { MESSAGES, STORAGE_AREA, DEFAULT_SETTINGS, URL_REGEX } from '~/lib/constants'
+import { MESSAGES, URL_REGEX } from '~/lib/constants'
 
-const SETTINGS_CONFIG = {
-  key: STORAGE_AREA.SETTINGS,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
+import { useSettingsStorage } from '~/lib/hooks/storage'
 
 export function Settings() {
-  const [settings, setSettings] = useStorage(SETTINGS_CONFIG, DEFAULT_SETTINGS)
+  const [settings, setSettings] = useSettingsStorage()
   const { autoSave, excludeList, saveDelay } = settings
 
   const updateSettings = useCallback((newSettings: Partial<SettingsStored>) => {

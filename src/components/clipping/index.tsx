@@ -1,23 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
 
 import { SaveClipping } from '~components/clipping/save-clipping'
 import { DeleteClipping } from '~components/clipping/delete-clipping'
 
 import { highlightClipping } from '~/lib/clipping/highlight'
 import { removeHighlightClassAndAttr } from '~/lib/clipping/delete'
-import { HIGHLIGHT_CLASS, STORAGE_AREA } from '~/lib/constants'
+import { HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getBaseResourceURL } from '~/lib/utils'
+import { useClippingsStorage } from '~/lib/hooks/storage'
 
-const CLIPPINGS_CONFIG = {
-  key: STORAGE_AREA.CLIPPINGS_BY_DS,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
 const pageBaseURL = getBaseResourceURL(window.location.href)
 
 export const ClippingOverlay = () => {
-  const [clippingMap] = useStorage(CLIPPINGS_CONFIG)
+  const [clippingMap] = useClippingsStorage()
   const [clippingList, setClippingList] = useState<SavedClipping[]>([])
 
   // We only run this once. DOM can be altered.

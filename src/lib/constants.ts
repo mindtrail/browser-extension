@@ -76,9 +76,10 @@ export const HIGHLIGHT_CLASS = 'mindtrail-clipping'
 export const SPLIT_TEXTNODE_CLASS = 'mindtrail-split-textNode'
 
 export const STORAGE_AREA = {
-  SETTINGS: 'settings',
   CLIPPINGS_BY_DS: 'clippings-by-ds',
+  RPA: 'rpa',
   SAVED_WEBSITES: 'saved-websites',
+  SETTINGS: 'settings',
 }
 
 export const CLIPPING_BTN_OFFSET = 16
