@@ -6,9 +6,13 @@ import * as api from '~/lib/api'
 import { getStorage } from '~/background/initialize'
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
-  console.log(444, req)
-
   const { type, payload } = req?.body
+
+  if (!payload) {
+    console.log('no data...')
+    res.send('no data...')
+    return
+  }
 
   switch (type) {
     case MESSAGES.SAVE_CLIPPING:
@@ -25,12 +29,6 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       break
     default:
       break
-  }
-
-  if (!payload) {
-    console.log('no data...')
-    res.send('no data...')
-    return
   }
 }
 

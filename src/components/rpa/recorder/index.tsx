@@ -6,14 +6,14 @@ import { Typography } from '~components/typography'
 
 import { Events } from '../events'
 import { generateMetadata } from '../utils/openai'
-import { createFlow } from '~/lib/supabase'
 import { sendMessageToBg } from '~/lib/bg-messaging'
+import { useRecorderState } from '~/lib/hooks/useRecorder'
+import { MESSAGES } from '~/lib/constants'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
-import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 export function FlowRecorder() {
   const {
@@ -95,8 +95,13 @@ export function FlowRecorder() {
     })
 
     setSaving(false)
-    console.log(flow)
-    createFlow(flow)
+    sendMessageToBg({
+      name: 'flows',
+      body: {
+        type: MESSAGES.CREATE_FLOW,
+        payload: flow,
+      },
+    })
   }
 
   return (

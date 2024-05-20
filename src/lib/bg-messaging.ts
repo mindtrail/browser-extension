@@ -1,6 +1,6 @@
 import { sendToBackground } from '@plasmohq/messaging'
 
-type Name = 'clippings'
+type Name = 'clippings' | 'flows'
 
 type Message = {
   name: Name
