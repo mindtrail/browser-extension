@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
 
 import { ChangePosition } from '~components/right-sidebar/change-position'
 import { SavePage } from '~components/right-sidebar/save-page'
 
 import { getPageData } from '~/lib/page-data'
 import { getBaseResourceURL } from '~lib/utils'
+import { useSavedWebsitesStorage } from '~/lib/hooks/storage'
 
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
-  STORAGE_KEY,
   MoveDirection,
   OverlayPosition,
 } from '~/lib/constants'
@@ -44,13 +42,8 @@ const OVERLAY_NEXT_POS = {
 
 const DEFAULT_OVERLAY_POS = DEFAULT_EXTENSION_SETTINGS.overlayPosition
 
-const SAVED_WEBSITES_CONFIG = {
-  key: STORAGE_KEY.SAVED_WEBSITES,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
-
 export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
-  const [savedWebsites, setSavedWebsites] = useStorage(SAVED_WEBSITES_CONFIG, [])
+  const [savedWebsites, setSavedWebsites] = useSavedWebsitesStorage()
   const [currentPageIsSaved, setCurrentPageIsSaved] = useState(false)
   const [loading, toggleLoading] = useReducer((c) => !c, false)
 

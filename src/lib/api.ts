@@ -49,5 +49,5 @@ export const searchHistoryAPICall = (searchQuery: string) =>
 export const getClippingListAPICall = () =>
   makeAPICall(`${TARGET_HOST + API.CLIPPING}?groupByDataSource=true`)
 
-export const getSavedDSListAPICall = () =>
+export const fetchSavedDSListAPICall = () =>
   makeAPICall(`${TARGET_HOST + API.DATA_SOURCE}?type=web_page`)

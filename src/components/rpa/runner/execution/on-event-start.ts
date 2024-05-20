@@ -1,4 +1,4 @@
-import { updateTask, getTask } from '../../utils/supabase'
+import { updateTask, getTask } from '~/lib/supabase'
 
 export async function onEventStart(flowId, event, taskId) {
   const taskRes = await getTask(taskId)

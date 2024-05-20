@@ -1,4 +1,4 @@
-import { getTask } from '../../../utils/supabase'
+import { getTask } from '~lib/supabase'
 
 export async function loopComponent({
   task,
