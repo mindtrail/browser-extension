@@ -1,4 +1,4 @@
-import { getTask, updateTask } from '../../utils/supabase'
+import { getTask, updateTask } from '~/lib/supabase'
 
 export async function onTaskEnd(flowId, taskId) {
   const taskRes = await getTask(taskId)

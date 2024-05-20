@@ -1,6 +1,6 @@
 import { buildParamsSchema } from '../build-params-schema'
 import { extractTableEntities } from '../extract-entities'
-import { updateTask, getTask } from '../../../utils/supabase'
+import { updateTask, getTask } from '~/lib/supabase'
 
 export async function extractComponent({ task, events, columns }) {
   const schema = buildParamsSchema(events)

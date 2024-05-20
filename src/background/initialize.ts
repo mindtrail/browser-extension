@@ -3,7 +3,7 @@ import savedIcon from 'url:~assets/saved-32.png'
 
 import { Storage } from '@plasmohq/storage'
 
-import { fetchClippingList } from './clippings/clippings'
+import { fetchClippingList } from './messages/clippings'
 import { updateExtensionIcon } from '~/lib/update-icon'
 
 import { API, DEFAULT_EXTENSION_SETTINGS, STORAGE_KEY } from '~/lib/constants'
@@ -24,7 +24,7 @@ export const initializeExtension = async (): Promise<Storage> => {
   }
 
   updateExtensionIcon(storage)
-  fetchClippingList(storage)
+  fetchClippingList()
   // fetchDataSources...
 
   return storage
