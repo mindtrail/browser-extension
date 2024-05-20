@@ -57,7 +57,7 @@ export function FlowRecorder() {
     const { selector } = event
 
     setEventsMap((prevMap) => {
-      const prevEvents = prevMap.get(selector) || []
+      const prevEvents = (prevMap?.get(selector) as Event[]) || []
       const newEvents = [...prevEvents, event]
       return new Map(prevMap).set(selector, newEvents)
     })
@@ -82,7 +82,7 @@ export function FlowRecorder() {
     const eventsRecorded = Array.from(eventsMap.values()).flat()
     const flow = await generateMetadata(eventsRecorded)
 
-    flow.events = eventsRecorded.map((event, index) => {
+    flow.events = eventsRecorded.map((event: Event, index) => {
       const start_dependencies = getStartDependencies(eventsRecorded, event)
       const end_dependencies = getEndDependencies(eventsRecorded, event)
       return {
@@ -113,7 +113,7 @@ export function FlowRecorder() {
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={cancelRecording} />
-          <Events eventsMap={eventsMap} removeEvent={removeEvent} />
+          <Events eventsMap={eventsMap as Map<string, any>} removeEvent={removeEvent} />
         </div>
       )}
 

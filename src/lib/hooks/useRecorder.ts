@@ -16,7 +16,7 @@ export const useRecorderState = () => {
   )
 
   const [isRecording, setIsRecording] = useState(storageData.isRecording)
-  const [eventsMap, setEventsMap] = useState(storageData.eventsMap)
+  const [eventsMap, setEventsMap] = useState(new Map(JSON.parse(storageData.eventsMap)))
   const [paused, setPaused] = useState(storageData.paused)
   const [saving, setSaving] = useState(storageData.saving)
 
@@ -25,8 +25,8 @@ export const useRecorderState = () => {
     if (isRecording !== storageData.isRecording) {
       setIsRecording(storageData.isRecording)
     }
-    if (eventsMap?.size !== storageData.eventsMap?.size) {
-      setEventsMap(storageData.eventsMap)
+    if (eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size) {
+      setEventsMap(new Map(JSON.parse(storageData.eventsMap)))
     }
     if (paused !== storageData.paused) {
       setPaused(storageData.paused)
@@ -40,11 +40,16 @@ export const useRecorderState = () => {
     // Check if the current state differs from the storage state before updating
     if (
       isRecording !== storageData.isRecording ||
-      eventsMap?.size !== storageData.eventsMap?.size ||
+      eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size ||
       paused !== storageData.paused ||
       saving !== storageData.saving
     ) {
-      setStorageData({ isRecording, eventsMap, paused, saving })
+      setStorageData({
+        isRecording,
+        eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
+        paused,
+        saving,
+      })
     }
   }, [isRecording, eventsMap, paused, saving])
 
