@@ -99,7 +99,7 @@ export const URL_REGEX =
 
 export const DEFAULT_RECORDER_STATE = {
   isRecording: false,
-  eventsMap: new Map(),
+  eventsMap: '[]',
   paused: false,
   saving: false,
 }
