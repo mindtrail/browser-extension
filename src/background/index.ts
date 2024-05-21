@@ -4,6 +4,7 @@ import { updateExtensionIcon } from '~/lib/update-icon'
 import * as api from '~/lib/api'
 
 import { initializeExtension, authenticateAndRetry } from './initialize'
+import { listenForNavigationEvents } from './navigation'
 
 let storage
 
@@ -11,7 +12,11 @@ async function initialize() {
   storage = await initializeExtension()
 }
 
-initialize()
+// Ensure listeners are added when the extension is installed or updated
+chrome.runtime.onInstalled.addListener(() => {
+  initialize()
+  listenForNavigationEvents()
+})
 
 chrome.runtime.onMessage.addListener(
   async (request, _sender, sendResponse: ContentScriptResponse) => {
