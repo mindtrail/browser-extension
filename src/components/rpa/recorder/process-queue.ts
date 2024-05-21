@@ -26,6 +26,13 @@ export function processQueue() {
 }
 
 export function debounceEvent(eventKey, event, callback, debounceDuration = 1000) {
+  // Process href click events immediately
+  if (event.type === 'click' && event.href) {
+    eventQueue.push({ event, callback })
+    processQueue()
+    return
+  }
+
   if (debounceTimers.has(eventKey)) {
     clearTimeout(debounceTimers.get(eventKey))
   }

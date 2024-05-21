@@ -1,5 +1,4 @@
 import { simulateEvent } from '../simulate-events'
-const delay = 500 // or event.delay
 
 export async function defaultComponent({
   flowId,
@@ -10,7 +9,8 @@ export async function defaultComponent({
 }) {
   await onEventStart(flowId, event)
   event.value = data[event.name] || event.value
+  await new Promise((resolve) => setTimeout(resolve, 500))
   simulateEvent(event)
-  await new Promise((resolve) => setTimeout(resolve, delay))
+  await new Promise((resolve) => setTimeout(resolve, 500))
   await onEventEnd(flowId, event)
 }
