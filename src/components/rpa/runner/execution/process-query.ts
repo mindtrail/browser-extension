@@ -1,4 +1,4 @@
-import { extractParams } from '../../utils/groq'
+import { extractParams } from '../../utils/openai'
 import { search } from '../../utils/openai'
 import { buildParamsSchema } from './build-params-schema'
 import { runEvents } from './run-events'
@@ -21,8 +21,9 @@ export async function processQuery({
   })
   console.log('entities', entities)
 
-  const filteredEntities = await search({ query, entities })
-  console.log('filteredEntities', filteredEntities)
+  // const filteredEntities = await search({ query, entities })
+  // console.log('filteredEntities', filteredEntities)
+  const filteredEntities = entities
 
   // Build an array of events for each entity
   // Update selector for first event to use the entity selector
