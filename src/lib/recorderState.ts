@@ -33,15 +33,18 @@ const createBackgroundEvent = async (event) => {
   return event
 }
 
-const watchBackgroundEvents = (callback) => {
+const onBackgroundEvent = (callback) => {
   RECORDER_CONFIG.instance.watch({
     [RECORDER_CONFIG.key]: (changes) => {
-      const backgroundEvents = changes.newValue.backgroundEvents || []
-      const event = backgroundEvents[backgroundEvents.length - 1]
-      if (!event) return
-      callback({ type: event.type, ...event.data })
+      const oldBackgroundEvents = changes.oldValue.backgroundEvents || []
+      const newBackgroundEvents = changes.newValue.backgroundEvents || []
+      if (newBackgroundEvents.length <= oldBackgroundEvents.length) return
+      const newEvents = newBackgroundEvents.slice(oldBackgroundEvents.length)
+      newEvents.forEach((event) => {
+        callback({ type: event.type, ...event.data })
+      })
     },
   })
 }
 
-export { getState, saveState, watchState, createBackgroundEvent, watchBackgroundEvents }
+export { getState, saveState, watchState, createBackgroundEvent, onBackgroundEvent }

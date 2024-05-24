@@ -49,6 +49,7 @@ export const useRecorderState = () => {
         eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
         paused,
         saving,
+        backgroundEvents: storageData.backgroundEvents,
       })
     }
   }, [isRecording, eventsMap, paused, saving])

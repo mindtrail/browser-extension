@@ -2,7 +2,7 @@ import { EVENT_TYPES } from './event-types'
 import { handleClickEvent } from './event-handlers/click-event'
 import { handleInputEvent } from './event-handlers/input-event'
 import { handleUrlEvent } from './event-handlers/url-event'
-import { watchBackgroundEvents } from '~/lib/recorderState'
+import { onBackgroundEvent } from '~/lib/recorderState'
 
 function createEventHandler(callback) {
   return (event) => {
@@ -25,7 +25,7 @@ function createEventHandler(callback) {
 function addEventListeners(eventHandler) {
   document.addEventListener(EVENT_TYPES.CLICK, eventHandler, true)
   document.addEventListener(EVENT_TYPES.INPUT, eventHandler, true)
-  watchBackgroundEvents(eventHandler)
+  onBackgroundEvent(eventHandler)
 }
 
 function removeEventListeners(eventHandler) {
