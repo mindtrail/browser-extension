@@ -1,4 +1,3 @@
-// const delay = 250
 const delay = 1000
 
 export async function urlComponent({ flowId, event, data, onEventStart, onEventEnd }) {

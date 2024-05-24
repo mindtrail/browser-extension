@@ -1,28 +1,59 @@
-export function simulateEvent(event) {
-  const element = document.querySelector(event.selector)
-  if (!element) {
-    if (event.href) window.location.href = event.href
-    return
-  }
+async function waitForUrl(baseURI, timeout = 10000, interval = 100) {
+  const endTime = Date.now() + timeout
+  return new Promise((resolve, reject) => {
+    const checkUrl = () => {
+      if (window.location.href.startsWith(baseURI)) {
+        resolve(true)
+      } else if (Date.now() > endTime) {
+        reject(new Error(`URL did not change to "${baseURI}" within the timeout period`))
+      } else {
+        setTimeout(checkUrl, interval)
+      }
+    }
+    checkUrl()
+  })
+}
 
+async function waitForElement(selector, timeout = 10000, interval = 100) {
+  const endTime = Date.now() + timeout
+  return new Promise((resolve, reject) => {
+    const checkElement = () => {
+      const element = document.querySelector(selector)
+      if (element) {
+        resolve(element)
+      } else if (Date.now() > endTime) {
+        reject(
+          new Error(
+            `Element with selector "${selector}" not found within the timeout period`,
+          ),
+        )
+      } else {
+        setTimeout(checkElement, interval)
+      }
+    }
+    checkElement()
+  })
+}
+
+export async function simulateEvent(event) {
   try {
+    await waitForUrl(event.baseURI)
+    const element: any = await waitForElement(event.selector)
+    if (!element) {
+      throw new Error(`Element with selector "${event.selector}" not found`)
+    }
     if (event.type === 'input') {
       let nativeInputValueSetter
-      if (element instanceof HTMLInputElement) {
+      if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
         nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-          window.HTMLInputElement.prototype,
+          element.constructor.prototype,
           'value',
         ).set
-      } else if (element instanceof HTMLTextAreaElement) {
-        nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-          window.HTMLTextAreaElement.prototype,
-          'value',
-        ).set
-      }
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(element, event.value)
-        element.dispatchEvent(new Event('input', { bubbles: true }))
+        if (nativeInputValueSetter) {
+          nativeInputValueSetter.call(element, event.value)
+          element.dispatchEvent(new Event('input', { bubbles: true }))
+        }
       }
     } else if (event.type === 'click') {
       element.click()
@@ -31,12 +62,11 @@ export function simulateEvent(event) {
     }
   } catch (error) {
     console.error('Error simulating event:', error)
+    throw error
   }
 }
 
-// const delay = 250
-const delay = 1000
-
+const delay = 500
 export async function defaultComponent({
   flowId,
   event,
@@ -47,7 +77,7 @@ export async function defaultComponent({
   await onEventStart(flowId, event)
   event.value = data[event.name] || event.value
   await new Promise((resolve) => setTimeout(resolve, delay))
-  simulateEvent(event)
+  await simulateEvent(event)
   await new Promise((resolve) => setTimeout(resolve, delay))
   await onEventEnd(flowId, event)
 }
