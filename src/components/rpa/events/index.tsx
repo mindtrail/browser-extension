@@ -30,8 +30,8 @@ export function Events(props: EventProps) {
   const collectionToIterate = readOnly ? eventsList : eventsMap
 
   collectionToIterate.forEach((eventsArray) => {
-    const event = readOnly ? eventsArray : eventsArray[0]
-    const value = event.value || event.textContent
+    const event = readOnly ? eventsArray : eventsArray[eventsArray.length - 1]
+    const value = event.value || event.textContent || event.url
 
     eventsToDisplay.push({
       ...event,

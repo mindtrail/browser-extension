@@ -1,68 +1,48 @@
-import { getSelector } from './find-selector'
-import { getHref } from './find-href'
-import { getValue } from './get-value'
-import { getContent } from './get-content'
-import { debounceEvent } from './process-queue'
+import { EVENT_TYPES } from './event-types'
+import { handleClickEvent } from './event-handlers/click-event'
+import { handleInputEvent } from './event-handlers/input-event'
+import { handleUrlEvent } from './event-handlers/url-event'
+import { watchBackgroundEvents } from '~/lib/recorderState'
 
-function eventHandler(callback) {
+function createEventHandler(callback) {
   return (event) => {
-    const { type, target } = event
-    console.log(event, type, 123)
-    const selector = getSelector(target)
-
-    if (!target || (selector && selector?.includes('plasmo-csui'))) {
-      return
+    switch (event.type) {
+      case EVENT_TYPES.CLICK:
+        handleClickEvent(event, callback)
+        break
+      case EVENT_TYPES.INPUT:
+        handleInputEvent(event, callback)
+        break
+      case EVENT_TYPES.URL:
+        handleUrlEvent(event, callback)
+        break
+      default:
+        break
     }
-
-    // Skip click events in input fields
-    if (
-      type === 'click' &&
-      (target?.nodeName === 'INPUT' || target?.nodeName === 'TEXTAREA')
-    ) {
-      return
-    }
-
-    const href = type === 'click' ? getHref(target) : null
-    const value = getValue({ type, target })
-    const textContent = getContent({ type, target })
-    const timeStamp = Date.now()
-    const eventKey = `${type}-${selector}`
-
-    const eventDetails = {
-      id: `${timeStamp}`,
-      type,
-      selector,
-      ...(value !== null && { value }),
-      ...(textContent !== null && { textContent }),
-      ...(target.name !== null && { name: target.name }),
-      ...(target.baseURI !== null && { baseURI: target.baseURI }),
-      ...(href !== null && { href }),
-      ...(target.type !== null && { targetType: target.type }),
-    }
-
-    debounceEvent(eventKey, eventDetails, callback)
   }
 }
 
-let handler = null
+function addEventListeners(eventHandler) {
+  document.addEventListener(EVENT_TYPES.CLICK, eventHandler, true)
+  document.addEventListener(EVENT_TYPES.INPUT, eventHandler, true)
+  watchBackgroundEvents(eventHandler)
+}
+
+function removeEventListeners(eventHandler) {
+  document.removeEventListener(EVENT_TYPES.CLICK, eventHandler, true)
+  document.removeEventListener(EVENT_TYPES.INPUT, eventHandler, true)
+}
 
 export function listenEvents(callback, shouldListen) {
-  if (!handler) {
-    handler = eventHandler(callback)
-  }
+  let eventHandler = createEventHandler(callback)
 
   if (shouldListen) {
-    document.addEventListener('click', handler, true)
-    document.addEventListener('input', handler, true)
+    addEventListeners(eventHandler)
   } else {
-    document.removeEventListener('click', handler, true)
-    document.removeEventListener('input', handler, true)
-    handler = null
+    removeEventListeners(eventHandler)
   }
 
   return () => {
-    document.removeEventListener('click', handler, true)
-    document.removeEventListener('input', handler, true)
-    handler = null // Reset handler after removing listeners
+    removeEventListeners(eventHandler)
   }
 }

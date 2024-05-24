@@ -59,7 +59,10 @@
       "activeTab",
       "scripting",
       "storage",
-      "unlimitedStorage"
+      "unlimitedStorage",
+      "tabs",
+      "windows",
+      "webNavigation"
     ],
     "content_scripts": [
       {

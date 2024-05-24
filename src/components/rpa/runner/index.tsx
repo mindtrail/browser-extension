@@ -23,7 +23,6 @@ export function FlowRunner() {
   const [flows, setFlows] = useState([])
   const [flowsRunning, setFlowsRunning] = useState([])
   const [eventsRunning, setEventsRunning] = useState(new Map())
-
   const runnerContainerRef = useRef(null)
 
   useEffect(() => {
@@ -40,7 +39,8 @@ export function FlowRunner() {
       const { data } = await getTasks()
       const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
       if (resumableTask) {
-        runFlow(resumableTask.state.flowId, resumableTask)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await runFlow(resumableTask.state.flowId, resumableTask)
       }
     }
     if (flows.length > 0) resumeTask()

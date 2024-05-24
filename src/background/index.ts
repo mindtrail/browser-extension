@@ -2,8 +2,9 @@ import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/c
 import { log } from '~/lib/utils'
 import { updateExtensionIcon } from '~/lib/update-icon'
 import * as api from '~/lib/api'
-
 import { initializeExtension, authenticateAndRetry } from './initialize'
+import { getState, createBackgroundEvent } from '~/lib/recorderState'
+import { EVENT_TYPES } from '~/components/rpa/recorder/event-types'
 
 let storage
 
@@ -97,7 +98,7 @@ async function fetchSavedDSList() {
 }
 
 async function processMessage(request: any, sendResponse: ContentScriptResponse) {
-  const { message, payload } = request
+  const { message, payload, action, tabId } = request
 
   switch (message) {
     case MESSAGES.SAVE_PAGE:
@@ -123,3 +124,16 @@ async function processMessage(request: any, sendResponse: ContentScriptResponse)
       break
   }
 }
+
+// Current URL event
+let debounceTimeout
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const state = await getState()
+  if (!state.isRecording) return
+  if (debounceTimeout) clearTimeout(debounceTimeout)
+  debounceTimeout = setTimeout(async () => {
+    const tab = await chrome.tabs.get(activeInfo.tabId)
+    const url = tab.url || tab.pendingUrl
+    await createBackgroundEvent({ type: EVENT_TYPES.URL, data: { url } })
+  }, 1000)
+})

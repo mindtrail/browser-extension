@@ -1,12 +1,13 @@
 import { loopComponent } from './components/loop'
 import { defaultComponent } from './components/default'
 import { extractComponent } from './components/extract'
+import { urlComponent } from './components/url'
 
-// considering using "components" instead of "events" as name
 const components = {
   loop: loopComponent,
   default: defaultComponent,
   extract: extractComponent,
+  url: urlComponent,
 }
 
 export async function runEvents({

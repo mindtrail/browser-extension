@@ -53,19 +53,35 @@ export function FlowRecorder() {
     setPaused(false)
   }
 
+  let lastSelector = ''
   function recordEvent(event) {
-    const { selector } = event
+    const { eventKey } = event
+    let newSelector = eventKey
 
     setEventsMap((prevMap) => {
-      const prevEvents = (prevMap?.get(selector) as Event[]) || []
-      const newEvents = [...prevEvents, event]
-      return new Map(prevMap).set(selector, newEvents)
+      const prevEvents = Array.from(prevMap.values()).flat()
+      const lastEvent: any = prevEvents[prevEvents.length - 1]
+
+      if (lastEvent && lastEvent.eventKey !== eventKey) {
+        const suffix =
+          prevEvents.filter((e: any) => e.eventKey.startsWith(eventKey)).length + 1
+        newSelector = `${eventKey}_${suffix}`
+      } else if (lastEvent && lastEvent.eventKey === eventKey) {
+        newSelector = lastSelector
+      }
+
+      const prevEventsForSelector = (prevMap?.get(newSelector) as Event[]) || []
+      const newEvents = [...prevEventsForSelector, event]
+      const newMap = new Map(prevMap).set(newSelector, newEvents)
+
+      lastSelector = newSelector
+      return newMap
     })
   }
 
   function removeEvent(event) {
     setEventsMap((prevMap) => {
-      prevMap.delete(event?.selector)
+      prevMap.delete(event?.eventKey)
       return new Map(prevMap)
     })
   }
