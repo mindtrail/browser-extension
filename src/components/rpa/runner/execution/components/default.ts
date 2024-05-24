@@ -1,11 +1,12 @@
-async function waitForUrl(baseURI, timeout = 10000, interval = 100) {
+async function waitForUrl(baseURI, timeout = 2000, interval = 100) {
+  const cleanBaseURI = baseURI.split('?')[0].split('#')[0]
   const endTime = Date.now() + timeout
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const checkUrl = () => {
-      if (window.location.href.startsWith(baseURI)) {
+      if (window.location.href.includes(cleanBaseURI)) {
         resolve(true)
       } else if (Date.now() > endTime) {
-        reject(new Error(`URL did not change to "${baseURI}" within the timeout period`))
+        window.location.href = baseURI
       } else {
         setTimeout(checkUrl, interval)
       }
@@ -40,7 +41,8 @@ export async function simulateEvent(event) {
     await waitForUrl(event.baseURI)
     const element: any = await waitForElement(event.selector)
     if (!element) {
-      throw new Error(`Element with selector "${event.selector}" not found`)
+      if (event.href) window.location.href = event.href
+      return
     }
     if (event.type === 'input') {
       let nativeInputValueSetter
