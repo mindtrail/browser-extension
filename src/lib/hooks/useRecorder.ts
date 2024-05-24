@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react'
-import { useStorage } from '@plasmohq/storage/hook'
-import { Storage } from '@plasmohq/storage'
-
-import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
-
-const RECORDER_CONFIG = {
-  key: STORAGE_AREA.RECORDER,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
+import { getRecorderState, saveRecorderState } from '~lib/hooks/recorder-storage'
+import { DEFAULT_RECORDER_STATE } from '~/lib/constants'
 
 export const useRecorderState = () => {
-  const [storageData, setStorageData] = useStorage(
-    RECORDER_CONFIG,
-    DEFAULT_RECORDER_STATE,
+  const [storageData, setStorageData] = useState(DEFAULT_RECORDER_STATE)
+  const [isRecording, setIsRecording] = useState(DEFAULT_RECORDER_STATE.isRecording)
+  const [eventsMap, setEventsMap] = useState(
+    new Map(JSON.parse(DEFAULT_RECORDER_STATE.eventsMap)),
   )
+  const [paused, setPaused] = useState(DEFAULT_RECORDER_STATE.paused)
+  const [saving, setSaving] = useState(DEFAULT_RECORDER_STATE.saving)
 
-  const [isRecording, setIsRecording] = useState(storageData.isRecording)
-  const [eventsMap, setEventsMap] = useState(new Map(JSON.parse(storageData.eventsMap)))
-  const [paused, setPaused] = useState(storageData.paused)
-  const [saving, setSaving] = useState(storageData.saving)
+  // Init: State -> Storage
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getRecorderState()
+      setStorageData(data)
+    }
+    fetchData()
+  }, [])
 
-  // Effect to update local state when storageData changes
+  // Sync: Storage -> State
   useEffect(() => {
     if (isRecording !== storageData.isRecording) {
       setIsRecording(storageData.isRecording)
@@ -36,22 +36,25 @@ export const useRecorderState = () => {
     }
   }, [storageData])
 
+  // Sync: State -> Storage
   useEffect(() => {
-    // Check if the current state differs from the storage state before updating
-    if (
-      isRecording !== storageData.isRecording ||
-      eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size ||
-      paused !== storageData.paused ||
-      saving !== storageData.saving
-    ) {
-      setStorageData({
-        isRecording,
-        eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
-        paused,
-        saving,
-        backgroundEvents: storageData.backgroundEvents,
-      })
+    const updateStorage = async () => {
+      if (
+        isRecording !== storageData.isRecording ||
+        eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size ||
+        paused !== storageData.paused ||
+        saving !== storageData.saving
+      ) {
+        await saveRecorderState({
+          isRecording,
+          eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
+          paused,
+          saving,
+          backgroundEvents: storageData.backgroundEvents,
+        })
+      }
     }
+    updateStorage()
   }, [isRecording, eventsMap, paused, saving])
 
   return {
