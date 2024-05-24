@@ -1,24 +1,17 @@
 import { useEffect, useState } from 'react'
-import { getRecorderState, saveRecorderState } from '~lib/hooks/recorder-storage'
+import { useStorage } from '@plasmohq/storage/hook'
 import { DEFAULT_RECORDER_STATE } from '~/lib/constants'
+import { RECORDER_CONFIG } from '~/lib/hooks/recorder-storage'
 
 export const useRecorderState = () => {
-  const [storageData, setStorageData] = useState(DEFAULT_RECORDER_STATE)
-  const [isRecording, setIsRecording] = useState(DEFAULT_RECORDER_STATE.isRecording)
-  const [eventsMap, setEventsMap] = useState(
-    new Map(JSON.parse(DEFAULT_RECORDER_STATE.eventsMap)),
+  const [storageData, setStorageData] = useStorage(
+    RECORDER_CONFIG,
+    DEFAULT_RECORDER_STATE,
   )
-  const [paused, setPaused] = useState(DEFAULT_RECORDER_STATE.paused)
-  const [saving, setSaving] = useState(DEFAULT_RECORDER_STATE.saving)
-
-  // Init: State -> Storage
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getRecorderState()
-      setStorageData(data)
-    }
-    fetchData()
-  }, [])
+  const [isRecording, setIsRecording] = useState(storageData.isRecording)
+  const [eventsMap, setEventsMap] = useState(new Map(JSON.parse(storageData.eventsMap)))
+  const [paused, setPaused] = useState(storageData.paused)
+  const [saving, setSaving] = useState(storageData.saving)
 
   // Sync: Storage -> State
   useEffect(() => {
@@ -38,23 +31,20 @@ export const useRecorderState = () => {
 
   // Sync: State -> Storage
   useEffect(() => {
-    const updateStorage = async () => {
-      if (
-        isRecording !== storageData.isRecording ||
-        eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size ||
-        paused !== storageData.paused ||
-        saving !== storageData.saving
-      ) {
-        await saveRecorderState({
-          isRecording,
-          eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
-          paused,
-          saving,
-          backgroundEvents: storageData.backgroundEvents,
-        })
-      }
+    if (
+      isRecording !== storageData.isRecording ||
+      eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size ||
+      paused !== storageData.paused ||
+      saving !== storageData.saving
+    ) {
+      setStorageData({
+        isRecording,
+        eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
+        paused,
+        saving,
+        backgroundEvents: storageData.backgroundEvents,
+      })
     }
-    updateStorage()
   }, [isRecording, eventsMap, paused, saving])
 
   return {
