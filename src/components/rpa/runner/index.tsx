@@ -74,7 +74,7 @@ export function FlowRunner() {
       setFlowsRunning([])
       setEventsRunning(new Map())
       await onTaskEnd(flowId, task.id)
-    }, 2500)
+    }, 100)
   }
 
   async function removeFlow(id) {

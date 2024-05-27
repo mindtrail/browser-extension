@@ -23,8 +23,10 @@ export async function runEvents({
   task = structuredClone(task)
   events = structuredClone(events)
   for (const event of events) {
-    // skip event if already found in task.logs
-    if (task.logs.find((log) => log.eventId === event.id)) continue
+    // skip event if already found in task.logs and status = 'ended'
+    if (task.logs.find((log) => log.eventId === event.id && log.status === 'ended')) {
+      continue
+    }
     const component = components[event.type]
     if (!component) continue
     await component({

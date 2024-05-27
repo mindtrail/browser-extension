@@ -3,7 +3,7 @@ import { waitForElement } from '../wait-for-element'
 
 async function triggerInputEvent(event) {
   try {
-    if (event.baseURI) await waitForUrl(event)
+    if (event.baseURI) await waitForUrl(event.baseURI)
 
     const element: any = await waitForElement(event.selector)
     if (!element) return
@@ -26,7 +26,7 @@ async function triggerInputEvent(event) {
   }
 }
 
-const delay = 500
+const delay = 10
 export async function inputComponent({ flowId, event, data, onEventStart, onEventEnd }) {
   await onEventStart(flowId, event)
   event.value = data[event.name] || event.value

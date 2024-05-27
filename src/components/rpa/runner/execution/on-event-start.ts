@@ -14,7 +14,7 @@ export async function onEventStart(flowId, event, taskId) {
       {
         flowId,
         eventId: event.id,
-        status: `${event.id}(start)`, // format for testing purpose
+        status: 'running',
       },
     ],
   })

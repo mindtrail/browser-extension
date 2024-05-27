@@ -9,12 +9,5 @@ export async function onTaskEnd(flowId, taskId) {
       ...task.state,
       status: 'ended',
     },
-    logs: [
-      ...task.logs,
-      {
-        flowId,
-        status: 'ended',
-      },
-    ],
   })
 }
