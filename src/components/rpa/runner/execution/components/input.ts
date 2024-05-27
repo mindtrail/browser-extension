@@ -29,12 +29,9 @@ async function triggerInputEvent(event) {
   }
 }
 
-const delay = 10
 export async function inputComponent({ flowId, event, data, onEventStart, onEventEnd }) {
   await onEventStart(flowId, event)
   event.value = data[event.name] || event.value
-  await new Promise((resolve) => setTimeout(resolve, delay))
   await triggerInputEvent(event)
-  await new Promise((resolve) => setTimeout(resolve, delay))
   await onEventEnd(flowId, event)
 }

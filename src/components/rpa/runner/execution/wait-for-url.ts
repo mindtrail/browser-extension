@@ -2,7 +2,7 @@ function cleanUrl(url) {
   return url.split('?')[0].split('#')[0]
 }
 
-export async function waitForUrl(baseURI, timeout = 3000, interval = 100) {
+export async function waitForUrl(baseURI, timeout = 2000, interval = 100) {
   const cleanBaseURI = cleanUrl(baseURI)
   const endTime = Date.now() + timeout
 

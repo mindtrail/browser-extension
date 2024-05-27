@@ -25,10 +25,8 @@ async function triggerClickEvent(event, callback) {
   }
 }
 
-const delay = 10
 export async function clickComponent({ flowId, event, onEventStart, onEventEnd }) {
   await onEventStart(flowId, event)
-  await new Promise((resolve) => setTimeout(resolve, delay))
   await triggerClickEvent(event, async () => {
     await onEventEnd(flowId, event)
   })

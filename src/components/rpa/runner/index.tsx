@@ -39,7 +39,6 @@ export function FlowRunner() {
       const { data } = await getTasks()
       const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
       if (resumableTask) {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
         await runFlow(resumableTask.state.flowId, resumableTask)
       }
     }
