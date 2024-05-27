@@ -3,7 +3,10 @@ import { waitForElement } from '../wait-for-element'
 
 async function triggerInputEvent(event) {
   try {
-    if (event.baseURI) await waitForUrl(event.baseURI)
+    if (event.baseURI) {
+      const urlMatch = await waitForUrl(event.baseURI)
+      if (!urlMatch) window.location.href = event.baseURI
+    }
 
     const element: any = await waitForElement(event.selector)
     if (!element) return
