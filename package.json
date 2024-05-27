@@ -57,6 +57,7 @@
     },
     "permissions": [
       "activeTab",
+      "microphone",
       "scripting",
       "storage",
       "unlimitedStorage",

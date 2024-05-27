@@ -1,8 +1,5 @@
 import OpenAI from 'openai'
-const openai = new OpenAI({
-  apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-})
+
 import {
   splitQueryPrompt,
   detectFlowPrompt,
@@ -12,6 +9,11 @@ import {
   extractPropertiesPrompt,
   splitNQLPrompt,
 } from './prompts'
+
+const openai = new OpenAI({
+  apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+})
 
 export async function splitQuery(query) {
   try {

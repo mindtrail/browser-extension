@@ -16,16 +16,7 @@ import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
-  const {
-    isRecording,
-    setIsRecording,
-    eventsMap,
-    setEventsMap,
-    paused,
-    setPaused,
-    saving,
-    setSaving,
-  } = useRecorderState()
+  const { isRecording, eventsMap, paused, saving, setRecordingState } = useRecorderState()
 
   useEffect(
     () => listenEvents(recordEvent, isRecording && !paused),
@@ -37,7 +28,7 @@ export function FlowRecorder() {
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isRecording) {
-        cancelRecording()
+        resetRecordingState()
       }
     }
 
@@ -47,38 +38,54 @@ export function FlowRecorder() {
     }
   }, [isRecording])
 
-  async function cancelRecording() {
-    setIsRecording(false)
-    setEventsMap(new Map())
-    setPaused(false)
+  function resetRecordingState() {
+    setRecordingState({
+      isRecording: false,
+      eventsMap: new Map(),
+      paused: false,
+      saving: false,
+    })
   }
 
   function recordEvent(event) {
     const { selector } = event
 
-    setEventsMap((prevMap) => {
-      const prevEvents = (prevMap?.get(selector) as Event[]) || []
+    setRecordingState((prevState) => {
+      const prevMap = prevState?.eventsMap || new Map()
+      const prevEvents = (prevMap.get(selector) as Event[]) || []
       const newEvents = [...prevEvents, event]
-      return new Map(prevMap).set(selector, newEvents)
+
+      return {
+        ...prevState,
+        eventsMap: new Map(prevMap).set(selector, newEvents),
+      }
     })
   }
 
   function removeEvent(event) {
-    setEventsMap((prevMap) => {
+    setRecordingState((prevState) => {
+      const prevMap = prevState?.eventsMap || new Map()
       prevMap.delete(event?.selector)
-      return new Map(prevMap)
+      return {
+        ...prevState,
+        eventsMap: new Map(prevMap),
+      }
     })
   }
 
   async function toggleRecording() {
-    setIsRecording(!isRecording)
-    setEventsMap(new Map())
+    const isRecordingState = !isRecording
 
-    if (!isRecording || !eventsMap.size) {
+    if (!isRecordingState || !eventsMap.size) {
+      resetRecordingState()
       return
     }
 
-    setSaving(true)
+    setRecordingState((prevState) => ({
+      ...prevState,
+      saving: true,
+    }))
+
     const eventsRecorded = Array.from(eventsMap.values()).flat()
     const flow = await generateMetadata(eventsRecorded)
 
@@ -94,7 +101,7 @@ export function FlowRecorder() {
       }
     })
 
-    setSaving(false)
+    resetRecordingState()
     sendMessageToBg({
       name: 'flows',
       body: {
@@ -102,6 +109,13 @@ export function FlowRecorder() {
         payload: flow,
       },
     })
+  }
+
+  function togglePause() {
+    setRecordingState((prevState) => ({
+      ...prevState,
+      paused: !prevState.paused,
+    }))
   }
 
   return (
@@ -112,7 +126,7 @@ export function FlowRecorder() {
     >
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
-          <CancelRecordingButton onClick={cancelRecording} />
+          <CancelRecordingButton onClick={resetRecordingState} />
           <Events eventsMap={eventsMap as Map<string, any>} removeEvent={removeEvent} />
         </div>
       )}
@@ -135,7 +149,7 @@ export function FlowRecorder() {
       ) : (
         <RecordButton
           onToggleRecording={toggleRecording}
-          onPause={() => setPaused(!paused)}
+          onPause={togglePause}
           isRecording={isRecording}
           paused={paused}
         />

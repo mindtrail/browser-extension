@@ -1,4 +1,6 @@
-import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
+import { Storage } from '@plasmohq/storage'
+
+import { API, MESSAGES, DEFAULT_RECORDER_STATE, STORAGE_AREA } from '~/lib/constants'
 import { log } from '~/lib/utils'
 import { updateExtensionIcon } from '~/lib/update-icon'
 import * as api from '~/lib/api'
@@ -6,10 +8,29 @@ import * as api from '~/lib/api'
 import { initializeExtension, authenticateAndRetry } from './initialize'
 import { listenForNavigationEvents } from './navigation'
 
-let storage
+let storage: Storage
+
+type RecorderState = typeof DEFAULT_RECORDER_STATE
 
 async function initialize() {
   storage = await initializeExtension()
+
+  const SETTINGS_CONFIG = {
+    key: STORAGE_AREA.SETTINGS,
+    instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+  }
+
+  // storage.watch({
+  //   [STORAGE_AREA.RECORDER]: ({ newValue }) => {
+  //     const recorderState = newValue as RecorderState
+
+  //     if (recorderState.isRecording) {
+  //       // startRecording()
+  //     } else {
+  //       // stopRecording()
+  //     }
+  //   },
+  // })
 }
 
 // Ensure listeners are added when the extension is installed or updated
@@ -124,7 +145,24 @@ async function processMessage(request: any, sendResponse: ContentScriptResponse)
     case MESSAGES.UPDATE_ICON:
       await updateExtensionIcon()
       break
+    case 'START_RECORDING':
+      startRecording(payload)
+      break
+    case 'STOP_RECORDING':
+      stopRecording()
+      break
     default:
       break
   }
+}
+
+let mediaRecorder
+let audioChunks = []
+
+async function startRecording(audio) {
+  console.log('Recording started', audio)
+}
+
+async function stopRecording() {
+  mediaRecorder && mediaRecorder?.stop()
 }

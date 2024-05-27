@@ -7,7 +7,7 @@ import { debounceEvent } from './process-queue'
 function eventHandler(callback) {
   return (event) => {
     const { type, target } = event
-    console.log(event, type, 123)
+    // console.log(event, type, 123)
     const selector = getSelector(target)
 
     if (!target || (selector && selector?.includes('plasmo-csui'))) {
