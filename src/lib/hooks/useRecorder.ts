@@ -20,7 +20,6 @@ export const useRecorderState = () => {
     [],
   )
 
-  console.log(111, recorderState)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
   const startRecording = useCallback(async () => {

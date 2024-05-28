@@ -21,7 +21,6 @@ export function Events(props: EventProps) {
 
   const eventsToDisplay = []
 
-  console.log(222, eventsList)
   eventsList.forEach((event) => {
     const value = event.value || event.textContent
 
