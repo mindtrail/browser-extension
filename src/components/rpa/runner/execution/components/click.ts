@@ -5,13 +5,17 @@ async function triggerClickEvent(event, callback) {
   try {
     if (event.baseURI) {
       const urlMatch = await waitForUrl(event.baseURI)
-      if (!urlMatch) window.location.href = event.baseURI
+      if (!urlMatch) {
+        window.location.href = event.baseURI
+      }
     }
 
     const element: any = await waitForElement(event.selector)
     if (!element) {
       await callback()
-      if (event.href) window.location.href = event.href
+      if (event.href) {
+        window.location.href = event.href
+      }
       return
     }
 
