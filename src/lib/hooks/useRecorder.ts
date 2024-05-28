@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
-import { DEFAULT_RECORDER_STATE } from '~/lib/constants'
-import { RECORDER_CONFIG } from '~/lib/hooks/recorder-storage'
+import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
+
+const RECORDER_CONFIG = {
+  key: STORAGE_AREA.RECORDER,
+  instance: new Storage({ area: 'local' }),
+}
 
 export const useRecorderState = () => {
   const [storageData, setStorageData] = useStorage(

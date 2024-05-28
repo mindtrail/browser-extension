@@ -1,41 +1,38 @@
-import { Storage } from '@plasmohq/storage'
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
+import { getStorage } from '~background/initialize'
 
-export const RECORDER_CONFIG = {
-  key: STORAGE_AREA.RECORDER,
-  instance: new Storage({ area: 'local' }),
-}
-
+let storage
 let storageData = DEFAULT_RECORDER_STATE
+getStorage().then((s) => (storage = s))
 
 export const getRecorderState = async () => {
-  const storedData: any = await RECORDER_CONFIG.instance.get(RECORDER_CONFIG.key)
+  const storedData: any = await storage.get(STORAGE_AREA.RECORDER)
   storageData = storedData || DEFAULT_RECORDER_STATE
   return storageData
 }
 
 export const saveRecorderState = async (newState) => {
   storageData = { ...storageData, ...newState }
-  await RECORDER_CONFIG.instance.set(RECORDER_CONFIG.key, storageData)
+  await storage.set(STORAGE_AREA.RECORDER, storageData)
   return storageData
 }
 
 export const watchRecorderState = (callback) => {
-  RECORDER_CONFIG.instance.watch({
-    [RECORDER_CONFIG.key]: (changes) => callback(changes.newValue, changes.oldValue),
+  storage.watch({
+    [STORAGE_AREA.RECORDER]: (changes) => callback(changes.newValue, changes.oldValue),
   })
 }
 
 export const createBackgroundEvent = async (event) => {
   storageData.backgroundEvents = storageData.backgroundEvents || []
   storageData.backgroundEvents = [...storageData.backgroundEvents, event]
-  await RECORDER_CONFIG.instance.set(RECORDER_CONFIG.key, storageData)
+  await storage.set(STORAGE_AREA.RECORDER, storageData)
   return event
 }
 
 export const onBackgroundEvent = (callback) => {
-  RECORDER_CONFIG.instance.watch({
-    [RECORDER_CONFIG.key]: (changes) => {
+  storage.watch({
+    [STORAGE_AREA.RECORDER]: (changes) => {
       const oldBackgroundEvents = changes.oldValue.backgroundEvents || []
       const newBackgroundEvents = changes.newValue.backgroundEvents || []
       if (newBackgroundEvents.length <= oldBackgroundEvents.length) return

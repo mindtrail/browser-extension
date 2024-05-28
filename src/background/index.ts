@@ -3,7 +3,7 @@ import { log } from '~/lib/utils'
 import { updateExtensionIcon } from '~/lib/update-icon'
 import * as api from '~/lib/api'
 import { initializeExtension, authenticateAndRetry } from './initialize'
-import { getRecorderState, createBackgroundEvent } from '~lib/hooks/recorder-storage'
+import { getRecorderState, createBackgroundEvent } from '~lib/background/recorder-storage'
 import { EVENT_TYPES } from '~/components/rpa/recorder/event-types'
 
 let storage
