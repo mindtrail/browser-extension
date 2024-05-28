@@ -79,10 +79,13 @@ export function FlowRecorder() {
     })
   }
 
-  function removeEvent(event) {
+  function removeEvent(index) {
     setEventsMap((prevMap) => {
-      prevMap.delete(event?.eventKey)
-      return new Map(prevMap)
+      const newMap = new Map(prevMap)
+      Array.from(prevMap.keys()).forEach((key, i) => {
+        if (i === index) newMap.delete(key)
+      })
+      return newMap
     })
   }
 
