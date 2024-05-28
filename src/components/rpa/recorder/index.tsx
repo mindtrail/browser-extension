@@ -71,7 +71,12 @@ export function FlowRecorder() {
     setEventsMap((prevMap) => {
       const prevEvents = Array.from(prevMap.values()).flat()
       lastKey = generateKey(event.eventKey, lastKey, prevEvents)
-      return new Map(prevMap).set(lastKey, event)
+
+      // use array for each key instead of single event (potentially useful for repetitive events)
+      const prevEventsForKey = (prevMap?.get(lastKey) as []) || []
+      const newEvents = [...prevEventsForKey, event]
+
+      return new Map(prevMap).set(lastKey, newEvents)
     })
   }
 
