@@ -33,14 +33,14 @@ export function listenForNavigationEvents() {
         console.error('Error retrieving tab:', chrome.runtime.lastError)
         return
       }
-      // console.log('Tab changed to:', tab)
+      console.log('Tab changed to:', tab)
       addNavigationEvent({ activeTabId: activeInfo.tabId })
     })
   })
 
   // Listen for new tab creation
   chrome.tabs.onCreated.addListener((tab) => {
-    // console.log('New tab opened:', tab)
+    console.log('New tab opened:', tab)
     addNavigationEvent({ newTabId: tab.id })
   })
 
@@ -48,16 +48,16 @@ export function listenForNavigationEvents() {
   chrome.webNavigation.onCompleted.addListener(
     (details) => {
       if (details.url === prevUrl) {
-        // console.log('Duplicate navigation event detected, ignoring.')
+        console.log('Duplicate navigation event detected, ignoring.')
         return
       }
       if (details?.frameId !== 0) {
-        // console.log('Ignoring navigation event for non-top frame')
+        console.log('Ignoring navigation event for non-top frame')
         return
       }
 
       prevUrl = details.url
-      // console.log('Navigation completed:', details)
+      console.log('Navigation completed:', details)
       addNavigationEvent({ currentUrl: details.url })
     },
     { url: [{ schemes: ['http', 'https'] }] },
@@ -66,12 +66,12 @@ export function listenForNavigationEvents() {
   chrome.webNavigation.onHistoryStateUpdated.addListener(
     (details) => {
       if (details.url === prevUrl) {
-        // console.log('Duplicate navigation event detected, ignoring.', prevUrl)
+        console.log('Duplicate navigation event detected, ignoring.', prevUrl)
         return
       }
 
       prevUrl = details.url
-      // console.log('In-page navigation:', details)
+      console.log('In-page navigation:', details)
       addNavigationEvent({ currentUrl: details.url })
     },
     { url: [{ schemes: ['http', 'https'] }] },
