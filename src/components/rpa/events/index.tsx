@@ -8,36 +8,28 @@ const EVENT_ICONS = {
 }
 
 interface EventProps {
-  eventsMap?: Map<string, any[]>
   eventsList?: any[]
-  removeEvent?: (event: any) => void
   debugMode?: boolean
   readOnly?: boolean
+  removeEvent?: (event: any) => void
 }
 
 export function Events(props: EventProps) {
-  const {
-    eventsMap,
-    eventsList = [],
-    removeEvent,
-    debugMode = false,
-    readOnly = false,
-  } = props
+  const { eventsList = [], removeEvent, debugMode = false, readOnly = false } = props
 
-  if (!eventsMap?.size && !eventsList?.length) return
+  if (!eventsList?.length) return
 
   const eventsToDisplay = []
-  const collectionToIterate = readOnly ? eventsList : eventsMap
 
-  collectionToIterate.forEach((eventsArray) => {
-    const event = readOnly ? eventsArray : eventsArray[0]
+  console.log(222, eventsList)
+  eventsList.forEach((event) => {
     const value = event.value || event.textContent
 
     eventsToDisplay.push({
       ...event,
       value: debugMode ? `${event.selector}: ${value}` : value,
       icon: EVENT_ICONS[event.type] || EVENT_ICONS.default,
-      count: readOnly ? eventsArray.length : undefined,
+      count: event?.count,
     })
   })
 

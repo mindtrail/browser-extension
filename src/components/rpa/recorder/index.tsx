@@ -8,11 +8,7 @@ import { Events } from '../events'
 import { generateMetadata } from '../utils/openai'
 import { sendMessageToBg } from '~/lib/bg-messaging'
 import { MESSAGES } from '~/lib/constants'
-import {
-  serializeEventsMap,
-  deserializeEventsMap,
-  useRecorderState,
-} from '~/lib/hooks/useRecorder'
+import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
@@ -24,7 +20,7 @@ export function FlowRecorder() {
     isRecording,
     isPaused,
     isSaving,
-    eventsMap,
+    eventsList,
     resetRecorderState,
     setRecorderState,
   } = useRecorderState()
@@ -50,25 +46,40 @@ export function FlowRecorder() {
   }, [isRecording])
 
   function recordEvent(event) {
-    const { selector } = event
     setRecorderState((prevState) => {
-      const prevMap = deserializeEventsMap(prevState?.eventsMap)
-      const prevEvents = (prevMap.get(selector) as Event[]) || []
-      const newEvents = [...prevEvents, event]
+      // If event in array, update count, otherwise add it to the array
+      const eventAlreadyInList = prevState?.eventsList.find(
+        (e) => e.selector === event.selector,
+      )
+
+      const updatedEventsList = eventAlreadyInList
+        ? prevState?.eventsList.map((e) => {
+            if (e.selector === event.selector) {
+              return {
+                ...e,
+                count: e.count + 1,
+              }
+            }
+            return e
+          })
+        : [...prevState?.eventsList, event]
+
       return {
         ...prevState,
-        eventsMap: new Map(prevMap).set(selector, newEvents),
+        eventsList: updatedEventsList,
       }
     })
   }
 
   function removeEvent(event) {
     setRecorderState((prevState) => {
-      const prevMap = prevState?.eventsMap || new Map()
-      prevMap.delete(event?.selector)
+      const remainingEvents = prevState?.eventsList.filter(
+        (e) => e.selector !== event.selector,
+      )
+
       return {
         ...prevState,
-        eventsMap: new Map(prevMap),
+        eventsList: remainingEvents,
       }
     })
   }
@@ -82,7 +93,7 @@ export function FlowRecorder() {
       return
     }
 
-    if (!eventsMap.size) {
+    if (!eventsList.length) {
       resetRecorderState()
       return
     }
@@ -92,7 +103,7 @@ export function FlowRecorder() {
       isSaving: true,
     }))
 
-    const eventsRecorded = Array.from(eventsMap.values()).flat()
+    const eventsRecorded = Array.from(eventsList.values()).flat()
     const flow = await generateMetadata(eventsRecorded)
 
     flow.events = eventsRecorded.map((event: Event, index) => {
@@ -138,11 +149,11 @@ export function FlowRecorder() {
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={resetRecorderState} />
-          <Events eventsMap={eventsMap as Map<string, any>} removeEvent={removeEvent} />
+          <Events eventsList={eventsList} removeEvent={removeEvent} />
         </div>
       )}
 
-      {isRecording && !eventsMap?.size && (
+      {isRecording && !eventsList?.length && (
         <Typography className='w-full text-center mb-6'>
           {isPaused ? 'isPaused Recording' : 'Recording Workflow...'}
         </Typography>

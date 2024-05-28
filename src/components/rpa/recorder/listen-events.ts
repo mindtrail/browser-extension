@@ -32,6 +32,7 @@ function eventHandler(callback) {
       id: `${timeStamp}`,
       type,
       selector,
+      count: 1,
       ...(value !== null && { value }),
       ...(textContent !== null && { textContent }),
       ...(target.name !== null && { name: target.name }),
