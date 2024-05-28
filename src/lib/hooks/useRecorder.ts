@@ -14,7 +14,7 @@ export const useRecorderState = () => {
     RECORDER_CONFIG,
     DEFAULT_RECORDER_STATE,
   )
-  const [recorder, setRecorder] = useState<MediaRecorder | null>(null)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
   // Parse only once and memoize
   const eventsMapFromStorage = useMemo(
@@ -22,37 +22,38 @@ export const useRecorderState = () => {
     [storageData.eventsMap],
   )
 
-  const [state, setState] = useState({
+  const [recorderState, setRecorderState] = useState({
     isRecording: storageData.isRecording,
     eventsMap: eventsMapFromStorage,
-    paused: storageData.paused,
-    saving: storageData.saving,
+    isPaused: storageData.isPaused,
+    isSaving: storageData.isSaving,
   })
-  console.log(1234)
 
-  // Handle state updates from storage changes
+  console.log(1234, recorderState)
+
+  // // Handle state updates from storage changes
   useEffect(() => {
-    setState((prev) => ({
+    setRecorderState((prev) => ({
       ...prev,
       isRecording: storageData.isRecording,
       eventsMap: eventsMapFromStorage,
-      paused: storageData.paused,
-      saving: storageData.saving,
+      isPaused: storageData.isPaused,
+      isSaving: storageData.isSaving,
     }))
   }, [storageData, eventsMapFromStorage])
 
   // Sync state back to storage
-  useEffect(() => {
-    // @ts-ignore
-    if (state !== storageData) {
-      setStorageData({
-        isRecording: state.isRecording,
-        eventsMap: JSON.stringify(Array.from(state.eventsMap.entries())),
-        paused: state.paused,
-        saving: state.saving,
-      })
-    }
-  }, [state])
+  // useEffect(() => {
+  //   // @ts-ignore
+  //   if (state !== storageData) {
+  //     setStorageData({
+  //       isRecording: state.isRecording,
+  //       eventsMap: JSON.stringify(Array.from(state.eventsMap.entries())),
+  //       isPaused: state.isPaused,
+  //       saving: state.saving,
+  //     })
+  //   }
+  // }, [state])
 
   const startRecording = useCallback(async () => {
     try {
@@ -62,16 +63,16 @@ export const useRecorderState = () => {
       newRecorder.ondataavailable = handleDataAvailable
       newRecorder.onstop = handleStop
       newRecorder.start(1000)
-      setRecorder(newRecorder)
+      setMediaRecorder(newRecorder)
     } catch (error) {
       console.error('Error accessing microphone:', error)
     }
   }, [])
 
   const stopRecording = useCallback(() => {
-    recorder?.stop()
-    setRecorder(null)
-  }, [recorder])
+    mediaRecorder?.stop()
+    setMediaRecorder(null)
+  }, [mediaRecorder])
 
   const handleDataAvailable = useCallback((event: BlobEvent) => {
     // Process each chunk, e.g., send to backend
@@ -82,12 +83,12 @@ export const useRecorderState = () => {
   }, [])
 
   useEffect(() => {
-    if (state.isRecording) {
+    if (recorderState.isRecording) {
       // startRecording()
     } else {
       // stopRecording()
     }
-  }, [state.isRecording, startRecording, stopRecording])
+  }, [recorderState.isRecording, startRecording, stopRecording])
 
-  return { ...state, setState }
+  return { ...recorderState, setRecorderState }
 }

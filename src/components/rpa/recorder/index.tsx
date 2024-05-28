@@ -16,11 +16,13 @@ import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
-  const { isRecording, eventsMap, paused, saving, setRecordingState } = useRecorderState()
+  const { isRecording, isPaused, isSaving, eventsMap, setRecorderState } =
+    useRecorderState()
 
+  console.log('isRecording', isRecording)
   useEffect(
-    () => listenEvents(recordEvent, isRecording && !paused),
-    [isRecording, paused],
+    () => listenEvents(recordEvent, isRecording && !isPaused),
+    [isRecording, isPaused],
   )
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export function FlowRecorder() {
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isRecording) {
-        resetRecordingState()
+        resetRecorderState()
       }
     }
 
@@ -38,19 +40,19 @@ export function FlowRecorder() {
     }
   }, [isRecording])
 
-  function resetRecordingState() {
-    setRecordingState({
+  function resetRecorderState() {
+    setRecorderState({
       isRecording: false,
       eventsMap: new Map(),
-      paused: false,
-      saving: false,
+      isPaused: false,
+      isSaving: false,
     })
   }
 
   function recordEvent(event) {
     const { selector } = event
 
-    setRecordingState((prevState) => {
+    setRecorderState((prevState) => {
       const prevMap = prevState?.eventsMap || new Map()
       const prevEvents = (prevMap.get(selector) as Event[]) || []
       const newEvents = [...prevEvents, event]
@@ -63,7 +65,7 @@ export function FlowRecorder() {
   }
 
   function removeEvent(event) {
-    setRecordingState((prevState) => {
+    setRecorderState((prevState) => {
       const prevMap = prevState?.eventsMap || new Map()
       prevMap.delete(event?.selector)
       return {
@@ -74,16 +76,22 @@ export function FlowRecorder() {
   }
 
   async function toggleRecording() {
-    const isRecordingState = !isRecording
-
-    if (!isRecordingState || !eventsMap.size) {
-      resetRecordingState()
+    if (!isRecording) {
+      setRecorderState((prevState) => ({
+        ...prevState,
+        isRecording: true,
+      }))
       return
     }
 
-    setRecordingState((prevState) => ({
+    if (!eventsMap.size) {
+      resetRecorderState()
+      return
+    }
+
+    setRecorderState((prevState) => ({
       ...prevState,
-      saving: true,
+      isSaving: true,
     }))
 
     const eventsRecorded = Array.from(eventsMap.values()).flat()
@@ -101,7 +109,12 @@ export function FlowRecorder() {
       }
     })
 
-    resetRecordingState()
+    setRecorderState((prevState) => ({
+      ...prevState,
+      isRecording: false,
+      isSaving: false,
+    }))
+
     sendMessageToBg({
       name: 'flows',
       body: {
@@ -112,9 +125,9 @@ export function FlowRecorder() {
   }
 
   function togglePause() {
-    setRecordingState((prevState) => ({
+    setRecorderState((prevState) => ({
       ...prevState,
-      paused: !prevState.paused,
+      isPaused: !prevState.isPaused,
     }))
   }
 
@@ -126,32 +139,32 @@ export function FlowRecorder() {
     >
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
-          <CancelRecordingButton onClick={resetRecordingState} />
+          <CancelRecordingButton onClick={resetRecorderState} />
           <Events eventsMap={eventsMap as Map<string, any>} removeEvent={removeEvent} />
         </div>
       )}
 
       {isRecording && !eventsMap?.size && (
         <Typography className='w-full text-center mb-6'>
-          {paused ? 'Paused Recording' : 'Recording Workflow...'}
+          {isPaused ? 'isPaused Recording' : 'Recording Workflow...'}
         </Typography>
       )}
 
-      {saving ? (
+      {isSaving ? (
         <Button
           className='flex w-full gap-4 items-center !opacity-75'
           variant='outline'
           disabled
         >
           <LoaderCircleIcon className='w-5 h-5 animate-spin' />
-          <Typography>Saving Workflow...</Typography>
+          <Typography>isSaving Workflow...</Typography>
         </Button>
       ) : (
         <RecordButton
           onToggleRecording={toggleRecording}
           onPause={togglePause}
           isRecording={isRecording}
-          paused={paused}
+          isPaused={isPaused}
         />
       )}
     </div>
