@@ -45,7 +45,7 @@ export function FlowRunner() {
     if (flows.length > 0) resumeTask()
   }, [flows])
 
-  async function runFlow(flowId: string, task: any) {
+  async function runFlow(flowId: string, task?: any) {
     if (flowsRunning?.length > 0) return
 
     const flowsToRun = await getFlowsToRun({ flows, flowId, query })
