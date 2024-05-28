@@ -13,7 +13,6 @@ import { MESSAGES } from '~/lib/constants'
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
-import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
   const {
@@ -53,29 +52,26 @@ export function FlowRecorder() {
     setPaused(false)
   }
 
-  let lastSelector = ''
-  function recordEvent(event) {
-    const { eventKey } = event
-    let newSelector = eventKey
+  function generateKey(eventKey, lastKey, prevEvents = []) {
+    let key = eventKey
+    const lastEvent = prevEvents[prevEvents.length - 1]
+    if (lastEvent && lastEvent.eventKey !== eventKey) {
+      // create new key
+      const i = prevEvents.filter((e) => e.eventKey.startsWith(eventKey)).length + 1
+      key = `${eventKey}_${i}`
+    } else if (lastEvent && lastEvent.eventKey === eventKey) {
+      // reuse last key
+      key = lastKey
+    }
+    return key
+  }
 
+  let lastKey = ''
+  function recordEvent(event) {
     setEventsMap((prevMap) => {
       const prevEvents = Array.from(prevMap.values()).flat()
-      const lastEvent: any = prevEvents[prevEvents.length - 1]
-
-      if (lastEvent && lastEvent.eventKey !== eventKey) {
-        const suffix =
-          prevEvents.filter((e: any) => e.eventKey.startsWith(eventKey)).length + 1
-        newSelector = `${eventKey}_${suffix}`
-      } else if (lastEvent && lastEvent.eventKey === eventKey) {
-        newSelector = lastSelector
-      }
-
-      const prevEventsForSelector = (prevMap?.get(newSelector) as Event[]) || []
-      const newEvents = [...prevEventsForSelector, event]
-      const newMap = new Map(prevMap).set(newSelector, newEvents)
-
-      lastSelector = newSelector
-      return newMap
+      lastKey = generateKey(event.eventKey, lastKey, prevEvents)
+      return new Map(prevMap).set(lastKey, event)
     })
   }
 

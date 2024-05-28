@@ -29,15 +29,13 @@ export function Events(props: EventProps) {
   const eventsToDisplay = []
   const collectionToIterate = readOnly ? eventsList : eventsMap
 
-  collectionToIterate.forEach((eventsArray) => {
-    const event = readOnly ? eventsArray : eventsArray[eventsArray.length - 1]
+  collectionToIterate.forEach((event) => {
     const value = event.value || event.textContent || event.url
 
     eventsToDisplay.push({
       ...event,
       value: debugMode ? `${event.selector}: ${value}` : value,
       icon: EVENT_ICONS[event.type] || EVENT_ICONS.default,
-      count: readOnly ? eventsArray.length : undefined,
     })
   })
 
