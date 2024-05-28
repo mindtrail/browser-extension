@@ -101,5 +101,5 @@ export const DEFAULT_RECORDER_STATE = {
   isRecording: false,
   isPaused: false,
   isSaving: false,
-  eventsMap: '[]',
+  eventsList: [],
 }

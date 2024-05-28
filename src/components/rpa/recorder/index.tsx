@@ -7,8 +7,12 @@ import { Typography } from '~components/typography'
 import { Events } from '../events'
 import { generateMetadata } from '../utils/openai'
 import { sendMessageToBg } from '~/lib/bg-messaging'
-import { useRecorderState } from '~/lib/hooks/useRecorder'
 import { MESSAGES } from '~/lib/constants'
+import {
+  serializeEventsMap,
+  deserializeEventsMap,
+  useRecorderState,
+} from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
@@ -16,10 +20,15 @@ import { RecordButton } from './record-button'
 import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
-  const { isRecording, isPaused, isSaving, eventsMap, setRecorderState } =
-    useRecorderState()
+  const {
+    isRecording,
+    isPaused,
+    isSaving,
+    eventsMap,
+    resetRecorderState,
+    setRecorderState,
+  } = useRecorderState()
 
-  console.log('isRecording', isRecording)
   useEffect(
     () => listenEvents(recordEvent, isRecording && !isPaused),
     [isRecording, isPaused],
@@ -40,23 +49,12 @@ export function FlowRecorder() {
     }
   }, [isRecording])
 
-  function resetRecorderState() {
-    setRecorderState({
-      isRecording: false,
-      eventsMap: new Map(),
-      isPaused: false,
-      isSaving: false,
-    })
-  }
-
   function recordEvent(event) {
     const { selector } = event
-
     setRecorderState((prevState) => {
-      const prevMap = prevState?.eventsMap || new Map()
+      const prevMap = deserializeEventsMap(prevState?.eventsMap)
       const prevEvents = (prevMap.get(selector) as Event[]) || []
       const newEvents = [...prevEvents, event]
-
       return {
         ...prevState,
         eventsMap: new Map(prevMap).set(selector, newEvents),

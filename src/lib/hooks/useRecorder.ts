@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
 import { Storage } from '@plasmohq/storage'
 
@@ -10,50 +10,43 @@ const RECORDER_CONFIG = {
 }
 
 export const useRecorderState = () => {
-  const [storageData, setStorageData] = useStorage(
+  const [recorderState, setRecorderState] = useStorage(
     RECORDER_CONFIG,
-    DEFAULT_RECORDER_STATE,
+    () => DEFAULT_RECORDER_STATE,
   )
+  const resetRecorderState = useCallback(
+    () => setRecorderState(DEFAULT_RECORDER_STATE),
+    [],
+  )
+
+  console.log(111, recorderState)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
   // Parse only once and memoize
-  const eventsMapFromStorage = useMemo(
-    () => new Map(JSON.parse(storageData.eventsMap || '[]')),
-    [storageData.eventsMap],
-  )
-
-  const [recorderState, setRecorderState] = useState({
-    isRecording: storageData.isRecording,
-    eventsMap: eventsMapFromStorage,
-    isPaused: storageData.isPaused,
-    isSaving: storageData.isSaving,
-  })
-
-  console.log(1234, recorderState)
-
-  // // Handle state updates from storage changes
-  useEffect(() => {
-    setRecorderState((prev) => ({
-      ...prev,
-      isRecording: storageData.isRecording,
-      eventsMap: eventsMapFromStorage,
-      isPaused: storageData.isPaused,
-      isSaving: storageData.isSaving,
-    }))
-  }, [storageData, eventsMapFromStorage])
+  // Handle state updates from storage changes. This works across tabs & on refresh
+  // useEffect(() => {
+  //   setRecorderState(() => ({
+  //     isRecording: recorderState.isRecording,
+  //     eventsMap: eventsMap,
+  //     isPaused: recorderState.isPaused,
+  //     isSaving: recorderState.isSaving,
+  //   }))
+  // }, [recorderState, eventsMap])
 
   // Sync state back to storage
   // useEffect(() => {
   //   // @ts-ignore
-  //   if (state !== storageData) {
-  //     setStorageData({
-  //       isRecording: state.isRecording,
-  //       eventsMap: JSON.stringify(Array.from(state.eventsMap.entries())),
-  //       isPaused: state.isPaused,
-  //       saving: state.saving,
+  //   console.log(1234, recorderState, recorderState)
+  //   // To refactor this...
+  //   if (recorderState?.isRecording !== recorderState.isRecording) {
+  //     setRecorderState({
+  //       isRecording: recorderState.isRecording,
+  //       eventsMap: JSON.stringify(Array.from(recorderState.eventsMap.entries())),
+  //       isPaused: recorderState.isPaused,
+  //       isSaving: recorderState.isSaving,
   //     })
   //   }
-  // }, [state])
+  // }, [recorderState, setRecorderState])
 
   const startRecording = useCallback(async () => {
     try {
@@ -82,13 +75,25 @@ export const useRecorderState = () => {
     // Finalize recording, e.g., close files, release resources
   }, [])
 
-  useEffect(() => {
-    if (recorderState.isRecording) {
-      // startRecording()
-    } else {
-      // stopRecording()
-    }
-  }, [recorderState.isRecording, startRecording, stopRecording])
+  // useEffect(() => {
+  //   if (recorderState.isRecording) {
+  //     // startRecording()
+  //   } else {
+  //     // stopRecording()
+  //   }
+  // }, [recorderState.isRecording, startRecording, stopRecording])
 
-  return { ...recorderState, setRecorderState }
+  return {
+    ...recorderState,
+    resetRecorderState,
+    setRecorderState,
+  }
+}
+
+export function deserializeEventsMap(eventsMap: string = '[]') {
+  return new Map(JSON.parse(eventsMap))
+}
+
+export function serializeEventsMap(eventsMap: Map<string, Event[]>) {
+  return JSON.stringify(Array.from(eventsMap.entries()))
 }
