@@ -13,7 +13,6 @@ import { MESSAGES } from '~/lib/constants'
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from './listen-events'
 import { RecordButton } from './record-button'
-import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
   const {
@@ -53,20 +52,41 @@ export function FlowRecorder() {
     setPaused(false)
   }
 
-  function recordEvent(event) {
-    const { selector } = event
+  function generateKey(eventKey, lastKey, prevEvents = []) {
+    let key = eventKey
+    const lastEvent = prevEvents[prevEvents.length - 1]
+    if (lastEvent && lastEvent.eventKey !== eventKey) {
+      // create new key
+      const i = prevEvents.filter((e) => e.eventKey.startsWith(eventKey)).length + 1
+      key = `${eventKey}_${i}`
+    } else if (lastEvent && lastEvent.eventKey === eventKey) {
+      // reuse last key
+      key = lastKey
+    }
+    return key
+  }
 
+  let lastKey = ''
+  function recordEvent(event) {
     setEventsMap((prevMap) => {
-      const prevEvents = (prevMap?.get(selector) as Event[]) || []
-      const newEvents = [...prevEvents, event]
-      return new Map(prevMap).set(selector, newEvents)
+      const prevEvents = Array.from(prevMap.values()).flat()
+      lastKey = generateKey(event.eventKey, lastKey, prevEvents)
+
+      // use array for each key instead of single event (potentially useful for repetitive events)
+      const prevEventsForKey = (prevMap?.get(lastKey) as []) || []
+      const newEvents = [...prevEventsForKey, event]
+
+      return new Map(prevMap).set(lastKey, newEvents)
     })
   }
 
-  function removeEvent(event) {
+  function removeEvent(index) {
     setEventsMap((prevMap) => {
-      prevMap.delete(event?.selector)
-      return new Map(prevMap)
+      const newMap = new Map(prevMap)
+      Array.from(prevMap.keys()).forEach((key, i) => {
+        if (i === index) newMap.delete(key)
+      })
+      return newMap
     })
   }
 
@@ -83,12 +103,8 @@ export function FlowRecorder() {
     const flow = await generateMetadata(eventsRecorded)
 
     flow.events = eventsRecorded.map((event: Event, index) => {
-      const start_dependencies = getStartDependencies(eventsRecorded, event)
-      const end_dependencies = getEndDependencies(eventsRecorded, event)
       return {
         ...event,
-        start_dependencies,
-        end_dependencies,
         event_name: flow.events[index]?.event_name,
         event_description: flow.events[index]?.event_description,
       }

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useStorage } from '@plasmohq/storage/hook'
 import { Storage } from '@plasmohq/storage'
-
+import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
 
 const RECORDER_CONFIG = {
   key: STORAGE_AREA.RECORDER,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+  instance: new Storage({ area: 'local' }),
 }
 
 export const useRecorderState = () => {
@@ -14,13 +13,12 @@ export const useRecorderState = () => {
     RECORDER_CONFIG,
     DEFAULT_RECORDER_STATE,
   )
-
   const [isRecording, setIsRecording] = useState(storageData.isRecording)
   const [eventsMap, setEventsMap] = useState(new Map(JSON.parse(storageData.eventsMap)))
   const [paused, setPaused] = useState(storageData.paused)
   const [saving, setSaving] = useState(storageData.saving)
 
-  // Effect to update local state when storageData changes
+  // Sync: Storage -> State
   useEffect(() => {
     if (isRecording !== storageData.isRecording) {
       setIsRecording(storageData.isRecording)
@@ -36,8 +34,8 @@ export const useRecorderState = () => {
     }
   }, [storageData])
 
+  // Sync: State -> Storage
   useEffect(() => {
-    // Check if the current state differs from the storage state before updating
     if (
       isRecording !== storageData.isRecording ||
       eventsMap?.size !== new Map(JSON.parse(storageData.eventsMap)).size ||
@@ -49,6 +47,7 @@ export const useRecorderState = () => {
         eventsMap: JSON.stringify(Array.from(eventsMap.entries())),
         paused,
         saving,
+        backgroundEvents: storageData.backgroundEvents,
       })
     }
   }, [isRecording, eventsMap, paused, saving])

@@ -7,12 +7,7 @@ export async function onTaskStart(flowId) {
       variables: {},
       flowId,
     },
-    logs: [
-      {
-        flowId,
-        status: 'started',
-      },
-    ],
+    logs: [],
   })
   return newTaskRes.data
 }

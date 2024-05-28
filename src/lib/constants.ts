@@ -102,4 +102,5 @@ export const DEFAULT_RECORDER_STATE = {
   eventsMap: '[]',
   paused: false,
   saving: false,
+  backgroundEvents: [],
 }

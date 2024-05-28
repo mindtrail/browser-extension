@@ -11,10 +11,9 @@ export async function onEventEnd(flowId, event, taskId) {
     },
     logs: task.logs.map((log) => {
       if (log.eventId === event.id) {
-        console.log('onEventEnd', event.id)
         return {
           ...log,
-          status: `${log.status} - ${event.id}(end)`, // format for testing purpose
+          status: 'ended',
         }
       }
       return log
