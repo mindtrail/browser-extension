@@ -70,7 +70,7 @@ export async function extractParams({ query, schema, entities }) {
     }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4o',
     temperature: 0.1,
-    response_format: { type: 'json_object' },
+    // response_format: { type: 'json_object' },
   })
   const result = completion.choices[0].message.content
   console.log('extractParams', result)

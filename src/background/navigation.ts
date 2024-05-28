@@ -41,7 +41,7 @@ export function listenForNavigationEvents() {
   // Listen for new tab creation
   chrome.tabs.onCreated.addListener((tab) => {
     console.log('New tab opened:', tab)
-    addNavigationEvent({ newTabId: tab.id })
+  addNavigationEvent({ newTabId: tab.id })
   })
 
   // Listen for navigation events

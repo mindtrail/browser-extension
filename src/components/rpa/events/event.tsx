@@ -14,7 +14,7 @@ interface EventProps {
   event: Event
   readOnly: boolean
   index: number
-  removeEvent: (event: Event) => void
+  removeEvent: (index: number) => void
 }
 
 export function Event({ event, readOnly, index, removeEvent }: EventProps) {
@@ -46,7 +46,7 @@ export function Event({ event, readOnly, index, removeEvent }: EventProps) {
         <Button
           variant='secondary'
           className={`invisible group-hover/row:visible absolute right-0`}
-          onClick={() => removeEvent(event)}
+          onClick={() => removeEvent(index)}
         >
           <Trash2Icon className='w-4 h-4' />
         </Button>
@@ -84,7 +84,7 @@ function rageClick(event) {
 }
 function clickedElement(element) {
   element = element || window.event
-  ;(target = element.target || element.srcElement),
-    (clickedObject = target.id || target.className)
+    ; (target = element.target || element.srcElement),
+      (clickedObject = target.id || target.className)
   //console.log(text);
 }

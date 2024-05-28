@@ -102,4 +102,12 @@ export const DEFAULT_RECORDER_STATE = {
   isPaused: false,
   isSaving: false,
   eventsList: [],
+  backgroundEvents: [],
+}
+
+export const EVENT_TYPES = {
+  CLICK: 'click',
+  INPUT: 'input',
+  URL: 'url',
+  BASE: 'base',
 }

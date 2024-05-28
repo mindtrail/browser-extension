@@ -1,3 +1,5 @@
+import { EVENT_TYPES } from './constants'
+
 let eventQueue = []
 let processingQueue = false
 let debounceTimers = new Map()
@@ -26,6 +28,16 @@ export function processQueue() {
 }
 
 export function debounceEvent(eventKey, event, callback, debounceDuration = 1000) {
+  // Process immediately
+  if (
+    event.type === EVENT_TYPES.URL ||
+    (event.type === EVENT_TYPES.CLICK && event.href)
+  ) {
+    eventQueue.push({ event, callback })
+    processQueue()
+    return
+  }
+
   if (debounceTimers.has(eventKey)) {
     clearTimeout(debounceTimers.get(eventKey))
   }

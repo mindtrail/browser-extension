@@ -23,7 +23,7 @@ interface RunItemProps {
   flow: any
   flowsRunning: string[]
   runnerContainerRef: React.RefObject<HTMLDivElement>
-  runFlow: (flowId: string) => Promise<void>
+  runFlow: (flowId: string, task?: any) => Promise<void>
   removeFlow: (flowId: string) => void
   updateFlowName: (flowId: string, flow: any) => any
   eventsRunning: Map<string, any[]>

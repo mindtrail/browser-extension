@@ -1,12 +1,15 @@
+import { inputComponent } from './components/input'
+import { clickComponent } from './components/click'
 import { loopComponent } from './components/loop'
-import { defaultComponent } from './components/default'
 import { extractComponent } from './components/extract'
+import { urlComponent } from './components/url'
 
-// considering using "components" instead of "events" as name
 const components = {
+  input: inputComponent,
+  click: clickComponent,
   loop: loopComponent,
-  default: defaultComponent,
   extract: extractComponent,
+  url: urlComponent,
 }
 
 export async function runEvents({
@@ -19,9 +22,13 @@ export async function runEvents({
 }) {
   task = structuredClone(task)
   events = structuredClone(events)
-
   for (const event of events) {
-    const component = components[event.type] || components.default
+    // skip event if already found in task.logs and status = 'ended'
+    if (task.logs.find((log) => log.eventId === event.id && log.status === 'ended')) {
+      continue
+    }
+    const component = components[event.type]
+    if (!component) break
     await component({
       task,
       flowId,

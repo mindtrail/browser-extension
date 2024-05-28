@@ -57,10 +57,11 @@
     },
     "permissions": [
       "activeTab",
-      "microphone",
       "scripting",
       "storage",
       "unlimitedStorage",
+      "tabs",
+      "windows",
       "webNavigation"
     ],
     "content_scripts": [

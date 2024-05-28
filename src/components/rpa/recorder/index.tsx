@@ -11,9 +11,8 @@ import { MESSAGES } from '~/lib/constants'
 import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
-import { listenEvents } from './listen-events'
+import { listenEvents } from './utils/listen-events'
 import { RecordButton } from './record-button'
-import { getStartDependencies, getEndDependencies } from './get-dependencies'
 
 export function FlowRecorder() {
   const {
@@ -45,13 +44,31 @@ export function FlowRecorder() {
     }
   }, [isRecording])
 
+  function generateKey(eventKey, lastKey, prevEvents = []) {
+    let key = eventKey
+    const lastEvent = prevEvents[prevEvents.length - 1]
+    if (lastEvent && lastEvent.eventKey !== eventKey) {
+      // create new key
+      const i = prevEvents.filter((e) => e.eventKey.startsWith(eventKey)).length + 1
+      key = `${eventKey}_${i}`
+    } else if (lastEvent && lastEvent.eventKey === eventKey) {
+      // reuse last key
+      key = lastKey
+    }
+    return key
+  }
+
+  // let lastKey = ''
   function recordEvent(event) {
     setRecorderState((prevState) => {
-      // If event in array, update count, otherwise add it to the array
+      const prevEvents = prevState?.eventsList
+
+      // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
+      // use array for each key instead of single event (potentially useful for repetitive events)
+
       const eventAlreadyInList = prevState?.eventsList.find(
         (e) => e.selector === event.selector,
       )
-
       const updatedEventsList = eventAlreadyInList
         ? prevState?.eventsList.map((e) => {
             if (e.selector === event.selector) {
@@ -107,12 +124,8 @@ export function FlowRecorder() {
     const flow = await generateMetadata(eventsRecorded)
 
     flow.events = eventsRecorded.map((event: Event, index) => {
-      const start_dependencies = getStartDependencies(eventsRecorded, event)
-      const end_dependencies = getEndDependencies(eventsRecorded, event)
       return {
         ...event,
-        start_dependencies,
-        end_dependencies,
         event_name: flow.events[index]?.event_name,
         event_description: flow.events[index]?.event_description,
       }

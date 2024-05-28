@@ -1,9 +1,15 @@
 import { Storage } from '@plasmohq/storage'
 
-import { API, MESSAGES, DEFAULT_RECORDER_STATE, STORAGE_AREA } from '~/lib/constants'
-import { log } from '~/lib/utils'
 import { updateExtensionIcon } from '~/lib/update-icon'
+import { getRecorderState, createBackgroundEvent } from '~lib/background/recorder-storage'
 import * as api from '~/lib/api'
+import { log } from '~/lib/utils'
+import {
+  EVENT_TYPES,
+  MESSAGES,
+  DEFAULT_RECORDER_STATE,
+  STORAGE_AREA,
+} from '~/lib/constants'
 
 import { initializeExtension, authenticateAndRetry } from './initialize'
 import { listenForNavigationEvents } from './navigation'
@@ -155,6 +161,19 @@ async function processMessage(request: any, sendResponse: ContentScriptResponse)
       break
   }
 }
+
+// Current URL event
+let debounceTimeout
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const state = await getRecorderState()
+  if (!state.isRecording) return
+  if (debounceTimeout) clearTimeout(debounceTimeout)
+  debounceTimeout = setTimeout(async () => {
+    const tab = await chrome.tabs.get(activeInfo.tabId)
+    const url = tab.url || tab.pendingUrl
+    await createBackgroundEvent({ type: EVENT_TYPES.URL, data: { url } })
+  }, 1000)
+})
 
 let mediaRecorder
 let audioChunks = []

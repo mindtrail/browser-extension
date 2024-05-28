@@ -1,12 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useStorage } from '@plasmohq/storage/hook'
 import { Storage } from '@plasmohq/storage'
-
+import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
 
 const RECORDER_CONFIG = {
   key: STORAGE_AREA.RECORDER,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
+  instance: new Storage({ area: 'local' }),
 }
 
 export const useRecorderState = () => {
@@ -48,7 +47,6 @@ export const useRecorderState = () => {
   const handleStop = useCallback(() => {
     // Finalize recording, e.g., close files, release resources
   }, [])
-
   useEffect(() => {
     if (recorderState.isRecording) {
       // startRecording()
