@@ -1,65 +1,63 @@
-import { EVENT_TYPES } from '~/lib/constants'
 import { getRecorderState, setRecorderState } from './storage/recorder'
 
+import { EVENT_TYPES } from '~/lib/constants'
+import { createBaseEvent } from '~/lib/utils/event-handlers/base-event'
+
 let listenersAdded = false
+
+export function listenForNavigationEvents() {
+  if (listenersAdded) return
+
+  // Current URL event
+  let debounceTimeout: NodeJS.Timeout | null = null
+  chrome.tabs.onActivated.addListener((activeInfo) => {
+    chrome.tabs.get(activeInfo.tabId, async (tab) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error retrieving tab:', chrome.runtime.lastError)
+        return
+      }
+
+      const recorderState = await getRecorderState()
+      if (!recorderState?.isRecording || recorderState?.isPaused) return
+
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout)
+      }
+
+      debounceTimeout = setTimeout(async () => {
+        const url = tab.url || tab.pendingUrl
+        await createNavEvent(url)
+      }, 500)
+    })
+  })
+
+  listenersAdded = true
+}
+
+async function createNavEvent(url: string) {
+  const recorderState = await getRecorderState()
+  const newEvent = { type: EVENT_TYPES.NAV, url }
+
+  const { eventDetails } = createBaseEvent({
+    event: newEvent,
+    type: EVENT_TYPES.NAV,
+  })
+
+  const { eventsList = [] } = recorderState
+  const updatedEventsList = [...eventsList, eventDetails]
+
+  const payload = { ...recorderState, eventsList: updatedEventsList }
+  console.log('createNavEvent', payload)
+
+  await setRecorderState({ ...recorderState, eventsList: updatedEventsList })
+}
+
+// @TODO: Ignore this for now -> to be developed
 // In page navigation can trigger twice, eg. having a SSR page can trigger this.
 // In page navigation & onCompleted will trigger both when navigating to a new page
 let prevUrl = ''
 
-export function listenForNavigationEvents() {
-  if (listenersAdded) {
-    // console.log('Listeners already added')
-    return
-  }
-
-  // Current URL event
-  let debounceTimeout: NodeJS.Timeout | null = null
-  chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    const recorderState = await getRecorderState()
-
-    if (!recorderState?.isRecording || recorderState?.isPaused) return
-
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
-    }
-
-    debounceTimeout = setTimeout(async () => {
-      const tab = await chrome.tabs.get(activeInfo.tabId)
-      const url = tab.url || tab.pendingUrl
-      const navEvent = { type: EVENT_TYPES.NAV, data: { url } }
-
-      await createNavEvent(navEvent)
-    }, 1000)
-  })
-}
-
-async function createNavEvent(event) {
-  const recorderState = await getRecorderState()
-  const { navEvents = [] } = recorderState
-
-  console.log('createNavEvent', recorderState)
-  const updatedEvents = [...navEvents, event]
-
-  const payload = { ...recorderState, navEvents: updatedEvents }
-  console.log('createNavEvent', payload)
-
-  await setRecorderState({ ...recorderState, navEvents: updatedEvents })
-  return event
-}
-
 export function extendedNavListeners() {
-  // // Listen for tab activation (tab changes)
-  // chrome.tabs.onActivated.addListener((activeInfo) => {
-  //   chrome.tabs.get(activeInfo.tabId, (tab) => {
-  //     if (chrome.runtime.lastError) {
-  //       console.error('Error retrieving tab:', chrome.runtime.lastError)
-  //       return
-  //     }
-  //     console.log('Tab changed to:', tab)
-  //     addNavigationEvent({ activeTabId: activeInfo.tabId })
-  //   })
-  // })
-
   // Listen for new tab creation
   chrome.tabs.onCreated.addListener((tab) => {
     console.log('New tab opened:', tab)
@@ -98,8 +96,6 @@ export function extendedNavListeners() {
     },
     { url: [{ schemes: ['http', 'https'] }] },
   )
-
-  listenersAdded = true
 }
 
 // "permissions": [
