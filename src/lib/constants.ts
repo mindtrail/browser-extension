@@ -102,7 +102,7 @@ export const DEFAULT_RECORDER_STATE = {
   isPaused: false,
   isSaving: false,
   eventsList: [],
-  backgroundEvents: [],
+  navEvents: [],
 }
 
 export const EVENT_TYPES = {
