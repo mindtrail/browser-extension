@@ -1,18 +1,12 @@
 import { Storage } from '@plasmohq/storage'
 
-import { updateExtensionIcon } from '~/lib/update-icon'
-import { getRecorderState, createBackgroundEvent } from '~lib/background/recorder-storage'
-import * as api from '~/lib/api'
+import { updateExtensionIcon } from '~background/utils/update-icon'
+import * as api from '~background/utils/api'
 import { log } from '~/lib/utils'
-import {
-  EVENT_TYPES,
-  MESSAGES,
-  DEFAULT_RECORDER_STATE,
-  STORAGE_AREA,
-} from '~/lib/constants'
+import { MESSAGES, DEFAULT_RECORDER_STATE, STORAGE_AREA } from '~/lib/constants'
 
-import { initializeExtension, authenticateAndRetry } from './initialize'
-import { listenForNavigationEvents } from './navigation'
+import { initializeExtension, authenticateAndRetry } from './utils/initialize'
+import { listenForNavigationEvents } from './utils/navigation'
 
 let storage: Storage
 
@@ -152,36 +146,12 @@ async function processMessage(request: any, sendResponse: ContentScriptResponse)
       await updateExtensionIcon()
       break
     case 'START_RECORDING':
-      startRecording(payload)
+      // startRecording(payload)
       break
     case 'STOP_RECORDING':
-      stopRecording()
+      // stopRecording()
       break
     default:
       break
   }
-}
-
-// Current URL event
-let debounceTimeout
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const state = await getRecorderState()
-  if (!state.isRecording) return
-  if (debounceTimeout) clearTimeout(debounceTimeout)
-  debounceTimeout = setTimeout(async () => {
-    const tab = await chrome.tabs.get(activeInfo.tabId)
-    const url = tab.url || tab.pendingUrl
-    await createBackgroundEvent({ type: EVENT_TYPES.URL, data: { url } })
-  }, 1000)
-})
-
-let mediaRecorder
-let audioChunks = []
-
-async function startRecording(audio) {
-  console.log('Recording started', audio)
-}
-
-async function stopRecording() {
-  mediaRecorder && mediaRecorder?.stop()
 }

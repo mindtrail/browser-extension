@@ -1,5 +1,5 @@
 import { debounceEvent } from '../utils/process-queue'
-import { EVENT_TYPES } from '../utils/constants'
+import { EVENT_TYPES } from '~/lib/constants'
 
 export function handleUrlEvent(event, callback) {
   const timeStamp = Date.now()

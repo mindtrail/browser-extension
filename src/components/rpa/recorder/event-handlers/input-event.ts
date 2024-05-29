@@ -1,7 +1,7 @@
 import { getSelector } from '../utils/find-selector'
 import { debounceEvent } from '../utils/process-queue'
-import { EVENT_TYPES } from '../utils/constants'
 import { createDOMEvent } from './dom-event'
+import { EVENT_TYPES } from '~/lib/constants'
 
 export function handleInputEvent(event, callback) {
   const { target } = event

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
+
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
 
 const RECORDER_CONFIG = {

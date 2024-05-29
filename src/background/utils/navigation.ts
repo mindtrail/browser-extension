@@ -1,3 +1,6 @@
+import { getRecorderState, createBackgroundEvent } from '~background/utils/recorder-storage'
+import { EVENT_TYPES } from '~/lib/constants'
+
 let flowRecorderState = {}
 
 // Function to update state and notify all tabs
@@ -25,6 +28,19 @@ export function listenForNavigationEvents() {
     return
   }
 
+  // Current URL event
+  let debounceTimeout
+  chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    const state = await getRecorderState()
+    if (!state.isRecording) return
+    if (debounceTimeout) clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(async () => {
+      const tab = await chrome.tabs.get(activeInfo.tabId)
+      const url = tab.url || tab.pendingUrl
+      await createBackgroundEvent({ type: EVENT_TYPES.URL, data: { url } })
+    }, 1000)
+  })
+
   console.log(111)
   // Listen for tab activation (tab changes)
   chrome.tabs.onActivated.addListener((activeInfo) => {
@@ -41,7 +57,7 @@ export function listenForNavigationEvents() {
   // Listen for new tab creation
   chrome.tabs.onCreated.addListener((tab) => {
     console.log('New tab opened:', tab)
-  addNavigationEvent({ newTabId: tab.id })
+    addNavigationEvent({ newTabId: tab.id })
   })
 
   // Listen for navigation events

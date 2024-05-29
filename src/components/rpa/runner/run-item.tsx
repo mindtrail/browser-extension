@@ -17,7 +17,7 @@ import {
   DropdownMenuPortal,
 } from '~/components/ui/dropdown-menu'
 
-import { Events } from '../events'
+import { Events } from '../events-list'
 
 interface RunItemProps {
   flow: any

@@ -1,10 +1,10 @@
 import { Storage } from '@plasmohq/storage'
 
-import { fetchClippingList } from './messages/clippings'
-import { updateExtensionIcon } from '~/lib/update-icon'
+import { fetchClippingList } from '../messages/clippings'
+import { updateExtensionIcon } from '~background/utils/update-icon'
 
 import { API, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
-import * as api from '~/lib/api'
+import * as api from '~background/utils/api'
 
 let storage: Storage
 

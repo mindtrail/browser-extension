@@ -14,7 +14,7 @@ interface EventProps {
   removeEvent?: (event: any) => void
 }
 
-export function Events(props: EventProps) {
+export function EventsList(props: EventProps) {
   const { eventsList = [], removeEvent, debugMode = false, readOnly = false } = props
 
   if (!eventsList?.length) return

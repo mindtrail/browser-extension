@@ -1,4 +1,4 @@
-import { EVENT_TYPES } from './constants'
+import { EVENT_TYPES } from '~/lib/constants'
 
 let eventQueue = []
 let processingQueue = false

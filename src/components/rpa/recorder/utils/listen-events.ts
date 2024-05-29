@@ -1,8 +1,8 @@
-import { EVENT_TYPES } from './constants'
+import { EVENT_TYPES } from '~/lib/constants'
 import { handleClickEvent } from '../event-handlers/click-event'
 import { handleInputEvent } from '../event-handlers/input-event'
 import { handleUrlEvent } from '../event-handlers/url-event'
-import { onBackgroundEvent } from '~lib/background/recorder-storage'
+import { onBackgroundEvent } from '~/background/utils/recorder-storage'
 
 function createEventHandler(callback) {
   return (event) => {

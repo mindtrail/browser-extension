@@ -4,7 +4,7 @@ import { LoaderCircleIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
 
-import { Events } from '../events'
+import { Events } from '../events-list'
 import { generateMetadata } from '../utils/openai'
 import { sendMessageToBg } from '~/lib/bg-messaging'
 import { MESSAGES } from '~/lib/constants'
