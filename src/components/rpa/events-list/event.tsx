@@ -19,7 +19,7 @@ interface EventProps {
 
 export function Event({ event, readOnly, index, removeEvent }: EventProps) {
   const { type, value, icon: Icon, count } = event
-
+  console.log(event)
   return (
     <div
       className={`flex items-center gap-4 px-4 py-2 w-full relative
@@ -84,7 +84,7 @@ function rageClick(event) {
 }
 function clickedElement(element) {
   element = element || window.event
-    ; (target = element.target || element.srcElement),
-      (clickedObject = target.id || target.className)
+  ;(target = element.target || element.srcElement),
+    (clickedObject = target.id || target.className)
   //console.log(text);
 }
