@@ -1,5 +1,5 @@
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
-import { getStorage } from '~background/utils/storage'
+import { getStorage } from '~lib/storage'
 
 let storage
 let storageData = DEFAULT_RECORDER_STATE
@@ -28,18 +28,4 @@ export const createBackgroundEvent = async (event) => {
   storageData.backgroundEvents = [...storageData.backgroundEvents, event]
   await storage.set(STORAGE_AREA.RECORDER, storageData)
   return event
-}
-
-export const onBackgroundEvent = (callback) => {
-  storage.watch({
-    [STORAGE_AREA.RECORDER]: (changes) => {
-      const oldBackgroundEvents = changes.oldValue.backgroundEvents || []
-      const newBackgroundEvents = changes.newValue.backgroundEvents || []
-      if (newBackgroundEvents.length <= oldBackgroundEvents.length) return
-      const newEvents = newBackgroundEvents.slice(oldBackgroundEvents.length)
-      newEvents.forEach((event) => {
-        callback({ type: event.type, ...event.data })
-      })
-    },
-  })
 }

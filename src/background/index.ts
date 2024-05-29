@@ -8,7 +8,7 @@ import { MESSAGES, DEFAULT_RECORDER_STATE, STORAGE_AREA } from '~/lib/constants'
 import { initializeExtension } from './utils/initialize'
 import { authenticateAndRetry } from './utils/auth'
 import { listenForNavigationEvents } from './utils/navigation'
-import { getStorage } from './utils/storage'
+import { getStorage } from '../lib/storage'
 
 let storage: Storage
 

@@ -3,7 +3,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging'
 
 import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
 import * as api from '~background/lib/api'
-import { getStorage } from '~background/utils/storage'
+import { getStorage } from '~lib/storage'
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   const { type, payload } = req?.body
