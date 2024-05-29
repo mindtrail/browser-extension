@@ -1,20 +1,32 @@
+import { getContent } from '../utils/get-content'
+import { getValue } from '../utils/get-value'
+import { EVENT_TYPES } from '~/lib/constants'
+
 interface BaseEventProps {
   event: any
   selector?: string
   type: string
 }
 
-export function createBaseEvent({ event, selector, type }: BaseEventProps) {
-  const { target = {} } = event
+export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) {
+  const { target = {}, url } = event
 
   const timeStamp = Date.now()
 
-  const eventKey = `${type}-${selector}`
+  const eventIdentifier = type === EVENT_TYPES.NAV ? url : selector
+  const eventKey = `${type}-${eventIdentifier}`
+
+  const value = getValue({ type, target })
+  const textContent = getContent({ type, target })
+
   const eventDetails = {
     id: `${timeStamp}`,
     eventKey,
-    selector,
     type,
+    ...(selector && { selector }),
+    ...(url && { url }),
+    ...(value !== null && { value }),
+    ...(textContent !== null && { textContent }),
     ...(target.name !== null && { name: target.name }),
     ...(target.baseURI !== null && { baseURI: target.baseURI }),
     ...(target.type !== null && { targetType: target.type }),
