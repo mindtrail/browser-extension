@@ -16,7 +16,7 @@ export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) 
   const eventIdentifier = type === EVENT_TYPES.NAV ? url : selector
   const eventKey = `${type}-${eventIdentifier}`
 
-  const value = getValue({ type, target })
+  const value = type === EVENT_TYPES.NAV ? url : getValue({ type, target })
   const textContent = getContent({ type, target })
 
   const eventDetails = {
@@ -24,7 +24,6 @@ export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) 
     eventKey,
     type,
     ...(selector && { selector }),
-    ...(url && { url }),
     ...(value !== null && { value }),
     ...(textContent !== null && { textContent }),
     ...(target.name !== null && { name: target.name }),

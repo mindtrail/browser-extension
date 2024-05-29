@@ -9,12 +9,12 @@ export const onBackgroundEvent = async (callback) => {
       const oldEventsList = oldValue.navEvents || []
       const newEventsList = newValue.navEvents || []
 
-      console.log(222, newValue)
       if (newEventsList.length <= oldEventsList.length) {
         return
       }
 
       const newEvents = newEventsList.slice(oldEventsList.length)
+      console.log(222, newEvents)
       newEvents.forEach((event) => {
         callback({ type: event.type, ...event.data })
       })

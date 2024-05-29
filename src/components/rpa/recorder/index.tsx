@@ -60,7 +60,9 @@ export function FlowRecorder() {
 
   // let lastKey = ''
   function recordEvent(event) {
+    console.log(333, event)
     setRecorderState((prevState) => {
+      console.log(prevState)
       const prevEvents = prevState?.eventsList
 
       // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
