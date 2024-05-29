@@ -8,20 +8,22 @@ const { RECORDER } = STORAGE_AREA
 
 getStorage().then((s) => (storage = s))
 
-export const getRecorderState = async () => {
-  const storedData: any = await storage.get(RECORDER)
-  recorderState = storedData || DEFAULT_RECORDER_STATE
-
-  return recorderState
+export const getRecorderState = async (): Promise<typeof DEFAULT_RECORDER_STATE> => {
+  const recorderState: any = await storage.get(RECORDER)
+  return recorderState || DEFAULT_RECORDER_STATE
 }
 
-export const setRecorderState = async (newState) => {
+export const setRecorderState = async (newState: typeof DEFAULT_RECORDER_STATE) => {
+  console.log(222, newState)
   await storage.set(RECORDER, newState)
   return newState
 }
 
 export const watchRecorderState = (callback) => {
   storage.watch({
-    [RECORDER]: (changes) => callback(changes.newValue, changes.oldValue),
+    [RECORDER]: (changes) => {
+      console.log(changes)
+      // callback(changes.newValue, changes.oldValue),
+    },
   })
 }

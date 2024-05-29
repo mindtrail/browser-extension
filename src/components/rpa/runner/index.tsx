@@ -37,8 +37,8 @@ export function FlowRunner() {
   useEffect(() => {
     const resumeTask = async () => {
       const { data } = await getTasks()
-      console.log(data)
       const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
+
       if (resumableTask) {
         await runFlow(resumableTask.state.flowId, resumableTask)
       }

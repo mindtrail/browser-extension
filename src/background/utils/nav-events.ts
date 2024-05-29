@@ -16,7 +16,8 @@ export function listenForNavigationEvents() {
   let debounceTimeout: NodeJS.Timeout | null = null
   chrome.tabs.onActivated.addListener(async (activeInfo) => {
     const recorderState = await getRecorderState()
-    if (!recorderState.isRecording) return
+
+    if (!recorderState?.isRecording || recorderState?.isPaused) return
 
     if (debounceTimeout) {
       clearTimeout(debounceTimeout)
@@ -27,14 +28,20 @@ export function listenForNavigationEvents() {
       const url = tab.url || tab.pendingUrl
       const navEvent = { type: EVENT_TYPES.NAV, data: { url } }
 
-      await createNavEvent(navEvent, recorderState)
+      await createNavEvent(navEvent)
     }, 1000)
   })
 }
 
-async function createNavEvent(event, recorderState) {
-  const { navEvents } = recorderState || []
+async function createNavEvent(event) {
+  const recorderState = await getRecorderState()
+  const { navEvents = [] } = recorderState
+
+  console.log('createNavEvent', recorderState)
   const updatedEvents = [...navEvents, event]
+
+  const payload = { ...recorderState, navEvents: updatedEvents }
+  console.log('createNavEvent', payload)
 
   await setRecorderState({ ...recorderState, navEvents: updatedEvents })
   return event

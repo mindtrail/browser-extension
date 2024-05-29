@@ -6,14 +6,15 @@ export const onBackgroundEvent = async (callback) => {
 
   storage.watch({
     [STORAGE_AREA.RECORDER]: ({ oldValue, newValue }) => {
-      const oldNavEvents = oldValue.navEvents || []
-      const newNavEvents = newValue.navEvents || []
+      const oldEventsList = oldValue.navEvents || []
+      const newEventsList = newValue.navEvents || []
 
-      if (newNavEvents.length <= oldNavEvents.length) {
+      console.log(222, newValue)
+      if (newEventsList.length <= oldEventsList.length) {
         return
       }
 
-      const newEvents = newNavEvents.slice(oldNavEvents.length)
+      const newEvents = newEventsList.slice(oldEventsList.length)
       newEvents.forEach((event) => {
         callback({ type: event.type, ...event.data })
       })
