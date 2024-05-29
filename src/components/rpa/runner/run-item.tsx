@@ -17,7 +17,7 @@ import {
   DropdownMenuPortal,
 } from '~/components/ui/dropdown-menu'
 
-import { Events } from '../events-list'
+import { EventsList } from '../events-list'
 
 interface RunItemProps {
   flow: any
@@ -169,7 +169,7 @@ export function RunItem(props: RunItemProps) {
       </div>
       {flowsRunning?.includes(flowId) && (
         <>
-          <Events eventsList={eventsList} readOnly={true} />
+          <EventsList eventsList={eventsList} readOnly={true} />
 
           {eventsList?.length === events?.length && (
             <Typography

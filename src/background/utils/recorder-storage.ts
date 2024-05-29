@@ -1,5 +1,5 @@
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
-import { getStorage } from '~background/utils/initialize'
+import { getStorage } from '~background/utils/storage'
 
 let storage
 let storageData = DEFAULT_RECORDER_STATE

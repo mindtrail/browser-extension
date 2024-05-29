@@ -4,7 +4,7 @@ import { LoaderCircleIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
 
-import { Events } from '../events-list'
+import { EventsList } from '../events-list'
 import { generateMetadata } from '../utils/openai'
 import { sendMessageToBg } from '~/lib/bg-messaging'
 import { MESSAGES } from '~/lib/constants'
@@ -162,7 +162,7 @@ export function FlowRecorder() {
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={resetRecorderState} />
-          <Events eventsList={eventsList} removeEvent={removeEvent} />
+          <EventsList eventsList={eventsList} removeEvent={removeEvent} />
         </div>
       )}
 

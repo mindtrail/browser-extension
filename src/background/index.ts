@@ -1,42 +1,22 @@
 import { Storage } from '@plasmohq/storage'
 
 import { updateExtensionIcon } from '~background/utils/update-icon'
-import * as api from '~background/utils/api'
+import * as api from '~background/lib/api'
 import { log } from '~/lib/utils'
 import { MESSAGES, DEFAULT_RECORDER_STATE, STORAGE_AREA } from '~/lib/constants'
 
-import { initializeExtension, authenticateAndRetry } from './utils/initialize'
+import { initializeExtension } from './utils/initialize'
+import { authenticateAndRetry } from './utils/auth'
 import { listenForNavigationEvents } from './utils/navigation'
+import { getStorage } from './utils/storage'
 
 let storage: Storage
 
-type RecorderState = typeof DEFAULT_RECORDER_STATE
-
-async function initialize() {
-  storage = await initializeExtension()
-
-  const SETTINGS_CONFIG = {
-    key: STORAGE_AREA.SETTINGS,
-    instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-  }
-
-  // storage.watch({
-  //   [STORAGE_AREA.RECORDER]: ({ newValue }) => {
-  //     const recorderState = newValue as RecorderState
-
-  //     if (recorderState.isRecording) {
-  //       // startRecording()
-  //     } else {
-  //       // stopRecording()
-  //     }
-  //   },
-  // })
-}
-
 // Ensure listeners are added when the extension is installed or updated
-chrome.runtime.onInstalled.addListener(() => {
-  initialize()
+chrome.runtime.onInstalled.addListener(async () => {
+  initializeExtension()
   listenForNavigationEvents()
+  storage = await getStorage()
 })
 
 chrome.runtime.onMessage.addListener(
