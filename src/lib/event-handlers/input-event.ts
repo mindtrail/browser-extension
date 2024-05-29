@@ -1,7 +1,7 @@
-import { getSelector } from '../utils/find-selector'
-import { debounceEvent } from '../utils/process-queue'
-import { createBaseEvent } from './base-event'
+import { getSelector } from '~/lib/recorder-utils/find-selector'
 import { EVENT_TYPES } from '~/lib/constants'
+import { debounceEvent } from './debounce-event'
+import { createBaseEvent } from './base-event'
 
 const { INPUT } = EVENT_TYPES
 

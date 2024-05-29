@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
@@ -11,7 +11,7 @@ import { MESSAGES } from '~/lib/constants'
 import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
-import { listenEvents } from './utils/listen-events'
+import { listenEvents } from '../../../lib/recorder-utils/listen-events'
 import { RecordButton } from './record-button'
 
 export function FlowRecorder() {

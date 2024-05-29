@@ -1,10 +1,8 @@
 import { EVENT_TYPES } from '~/lib/constants'
-import { handleClickEvent } from '../event-handlers/click-event'
-import { handleInputEvent } from '../event-handlers/input-event'
-import { handleUrlEvent } from '../event-handlers/url-event'
-import { onBackgroundEvent } from './listen-storage'
+import { handleClickEvent } from '~/lib/event-handlers/click-event'
+import { handleInputEvent } from '~/lib/event-handlers/input-event'
 
-const { CLICK, INPUT, NAV } = EVENT_TYPES
+const { CLICK, INPUT } = EVENT_TYPES
 
 function createEventHandler(callback) {
   return (event) => {
@@ -15,9 +13,6 @@ function createEventHandler(callback) {
       case INPUT:
         handleInputEvent(event, callback)
         break
-      case NAV:
-        handleUrlEvent(event, callback)
-        break
       default:
         break
     }
@@ -27,7 +22,6 @@ function createEventHandler(callback) {
 function addEventListeners(eventHandler) {
   document.addEventListener(CLICK, eventHandler, true)
   document.addEventListener(INPUT, eventHandler, true)
-  onBackgroundEvent(eventHandler)
 }
 
 function removeEventListeners(eventHandler) {

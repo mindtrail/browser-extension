@@ -1,8 +1,8 @@
-import { getSelector } from '../utils/find-selector'
-import { getHref } from '../utils/find-href'
-import { debounceEvent } from '../utils/process-queue'
-import { createBaseEvent } from './base-event'
+import { getSelector } from '~/lib/recorder-utils/find-selector'
+import { getHref } from '~/lib/recorder-utils/find-href'
 import { EVENT_TYPES } from '~/lib/constants'
+import { debounceEvent } from './debounce-event'
+import { createBaseEvent } from './base-event'
 
 const { CLICK } = EVENT_TYPES
 

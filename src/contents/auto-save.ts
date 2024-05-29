@@ -2,7 +2,7 @@ import { Storage } from '@plasmohq/storage'
 
 import { AUTO_SAVE_DELAY, MESSAGES, STORAGE_AREA } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
-import { getBaseResourceURL } from '~lib/utils'
+import { getBaseResourceURL } from '~/lib/utils'
 
 const storage = new Storage({ area: 'local' })
 

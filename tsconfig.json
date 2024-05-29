@@ -5,7 +5,7 @@
   "compilerOptions": {
     "paths": {
       "~*": ["./src/*"],
-      "~/utils": ["./src/lib/utils"]
+      "~/utils": ["src/lib/recorder-utils"]
     },
     "typeRoots": ["./node_modules/@types", "./types", "~/types/*"],
     "baseUrl": "."

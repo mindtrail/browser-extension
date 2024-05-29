@@ -4,14 +4,14 @@ let eventQueue = []
 let processingQueue = false
 let debounceTimers = new Map()
 
-export function processEvent(event, callback) {
+function processEvent(event, callback) {
   // const delay = lastEventTime ? event.timeStamp - lastEventTime : 0
   // console.log(`Processing event: ${event.type} at ${event.selector} with delay ${delay}`)
   // lastEventTime = event.timeStamp
   callback({ ...event })
 }
 
-export function processNextEvent() {
+function processNextEvent() {
   if (eventQueue.length === 0) {
     processingQueue = false
     return
@@ -21,7 +21,7 @@ export function processNextEvent() {
   processNextEvent()
 }
 
-export function processQueue() {
+function processQueue() {
   if (processingQueue || eventQueue.length === 0) return
   processingQueue = true
   processNextEvent()

@@ -1,5 +1,5 @@
 import { extractProperties } from '../../utils/openai'
-import { getSelector } from '../../recorder/utils/find-selector'
+import { getSelector } from '../../../../lib/recorder-utils/find-selector'
 
 export async function extractTableEntities({ columns, entitySelectorPattern }) {
   const entitySelector = entitySelectorPattern.split(' ').pop()

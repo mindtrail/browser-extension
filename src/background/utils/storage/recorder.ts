@@ -1,6 +1,6 @@
 import { Storage } from '@plasmohq/storage'
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
-import { getStorage } from '~lib/storage'
+import { getStorage } from '~/lib/storage'
 
 let storage: Storage
 let recorderState = DEFAULT_RECORDER_STATE

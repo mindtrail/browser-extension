@@ -1,4 +1,4 @@
-import { getStorage } from '~lib/storage'
+import { getStorage } from '~/lib/storage'
 import { STORAGE_AREA } from '~/lib/constants'
 
 export const onBackgroundEvent = async (callback) => {
