@@ -4,7 +4,7 @@ import { debounceEvent } from '../utils/process-queue'
 import { createBaseEvent } from './base-event'
 import { EVENT_TYPES } from '~/lib/constants'
 
-const { INPUT } = EVENT_TYPES
+const { CLICK } = EVENT_TYPES
 
 export function handleClickEvent(event, callback) {
   const { target } = event
@@ -19,7 +19,7 @@ export function handleClickEvent(event, callback) {
 
   const href = getHref(target)
 
-  let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: INPUT })
+  let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: CLICK })
   eventDetails = {
     ...eventDetails,
     ...(href !== null && { href }),

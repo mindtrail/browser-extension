@@ -17,6 +17,7 @@ const openai = new OpenAI({
 
 export async function splitQuery(query) {
   try {
+    console.log('splitQuery', query)
     const completion = await openai.chat.completions.create({
       messages: splitQueryPrompt(
         query,
