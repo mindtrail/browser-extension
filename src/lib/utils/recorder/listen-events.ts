@@ -1,6 +1,6 @@
 import { EVENT_TYPES } from '~/lib/constants'
-import { handleClickEvent } from '~/lib/event-handlers/click-event'
-import { handleInputEvent } from '~/lib/event-handlers/input-event'
+import { handleClickEvent } from '~lib/utils/event-handlers/click-event'
+import { handleInputEvent } from '~lib/utils/event-handlers/input-event'
 
 const { CLICK, INPUT } = EVENT_TYPES
 

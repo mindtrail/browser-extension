@@ -1,5 +1,5 @@
-import { getContent } from '~/lib/recorder-utils/get-content'
-import { getValue } from '~/lib/recorder-utils/get-value'
+import { getContent } from '~lib/utils/recorder/get-content'
+import { getValue } from '~lib/utils/recorder/get-value'
 import { EVENT_TYPES } from '~/lib/constants'
 
 interface BaseEventProps {

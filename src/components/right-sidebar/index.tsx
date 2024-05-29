@@ -5,7 +5,7 @@ import { ChangePosition } from '~components/right-sidebar/change-position'
 import { SavePage } from '~components/right-sidebar/save-page'
 
 import { getPageData } from '~/lib/page-data'
-import { getBaseResourceURL } from '~/lib/utils'
+import { getBaseResourceURL } from '~lib/utils'
 import { useSavedWebsitesStorage } from '~/lib/hooks/storage'
 
 import {

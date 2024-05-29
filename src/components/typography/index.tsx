@@ -1,4 +1,4 @@
-import { cn } from '~/lib/utils'
+import { cn } from '~lib/utils'
 import * as React from 'react'
 
 type TypographyProps = {
@@ -56,5 +56,5 @@ export const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(
         {...props}
       />
     )
-  }
+  },
 )

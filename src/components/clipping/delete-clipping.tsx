@@ -8,7 +8,7 @@ import { Button } from '~/components/ui/button'
 
 import { IconSpinner } from '~components/icons/spinner'
 
-import { sendMessageToBg } from '~/lib/bg-messaging'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getDeleteBtnCoordinates } from '~/lib/clipping/delete'
 

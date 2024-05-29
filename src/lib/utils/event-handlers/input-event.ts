@@ -1,4 +1,4 @@
-import { getSelector } from '~/lib/recorder-utils/find-selector'
+import { getSelector } from '~lib/utils/recorder/find-selector'
 import { EVENT_TYPES } from '~/lib/constants'
 import { debounceEvent } from './debounce-event'
 import { createBaseEvent } from './base-event'

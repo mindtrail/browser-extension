@@ -1,4 +1,4 @@
-import { getBaseResourceURL } from '~/lib/utils'
+import { getBaseResourceURL } from '~lib/utils'
 
 export const getPageData = (): PageData => {
   const html = document.documentElement.outerHTML

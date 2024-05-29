@@ -2,7 +2,7 @@ import { Storage } from '@plasmohq/storage'
 
 import { updateExtensionIcon } from '~background/utils/update-icon'
 import * as api from '~background/lib/api'
-import { log } from '~/lib/utils'
+import { log } from '~lib/utils'
 import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
 
 import { initializeExtension } from './utils/initialize'

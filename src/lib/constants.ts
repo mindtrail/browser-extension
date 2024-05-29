@@ -34,11 +34,6 @@ export const CONTENT_SCRIPT_EXCLUDE = [
   'https://*.plasmo.com/*',
 ]
 
-// export const PLASMO_CONFIG: PlasmoCSConfig = {
-//   matches: CONTENT_SCRIPT_MATCH,
-//   exclude_matches: CONTENT_SCRIPT_EXCLUDE,
-// }
-
 export enum OverlayPosition {
   top = 'top',
   bottom = 'bottom',

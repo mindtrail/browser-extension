@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip
 import { Button } from '~/components/ui/button'
 import { IconSpinner } from '~components/icons/spinner'
 
-import { sendMessageToBg } from '~/lib/bg-messaging'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import {
   getClippingData,

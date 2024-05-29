@@ -6,12 +6,12 @@ import { Typography } from '~components/typography'
 
 import { EventsList } from '../events-list'
 import { generateMetadata } from '../utils/openai'
-import { sendMessageToBg } from '~/lib/bg-messaging'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES } from '~/lib/constants'
 import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
-import { listenEvents } from '../../../lib/recorder-utils/listen-events'
+import { listenEvents } from '../../../lib/utils/recorder/listen-events'
 import { RecordButton } from './record-button'
 
 export function FlowRecorder() {
