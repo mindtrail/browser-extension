@@ -1,4 +1,7 @@
-import { getRecorderState, createBackgroundEvent } from '~background/utils/recorder-storage'
+import {
+  getRecorderState,
+  createBackgroundEvent,
+} from '~background/utils/recorder-storage'
 import { EVENT_TYPES } from '~/lib/constants'
 
 let flowRecorderState = {}
@@ -37,7 +40,7 @@ export function listenForNavigationEvents() {
     debounceTimeout = setTimeout(async () => {
       const tab = await chrome.tabs.get(activeInfo.tabId)
       const url = tab.url || tab.pendingUrl
-      await createBackgroundEvent({ type: EVENT_TYPES.URL, data: { url } })
+      await createBackgroundEvent({ type: EVENT_TYPES.NAV, data: { url } })
     }, 1000)
   })
 

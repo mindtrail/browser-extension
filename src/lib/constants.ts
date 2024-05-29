@@ -108,6 +108,6 @@ export const DEFAULT_RECORDER_STATE = {
 export const EVENT_TYPES = {
   CLICK: 'click',
   INPUT: 'input',
-  URL: 'url',
+  NAV: 'navigation',
   BASE: 'base',
 }

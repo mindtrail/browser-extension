@@ -4,16 +4,18 @@ import { handleInputEvent } from '../event-handlers/input-event'
 import { handleUrlEvent } from '../event-handlers/url-event'
 import { onBackgroundEvent } from './listen-storage'
 
+const { CLICK, INPUT, NAV } = EVENT_TYPES
+
 function createEventHandler(callback) {
   return (event) => {
     switch (event.type) {
-      case EVENT_TYPES.CLICK:
+      case CLICK:
         handleClickEvent(event, callback)
         break
-      case EVENT_TYPES.INPUT:
+      case INPUT:
         handleInputEvent(event, callback)
         break
-      case EVENT_TYPES.URL:
+      case NAV:
         handleUrlEvent(event, callback)
         break
       default:
@@ -23,14 +25,14 @@ function createEventHandler(callback) {
 }
 
 function addEventListeners(eventHandler) {
-  document.addEventListener(EVENT_TYPES.CLICK, eventHandler, true)
-  document.addEventListener(EVENT_TYPES.INPUT, eventHandler, true)
+  document.addEventListener(CLICK, eventHandler, true)
+  document.addEventListener(INPUT, eventHandler, true)
   onBackgroundEvent(eventHandler)
 }
 
 function removeEventListeners(eventHandler) {
-  document.removeEventListener(EVENT_TYPES.CLICK, eventHandler, true)
-  document.removeEventListener(EVENT_TYPES.INPUT, eventHandler, true)
+  document.removeEventListener(CLICK, eventHandler, true)
+  document.removeEventListener(INPUT, eventHandler, true)
 }
 
 export function listenEvents(callback, shouldListen) {

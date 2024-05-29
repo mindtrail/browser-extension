@@ -28,11 +28,9 @@ export function processQueue() {
 }
 
 export function debounceEvent(eventKey, event, callback, debounceDuration = 1000) {
+  const { NAV, CLICK } = EVENT_TYPES
   // Process immediately
-  if (
-    event.type === EVENT_TYPES.URL ||
-    (event.type === EVENT_TYPES.CLICK && event.href)
-  ) {
+  if (event.type === NAV || (event.type === CLICK && event.href)) {
     eventQueue.push({ event, callback })
     processQueue()
     return
