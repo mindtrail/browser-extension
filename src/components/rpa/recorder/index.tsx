@@ -73,14 +73,14 @@ export function FlowRecorder() {
       )
       const updatedEventsList = eventAlreadyInList
         ? prevState?.eventsList.map((e) => {
-            if (e.selector === event.selector) {
-              return {
-                ...e,
-                count: e.count + 1,
-              }
+          if (e.selector === event.selector) {
+            return {
+              ...event,
+              count: e.count + 1,
             }
-            return e
-          })
+          }
+          return e
+        })
         : [...prevState?.eventsList, event]
 
       return {
