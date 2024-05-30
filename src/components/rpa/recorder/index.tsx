@@ -90,7 +90,7 @@ export function FlowRecorder() {
     })
   }
 
-  function deleteEvent(index) {
+  function deleteEvent(index: number) {
     setRecorderState((prevState) => {
       const remainingEvents = prevState?.eventsList.filter((_e, i) => i !== index)
       return {

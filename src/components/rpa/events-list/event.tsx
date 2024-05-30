@@ -46,7 +46,7 @@ export function Event({ event, readOnly, index, deleteEvent }: EventProps) {
         <Button
           variant='secondary'
           className={`invisible group-hover/row:visible absolute right-0`}
-          onClick={() => deleteEvent(index, event)}
+          onClick={() => deleteEvent(index)}
         >
           <Trash2Icon className='w-4 h-4' />
         </Button>
