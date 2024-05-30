@@ -83,7 +83,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     toggleLoading()
     if (response?.error) {
       const { message, status } = response.error
-      alert(`${status}: ${message}`) // TODO: use toast (status message)
+      alert(`${status} ${message}`) // TODO: use toast (status message)
 
       console.error(`${status}: ${message}`)
       return

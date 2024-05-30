@@ -6,7 +6,6 @@ import { log } from '~lib/utils'
 import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
 
 import { initializeExtension } from './utils/initialize'
-import { authenticateAndRetry } from './utils/auth'
 import { listenForNavigationEvents } from './utils/nav-events'
 import { getStorage } from '../lib/storage'
 
@@ -21,29 +20,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.runtime.onMessage.addListener(
   async (request, _sender, sendResponse: ContentScriptResponse) => {
-    try {
-      await processMessage(request, sendResponse)
-    } catch (error) {
-      const { cause } = error || {}
-      console.error('Error :::', cause)
-
-      if (parseInt(cause?.status) === 401) {
-        setTimeout(async () => {
-          console.log(request, cause)
-          // This can be done better, but oh well...
-          await authenticateAndRetry(sendResponse, () =>
-            processMessage(request, sendResponse),
-          )
-        }, 1000)
-        return
-      }
-
-      const resultError = cause || { message: 'Unknown error' }
-      log('resultError', resultError)
-
-      sendResponse({ error: resultError })
-    }
-    // Return true keeps the connection allive with the content script
+    await processMessage(request, sendResponse)
     return true
   },
 )
@@ -51,34 +28,6 @@ chrome.runtime.onMessage.addListener(
 async function savePage(payload: PageData, sendResponse: ContentScriptResponse) {
   const response = await api.savePageAPICall(payload)
   sendResponse(response)
-}
-
-async function saveClipping(payload: SavedClipping, sendResponse: ContentScriptResponse) {
-  const { pageData, ...rest } = payload
-
-  const { dataSource } = await api.savePageAPICall(pageData)
-  log('dataSource', dataSource)
-
-  if (!dataSource) {
-    throw new Error('No dataSource', { cause: { error: 'No dataSource' } })
-  }
-
-  const saveClippingPayload = {
-    ...rest,
-    dataSourceId: dataSource.id,
-  }
-
-  const newClipping = await api.saveClippingAPICall(saveClippingPayload)
-  console.log('newClipping', newClipping)
-
-  sendResponse(newClipping)
-}
-
-async function deleteClipping({ clippingId }, sendResponse: ContentScriptResponse) {
-  const deletedClipping = await api.deleteClippingAPICall(clippingId)
-
-  log('deleted Clipping', deletedClipping)
-  sendResponse(deletedClipping)
 }
 
 interface searchPayload {

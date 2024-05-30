@@ -1,3 +1,4 @@
+import { authExtension } from '../utils/auth'
 import { HOST, API } from '~/lib/constants'
 
 const NODE_ENV = process.env.NODE_ENV
@@ -7,21 +8,43 @@ export const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
 // The extension has host_permissions to localhost & the deployed app.
 // That means it can access the cookies and send them with every fetch request.
 async function makeAPICall(url: string, options = {}) {
-  const response = await fetch(url, {
-    credentials: 'include',
-    ...options,
-  })
-
-  if (!response.ok) {
-    let message = (await response?.text()) || (await response?.json()) || 'API error'
-    const { status } = response
-
-    throw new Error(message, {
-      cause: { message, status },
+  try {
+    let response = await fetch(url, {
+      credentials: 'include',
+      ...options,
     })
-  }
 
-  return await response.json()
+    if (!response.ok) {
+      const { status } = response
+
+      if (status === 401) {
+        console.log('Authenticating')
+        const authSuccess = await authExtension()
+
+        console.log(222, authSuccess)
+        if (!authSuccess) {
+          return { error: { status: 'Could not log in.', message: '' } }
+        }
+
+        // Retry operation after sign in
+        response = await fetch(url, {
+          credentials: 'include',
+          ...options,
+        })
+
+        if (!response.ok) {
+          const message =
+            (await response?.text()) || (await response?.json()) || 'API error'
+          return { error: { status: 'API error.', message } }
+        }
+      }
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.log('API call error:', error)
+    return { error: { status: 'API error.', message: error } }
+  }
 }
 
 export const savePageAPICall = (payload: PageData): Promise<CreatePageResponse> =>

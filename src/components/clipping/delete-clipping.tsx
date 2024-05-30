@@ -69,8 +69,6 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
   }, [])
 
   const handleBtnMouseEnter = useCallback(() => {
-    console.log(hoveredClippingId)
-
     clearTimeout(hideTimeout.current) // Clear the timeout to prevent hiding
   }, [])
 
@@ -102,7 +100,6 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
     async (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
 
-      console.log(hoveredClippingId)
       toggleLoading()
       const payload = { clippingId: hoveredClippingId }
 
@@ -135,8 +132,6 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
   }
 
   const { left, top } = btnCoorindates
-
-  console.log(hoveredClippingId)
 
   return (
     <Tooltip>

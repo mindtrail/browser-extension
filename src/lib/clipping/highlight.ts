@@ -35,6 +35,7 @@ function highlightClippingFromRange(clipping: SavedClipping) {
   if (!clipping) {
     return
   }
+  console.log(clipping)
 
   let { selector, content, id: clippingId } = clipping
   selector = parseSelector(selector)
