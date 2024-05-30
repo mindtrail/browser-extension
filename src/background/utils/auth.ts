@@ -1,31 +1,6 @@
-import { Storage } from '@plasmohq/storage'
-
-import { fetchClippingList } from './messages/clippings'
-import { updateExtensionIcon } from '~/lib/update-icon'
-
-import { API, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
-import * as api from '~/lib/api'
-
-let storage: Storage
-
-export const getStorage = async () => {
-  return storage || new Storage({ area: 'local' })
-}
-
-export const initializeExtension = async (): Promise<Storage> => {
-  storage = await getStorage()
-
-  const settings = (await storage.get(STORAGE_AREA.SETTINGS)) as SettingsStored
-  if (!settings) {
-    await storage.set(STORAGE_AREA.SETTINGS, DEFAULT_EXTENSION_SETTINGS)
-  }
-
-  updateExtensionIcon(storage)
-  fetchClippingList()
-  // fetchDataSources...
-
-  return storage
-}
+import { API } from '~/lib/constants'
+import * as api from '~background/lib/api'
+import { initializeExtension } from './initialize'
 
 export const authenticateAndRetry = async (
   sendResponse: ContentScriptResponse,

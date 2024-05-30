@@ -7,7 +7,7 @@ import { ClippingOverlay } from '~/components/clipping'
 import { RightSidebar } from '~/components/right-sidebar'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
-import { isHostExcluded } from '~/lib/utils'
+import { isHostExcluded } from '~lib/utils'
 import { useSettingsStorage } from '~/lib/hooks/storage'
 
 // Needed to inject the CSS into the page

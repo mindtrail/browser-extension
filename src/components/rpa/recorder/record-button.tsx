@@ -6,10 +6,10 @@ interface RecordButtonProps {
   onToggleRecording: () => void
   onPause: () => void
   isRecording: boolean
-  paused: boolean
+  isPaused: boolean
 }
 export function RecordButton(props: RecordButtonProps) {
-  const { onPause, onToggleRecording, isRecording, paused } = props
+  const { onPause, onToggleRecording, isRecording, isPaused } = props
 
   return isRecording ? (
     <div className='flex w-full gap-2 items-center'>
@@ -18,12 +18,12 @@ export function RecordButton(props: RecordButtonProps) {
         variant='outline'
         onClick={onPause}
       >
-        {paused ? (
+        {isPaused ? (
           <RecordIcon className='w-5 h-5' />
         ) : (
           <CirclePauseIcon className='w-5 h-5' />
         )}
-        {paused ? 'Resume' : '  Pause'}
+        {isPaused ? 'Resume' : '  Pause'}
       </Button>
       <Button
         className='flex w-full gap-2 items-center'

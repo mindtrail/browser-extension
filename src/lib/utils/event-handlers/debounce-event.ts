@@ -1,17 +1,17 @@
-import { EVENT_TYPES } from './event-types'
+import { EVENT_TYPES } from '~/lib/constants'
 
 let eventQueue = []
 let processingQueue = false
 let debounceTimers = new Map()
 
-export function processEvent(event, callback) {
+function processEvent(event, callback) {
   // const delay = lastEventTime ? event.timeStamp - lastEventTime : 0
   // console.log(`Processing event: ${event.type} at ${event.selector} with delay ${delay}`)
   // lastEventTime = event.timeStamp
   callback({ ...event })
 }
 
-export function processNextEvent() {
+function processNextEvent() {
   if (eventQueue.length === 0) {
     processingQueue = false
     return
@@ -21,18 +21,16 @@ export function processNextEvent() {
   processNextEvent()
 }
 
-export function processQueue() {
+function processQueue() {
   if (processingQueue || eventQueue.length === 0) return
   processingQueue = true
   processNextEvent()
 }
 
 export function debounceEvent(eventKey, event, callback, debounceDuration = 1000) {
+  const { NAV, CLICK } = EVENT_TYPES
   // Process immediately
-  if (
-    event.type === EVENT_TYPES.URL ||
-    (event.type === EVENT_TYPES.CLICK && event.href)
-  ) {
+  if (event.type === NAV || (event.type === CLICK && event.href)) {
     eventQueue.push({ event, callback })
     processQueue()
     return

@@ -6,7 +6,7 @@ import savedIcon from 'url:~assets/saved-32.png'
 import { STORAGE_AREA } from '~/lib/constants'
 
 // Based on Auto/Manual save, update the extension icon
-async function updateExtensionIcon(storage: Storage = undefined) {
+export async function updateExtensionIcon(storage: Storage = undefined) {
   const settings = (await storage.get(STORAGE_AREA.SETTINGS)) as SettingsStored
   const autoSave = settings?.autoSave
 
@@ -16,5 +16,3 @@ async function updateExtensionIcon(storage: Storage = undefined) {
 
   console.log('Update Icon --- :', autoSave)
 }
-
-export { updateExtensionIcon }

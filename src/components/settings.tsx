@@ -8,7 +8,7 @@ import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
 
-import { addHttpsIfMissing } from '~/lib/utils'
+import { addHttpsIfMissing } from '~lib/utils'
 import { MESSAGES, URL_REGEX } from '~/lib/constants'
 
 import { useSettingsStorage } from '~/lib/hooks/storage'

@@ -1,18 +1,23 @@
-import { API, MESSAGES, DEFAULT_EXTENSION_SETTINGS, STORAGE_AREA } from '~/lib/constants'
-import { log } from '~/lib/utils'
-import { updateExtensionIcon } from '~/lib/update-icon'
-import * as api from '~/lib/api'
-import { initializeExtension, authenticateAndRetry } from './initialize'
-import { getRecorderState, createBackgroundEvent } from '~lib/background/recorder-storage'
-import { EVENT_TYPES } from '~/components/rpa/recorder/event-types'
+import { Storage } from '@plasmohq/storage'
 
-let storage
+import { updateExtensionIcon } from '~background/utils/update-icon'
+import * as api from '~background/lib/api'
+import { log } from '~lib/utils'
+import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
 
-async function initialize() {
-  storage = await initializeExtension()
-}
+import { initializeExtension } from './utils/initialize'
+import { authenticateAndRetry } from './utils/auth'
+import { listenForNavigationEvents } from './utils/nav-events'
+import { getStorage } from '../lib/storage'
 
-initialize()
+let storage: Storage
+
+// Ensure listeners are added when the extension is installed or updated
+chrome.runtime.onInstalled.addListener(async () => {
+  initializeExtension()
+  listenForNavigationEvents()
+  storage = await getStorage()
+})
 
 chrome.runtime.onMessage.addListener(
   async (request, _sender, sendResponse: ContentScriptResponse) => {
@@ -38,7 +43,6 @@ chrome.runtime.onMessage.addListener(
 
       sendResponse({ error: resultError })
     }
-
     // Return true keeps the connection allive with the content script
     return true
   },
@@ -63,8 +67,6 @@ async function saveClipping(payload: SavedClipping, sendResponse: ContentScriptR
     ...rest,
     dataSourceId: dataSource.id,
   }
-
-  console.log('payload', saveClippingPayload)
 
   const newClipping = await api.saveClippingAPICall(saveClippingPayload)
   console.log('newClipping', newClipping)
@@ -105,35 +107,28 @@ async function processMessage(request: any, sendResponse: ContentScriptResponse)
       await savePage(payload, sendResponse)
       fetchSavedDSList() // Update storage data after a new page added
       break
-    case MESSAGES.SAVE_CLIPPING:
-      await saveClipping(payload, sendResponse)
-      // fetchClippingList() // Update storage data afeter a new item added
-      fetchSavedDSList() // Update storage data after a new page added
-      break
-    case MESSAGES.DELETE_CLIPPING:
-      await deleteClipping(payload, sendResponse)
-      // fetchClippingList() // Update storage data after a delete
-      break
+    // case MESSAGES.SAVE_CLIPPING:
+    //   await saveClipping(payload, sendResponse)
+    //   // fetchClippingList() // Update storage data afeter a new item added
+    //   fetchSavedDSList() // Update storage data after a new page added
+    //   break
+    // case MESSAGES.DELETE_CLIPPING:
+    //   await deleteClipping(payload, sendResponse)
+    //   // fetchClippingList() // Update storage data after a delete
+    //   break
     case MESSAGES.SEARCH_HISTORY:
       await searchHistory(payload, sendResponse)
       break
     case MESSAGES.UPDATE_ICON:
       await updateExtensionIcon()
       break
+    case 'START_RECORDING':
+      // startRecording(payload)
+      break
+    case 'STOP_RECORDING':
+      // stopRecording()
+      break
     default:
       break
   }
 }
-
-// Current URL event
-let debounceTimeout
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const state = await getRecorderState()
-  if (!state.isRecording) return
-  if (debounceTimeout) clearTimeout(debounceTimeout)
-  debounceTimeout = setTimeout(async () => {
-    const tab = await chrome.tabs.get(activeInfo.tabId)
-    const url = tab.url || tab.pendingUrl
-    await createBackgroundEvent({ type: EVENT_TYPES.URL, data: { url } })
-  }, 1000)
-})

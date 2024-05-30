@@ -4,7 +4,7 @@ import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 import { MoveDirection, OverlayPosition } from '~/lib/constants'
-import { cn } from '~/lib/utils'
+import { cn } from '~lib/utils'
 
 interface ChangePositionProps {
   handleClick: (direction: MoveDirection) => void

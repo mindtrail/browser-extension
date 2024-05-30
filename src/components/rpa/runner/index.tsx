@@ -38,6 +38,7 @@ export function FlowRunner() {
     const resumeTask = async () => {
       const { data } = await getTasks()
       const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
+
       if (resumableTask) {
         await runFlow(resumableTask.state.flowId, resumableTask)
       }
@@ -49,6 +50,7 @@ export function FlowRunner() {
     if (flowsRunning?.length > 0) return
 
     const flowsToRun = await getFlowsToRun({ flows, flowId, query })
+
     setFlowsRunning(flowsToRun.map((flow) => flow?.flowId))
 
     task = task || (await onTaskStart(flowId))

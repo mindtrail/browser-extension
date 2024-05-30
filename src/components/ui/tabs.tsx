@@ -1,7 +1,7 @@
-import * as TabsPrimitive from "@radix-ui/react-tabs"
-import * as React from "react"
+import * as TabsPrimitive from '@radix-ui/react-tabs'
+import * as React from 'react'
 
-import { cn } from "~/utils"
+import { cn } from '~lib/utils'
 
 const Tabs = TabsPrimitive.Root
 
@@ -12,8 +12,8 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-9 items-center justify-center rounded-lg bg-muted text-muted-foreground",
-      className
+      'inline-flex h-9 items-center justify-center rounded-lg bg-muted text-muted-foreground',
+      className,
     )}
     {...props}
   />
@@ -27,8 +27,8 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex flex-1 items-center justify-center whitespace-nowrap h-9 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 leading-none border-b-2 border-transparent hover:text-blue-400 data-[state=active]:text-blue-500 data-[state=active]:border-blue-500 data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_1px] data-[state=active]:focus:shadow-blue-500  cursor-default",
-      className
+      'inline-flex flex-1 items-center justify-center whitespace-nowrap h-9 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 leading-none border-b-2 border-transparent hover:text-blue-400 data-[state=active]:text-blue-500 data-[state=active]:border-blue-500 data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_1px] data-[state=active]:focus:shadow-blue-500  cursor-default',
+      className,
     )}
     {...props}
   />
@@ -42,8 +42,8 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-      className
+      'mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+      className,
     )}
     {...props}
   />

@@ -6,7 +6,7 @@ import { TooltipProvider } from '~/components/ui/tooltip'
 import { ClippingOverlay } from '~/components/clipping'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
-import { isHostExcluded } from '~/lib/utils'
+import { isHostExcluded } from '~lib/utils'
 import { useSettingsStorage } from '~/lib/hooks/storage'
 
 const SidePanelRPA = () => {

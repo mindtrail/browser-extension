@@ -34,11 +34,6 @@ export const CONTENT_SCRIPT_EXCLUDE = [
   'https://*.plasmo.com/*',
 ]
 
-// export const PLASMO_CONFIG: PlasmoCSConfig = {
-//   matches: CONTENT_SCRIPT_MATCH,
-//   exclude_matches: CONTENT_SCRIPT_EXCLUDE,
-// }
-
 export enum OverlayPosition {
   top = 'top',
   bottom = 'bottom',
@@ -99,8 +94,14 @@ export const URL_REGEX =
 
 export const DEFAULT_RECORDER_STATE = {
   isRecording: false,
-  eventsMap: '[]',
-  paused: false,
-  saving: false,
-  backgroundEvents: [],
+  isPaused: false,
+  isSaving: false,
+  eventsList: [],
+}
+
+export const EVENT_TYPES = {
+  CLICK: 'click',
+  INPUT: 'input',
+  NAV: 'navigation',
+  BASE: 'base',
 }

@@ -1,34 +1,32 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
 
-import { Events } from '../events'
+import { EventsList } from '../events-list'
 import { generateMetadata } from '../utils/openai'
-import { sendMessageToBg } from '~/lib/bg-messaging'
-import { useRecorderState } from '~/lib/hooks/useRecorder'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES } from '~/lib/constants'
+import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
-import { listenEvents } from './listen-events'
+import { listenEvents } from '../../../lib/utils/recorder/listen-events'
 import { RecordButton } from './record-button'
 
 export function FlowRecorder() {
   const {
     isRecording,
-    setIsRecording,
-    eventsMap,
-    setEventsMap,
-    paused,
-    setPaused,
-    saving,
-    setSaving,
+    isPaused,
+    isSaving,
+    eventsList,
+    resetRecorderState,
+    setRecorderState,
   } = useRecorderState()
 
   useEffect(
-    () => listenEvents(recordEvent, isRecording && !paused),
-    [isRecording, paused],
+    () => listenEvents(recordEvent, isRecording && !isPaused),
+    [isRecording, isPaused],
   )
 
   useEffect(() => {
@@ -36,7 +34,7 @@ export function FlowRecorder() {
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isRecording) {
-        cancelRecording()
+        resetRecorderState()
       }
     }
 
@@ -45,12 +43,6 @@ export function FlowRecorder() {
       window.removeEventListener('keydown', handleEscape)
     }
   }, [isRecording])
-
-  async function cancelRecording() {
-    setIsRecording(false)
-    setEventsMap(new Map())
-    setPaused(false)
-  }
 
   function generateKey(eventKey, lastKey, prevEvents = []) {
     let key = eventKey
@@ -66,40 +58,68 @@ export function FlowRecorder() {
     return key
   }
 
-  let lastKey = ''
+  // let lastKey = ''
   function recordEvent(event) {
-    setEventsMap((prevMap) => {
-      const prevEvents = Array.from(prevMap.values()).flat()
-      lastKey = generateKey(event.eventKey, lastKey, prevEvents)
+    setRecorderState((prevState) => {
+      console.log(prevState)
+      const prevEvents = prevState?.eventsList
 
+      // @TODO: reimplement this
+      // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
       // use array for each key instead of single event (potentially useful for repetitive events)
-      const prevEventsForKey = (prevMap?.get(lastKey) as []) || []
-      const newEvents = [...prevEventsForKey, event]
 
-      return new Map(prevMap).set(lastKey, newEvents)
+      const eventAlreadyInList = prevState?.eventsList.find(
+        (e) => e.selector === event.selector,
+      )
+      const updatedEventsList = eventAlreadyInList
+        ? prevState?.eventsList.map((e) => {
+          if (e.selector === event.selector) {
+            return {
+              ...event,
+              count: e.count + 1,
+            }
+          }
+          return e
+        })
+        : [...prevState?.eventsList, event]
+
+      return {
+        ...prevState,
+        eventsList: updatedEventsList,
+      }
     })
   }
 
-  function removeEvent(index) {
-    setEventsMap((prevMap) => {
-      const newMap = new Map(prevMap)
-      Array.from(prevMap.keys()).forEach((key, i) => {
-        if (i === index) newMap.delete(key)
-      })
-      return newMap
+  function deleteEvent(index: number) {
+    setRecorderState((prevState) => {
+      const remainingEvents = prevState?.eventsList.filter((_e, i) => i !== index)
+      return {
+        ...prevState,
+        eventsList: remainingEvents,
+      }
     })
   }
 
   async function toggleRecording() {
-    setIsRecording(!isRecording)
-    setEventsMap(new Map())
-
-    if (!isRecording || !eventsMap.size) {
+    if (!isRecording) {
+      setRecorderState((prevState) => ({
+        ...prevState,
+        isRecording: true,
+      }))
       return
     }
 
-    setSaving(true)
-    const eventsRecorded = Array.from(eventsMap.values()).flat()
+    if (!eventsList.length) {
+      resetRecorderState()
+      return
+    }
+
+    setRecorderState((prevState) => ({
+      ...prevState,
+      isSaving: true,
+    }))
+
+    const eventsRecorded = Array.from(eventsList.values()).flat()
     const flow = await generateMetadata(eventsRecorded)
 
     flow.events = eventsRecorded.map((event: Event, index) => {
@@ -110,7 +130,12 @@ export function FlowRecorder() {
       }
     })
 
-    setSaving(false)
+    setRecorderState((prevState) => ({
+      ...prevState,
+      isRecording: false,
+      isSaving: false,
+    }))
+
     sendMessageToBg({
       name: 'flows',
       body: {
@@ -118,6 +143,15 @@ export function FlowRecorder() {
         payload: flow,
       },
     })
+
+    resetRecorderState()
+  }
+
+  function togglePause() {
+    setRecorderState((prevState) => ({
+      ...prevState,
+      isPaused: !prevState.isPaused,
+    }))
   }
 
   return (
@@ -128,32 +162,32 @@ export function FlowRecorder() {
     >
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
-          <CancelRecordingButton onClick={cancelRecording} />
-          <Events eventsMap={eventsMap as Map<string, any>} removeEvent={removeEvent} />
+          <CancelRecordingButton onClick={resetRecorderState} />
+          <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
         </div>
       )}
 
-      {isRecording && !eventsMap?.size && (
+      {isRecording && !eventsList?.length && (
         <Typography className='w-full text-center mb-6'>
-          {paused ? 'Paused Recording' : 'Recording Workflow...'}
+          {isPaused ? 'isPaused Recording' : 'Recording Workflow...'}
         </Typography>
       )}
 
-      {saving ? (
+      {isSaving ? (
         <Button
           className='flex w-full gap-4 items-center !opacity-75'
           variant='outline'
           disabled
         >
           <LoaderCircleIcon className='w-5 h-5 animate-spin' />
-          <Typography>Saving Workflow...</Typography>
+          <Typography>isSaving Workflow...</Typography>
         </Button>
       ) : (
         <RecordButton
           onToggleRecording={toggleRecording}
-          onPause={() => setPaused(!paused)}
+          onPause={togglePause}
           isRecording={isRecording}
-          paused={paused}
+          isPaused={isPaused}
         />
       )}
     </div>

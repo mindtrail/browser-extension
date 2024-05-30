@@ -7,7 +7,7 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { MESSAGES } from '~/lib/constants'
-import { addHttpsIfMissing } from '~/lib/utils'
+import { addHttpsIfMissing } from '~lib/utils'
 
 type SearchResult = {
   hostName: string

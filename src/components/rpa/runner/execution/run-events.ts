@@ -2,14 +2,14 @@ import { inputComponent } from './components/input'
 import { clickComponent } from './components/click'
 import { loopComponent } from './components/loop'
 import { extractComponent } from './components/extract'
-import { urlComponent } from './components/url'
+import { navigationComponent } from './components/navigation'
 
 const components = {
   input: inputComponent,
   click: clickComponent,
   loop: loopComponent,
   extract: extractComponent,
-  url: urlComponent,
+  navigation: navigationComponent,
 }
 
 export async function runEvents({
