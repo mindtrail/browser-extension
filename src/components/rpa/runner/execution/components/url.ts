@@ -1,5 +1,5 @@
 export async function urlComponent({ flowId, event, onEventStart, onEventEnd }) {
   await onEventStart(flowId, event)
   await onEventEnd(flowId, event)
-  window.location.href = event.url || event.value
+  window.location.href = event.value
 }

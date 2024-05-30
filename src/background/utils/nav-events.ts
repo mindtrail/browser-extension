@@ -46,9 +46,6 @@ async function createNavEvent(url: string) {
   const { eventsList = [] } = recorderState
   const updatedEventsList = [...eventsList, eventDetails]
 
-  const payload = { ...recorderState, eventsList: updatedEventsList }
-  console.log('createNavEvent', payload)
-
   await setRecorderState({ ...recorderState, eventsList: updatedEventsList })
 }
 

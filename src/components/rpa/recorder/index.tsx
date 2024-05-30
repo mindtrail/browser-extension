@@ -60,11 +60,11 @@ export function FlowRecorder() {
 
   // let lastKey = ''
   function recordEvent(event) {
-    console.log(333, event)
     setRecorderState((prevState) => {
       console.log(prevState)
       const prevEvents = prevState?.eventsList
 
+      // @TODO: reimplement this
       // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
       // use array for each key instead of single event (potentially useful for repetitive events)
 
@@ -90,12 +90,9 @@ export function FlowRecorder() {
     })
   }
 
-  function removeEvent(event) {
+  function deleteEvent(index) {
     setRecorderState((prevState) => {
-      const remainingEvents = prevState?.eventsList.filter(
-        (e) => e.selector !== event.selector,
-      )
-
+      const remainingEvents = prevState?.eventsList.filter((_e, i) => i !== index)
       return {
         ...prevState,
         eventsList: remainingEvents,
@@ -164,7 +161,7 @@ export function FlowRecorder() {
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
           <CancelRecordingButton onClick={resetRecorderState} />
-          <EventsList eventsList={eventsList} removeEvent={removeEvent} />
+          <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
         </div>
       )}
 

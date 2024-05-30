@@ -11,11 +11,11 @@ interface EventProps {
   eventsList?: any[]
   debugMode?: boolean
   readOnly?: boolean
-  removeEvent?: (event: any) => void
+  deleteEvent?: (event: any) => void
 }
 
 export function EventsList(props: EventProps) {
-  const { eventsList = [], removeEvent, debugMode = false, readOnly = false } = props
+  const { eventsList = [], deleteEvent, debugMode = false, readOnly = false } = props
 
   if (!eventsList?.length) return
 
@@ -40,7 +40,7 @@ export function EventsList(props: EventProps) {
           event={event}
           readOnly={readOnly}
           index={index}
-          removeEvent={removeEvent}
+          deleteEvent={deleteEvent}
         />
       ))}
     </div>

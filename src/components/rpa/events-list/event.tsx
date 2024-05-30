@@ -14,10 +14,10 @@ interface EventProps {
   event: Event
   readOnly: boolean
   index: number
-  removeEvent: (index: number) => void
+  deleteEvent: (index: number) => void
 }
 
-export function Event({ event, readOnly, index, removeEvent }: EventProps) {
+export function Event({ event, readOnly, index, deleteEvent }: EventProps) {
   const { type, value, icon: Icon, count } = event
 
   return (
@@ -46,7 +46,7 @@ export function Event({ event, readOnly, index, removeEvent }: EventProps) {
         <Button
           variant='secondary'
           className={`invisible group-hover/row:visible absolute right-0`}
-          onClick={() => removeEvent(index)}
+          onClick={() => deleteEvent(index, event)}
         >
           <Trash2Icon className='w-4 h-4' />
         </Button>
