@@ -26,7 +26,7 @@ interface RunItemProps {
   runFlow: (flowId: string, task?: any) => Promise<void>
   removeFlow: (flowId: string) => void
   updateFlowName: (flowId: string, flow: any) => any
-  eventsRunning: Map<string, any[]>
+  eventsList: any[]
 }
 
 export function RunItem(props: RunItemProps) {
@@ -34,7 +34,7 @@ export function RunItem(props: RunItemProps) {
     flow,
     flowsRunning,
     runnerContainerRef,
-    eventsRunning,
+    eventsList,
     runFlow,
     removeFlow,
     updateFlowName,
@@ -45,8 +45,6 @@ export function RunItem(props: RunItemProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [flowName, setFlowName] = useState(initialName)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  const eventsList = eventsRunning.get(flowId)
 
   useEffect(() => {
     if (!isRenaming) return
