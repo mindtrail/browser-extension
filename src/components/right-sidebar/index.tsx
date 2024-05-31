@@ -76,7 +76,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
       return
     }
 
-    setSavedWebsites((prev) => [...prev, payload.url])
+    setSavedWebsites((prev) => [...prev, payload?.url])
   }, [])
 
   const handlePositionChange = useCallback(
@@ -89,7 +89,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
   )
 
   useEffect(() => {
-    const saveStatus = savedWebsites.includes(getBaseResourceURL(window.location.href))
+    const saveStatus = savedWebsites?.includes(getBaseResourceURL(window.location.href))
     setCurrentPageIsSaved(saveStatus)
   }, [savedWebsites])
 

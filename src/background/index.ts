@@ -3,7 +3,7 @@ import { Storage } from '@plasmohq/storage'
 import { updateExtensionIcon } from '~/background/utils/update-icon'
 import * as api from '~/background/lib/api'
 import { log } from '~/lib/utils'
-import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
+import { MESSAGES } from '~/lib/constants'
 
 import { initializeExtension } from './utils/initialize'
 import { listenForNavigationEvents } from './utils/nav-events'
@@ -25,11 +25,6 @@ chrome.runtime.onMessage.addListener(
   },
 )
 
-async function savePage(payload: PageData, sendResponse: ContentScriptResponse) {
-  const response = await api.savePageAPICall(payload)
-  sendResponse(response)
-}
-
 interface searchPayload {
   searchQuery: string
 }
@@ -43,30 +38,15 @@ async function searchHistory(
   sendResponse(websites)
 }
 
-async function fetchSavedDSList() {
-  const savedDsList = await api.fetchSavedDSListAPICall()
-  await storage.set(STORAGE_AREA.SAVED_WEBSITES, savedDsList)
-}
-
 async function processMessage(request: any, sendResponse: ContentScriptResponse) {
   const { message, payload } = request
 
   switch (message) {
-    case MESSAGES.SAVE_PAGE:
-      await savePage(payload, sendResponse)
-      fetchSavedDSList() // Update storage data after a new page added
-      break
     case MESSAGES.SEARCH_HISTORY:
       await searchHistory(payload, sendResponse)
       break
     case MESSAGES.UPDATE_ICON:
       await updateExtensionIcon()
-      break
-    case 'START_RECORDING':
-      // startRecording(payload)
-      break
-    case 'STOP_RECORDING':
-      // stopRecording()
       break
     default:
       break

@@ -9,7 +9,6 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   const { type, payload } = req?.body
 
   if (!payload) {
-    console.log('no data...')
     res.send('no data...')
     return
   }
@@ -29,7 +28,12 @@ export default handler
 
 export async function fetchSavedDSList() {
   const storage = await getStorage()
-  const savedDsList = await api.fetchSavedDSListAPICall()
+  const result = await api.fetchSavedDSListAPICall()
 
-  await storage.set(STORAGE_AREA.SAVED_WEBSITES, savedDsList)
+  if (result?.error) {
+    await storage.set(STORAGE_AREA.SAVED_WEBSITES, [])
+    return
+  }
+
+  await storage.set(STORAGE_AREA.SAVED_WEBSITES, result)
 }
