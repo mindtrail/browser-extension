@@ -1,8 +1,8 @@
 import { Storage } from '@plasmohq/storage'
 
-import { updateExtensionIcon } from '~background/utils/update-icon'
-import * as api from '~background/lib/api'
-import { log } from '~lib/utils'
+import { updateExtensionIcon } from '~/background/utils/update-icon'
+import * as api from '~/background/lib/api'
+import { log } from '~/lib/utils'
 import { MESSAGES, STORAGE_AREA } from '~/lib/constants'
 
 import { initializeExtension } from './utils/initialize'
@@ -56,15 +56,6 @@ async function processMessage(request: any, sendResponse: ContentScriptResponse)
       await savePage(payload, sendResponse)
       fetchSavedDSList() // Update storage data after a new page added
       break
-    // case MESSAGES.SAVE_CLIPPING:
-    //   await saveClipping(payload, sendResponse)
-    //   // fetchClippingList() // Update storage data afeter a new item added
-    //   fetchSavedDSList() // Update storage data after a new page added
-    //   break
-    // case MESSAGES.DELETE_CLIPPING:
-    //   await deleteClipping(payload, sendResponse)
-    //   // fetchClippingList() // Update storage data after a delete
-    //   break
     case MESSAGES.SEARCH_HISTORY:
       await searchHistory(payload, sendResponse)
       break

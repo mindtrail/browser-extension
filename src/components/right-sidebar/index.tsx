@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
-import { ChangePosition } from '~components/right-sidebar/change-position'
-import { SavePage } from '~components/right-sidebar/save-page'
+import { ChangePosition } from '~/components/right-sidebar/change-position'
+import { SavePage } from '~/components/right-sidebar/save-page'
 
 import { getPageData } from '~/lib/page-data'
 import { getBaseResourceURL } from '~lib/utils'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { useSavedWebsitesStorage } from '~/lib/hooks/storage'
 
 import {
@@ -57,9 +58,12 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
     toggleLoading()
     const payload = getPageData()
 
-    const result = await chrome.runtime.sendMessage({
-      message: MESSAGES.SAVE_PAGE,
-      payload,
+    const result = await sendMessageToBg({
+      name: 'data-sources',
+      body: {
+        type: MESSAGES.SAVE_PAGE,
+        payload,
+      },
     })
 
     toggleLoading()
