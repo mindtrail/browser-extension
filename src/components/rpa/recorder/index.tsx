@@ -143,6 +143,8 @@ export function FlowRecorder() {
         payload: flow,
       },
     })
+
+    resetRecorderState()
   }
 
   function togglePause() {
