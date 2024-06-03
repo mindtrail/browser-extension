@@ -32,22 +32,67 @@ export function FlowRecorder() {
   useEffect(() => {
     if (!isRecording) return
 
+    let currentOutlinedElement = null
+
+    const handleMouseOver = (event: KeyboardEvent) => {
+      if (currentOutlinedElement) {
+        removeOutlineStyles(currentOutlinedElement)
+      }
+
+      currentOutlinedElement = event.target
+      addOutlineStyles(currentOutlinedElement)
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isRecording) {
+      if (event.key === 'Escape') {
         resetRecorderState()
       }
 
-      // If event key is alt/options, pause recording
-      if (event.key === 'Alt' && isRecording) {
-        // togglePause()
+      if (event.key === 'Alt') {
+        window.addEventListener('mouseover', handleMouseOver)
+      }
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === 'Alt') {
+        if (currentOutlinedElement) {
+          removeOutlineStyles(currentOutlinedElement)
+          currentOutlinedElement = null
+        }
+        window.removeEventListener('mouseover', handleMouseOver)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('mouseover', handleMouseOver)
     }
-  }, [isRecording])
+  }, [isRecording, resetRecorderState])
+
+  // @TODO: Add an absolute position overlay with a high Z-Index and BG
+  function addOutlineStyles(element: HTMLElement) {
+    if (!element) return
+
+    element.style.outline = '2px dashed green'
+    element.style.outlineOffset = '1px'
+    element.style.borderRadius = '4px'
+    element.style.cursor = 'pointer'
+    element.style.backgroundColor = 'rgba(0, 255, 0, 0.05)'
+  }
+
+  function removeOutlineStyles(element: HTMLElement) {
+    if (!element) return
+
+    element.style.outline = ''
+    element.style.outlineOffset = ''
+    element.style.borderRadius = ''
+    element.style.cursor = ''
+    element.style.backgroundColor = ''
+  }
 
   function generateKey(eventKey, lastKey, prevEvents = []) {
     let key = eventKey
