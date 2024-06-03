@@ -7,14 +7,14 @@ export const TARGET_HOST = IS_DEV ? HOST.LOCAL : HOST.REMOTE
 
 // The extension has host_permissions to localhost & the deployed app.
 // That means it can access the cookies and send them with every fetch request.
-async function makeAPICall(url: string, options = {}) {
+async function makeAPICall(url: string, options = {}, skipRetry = false) {
   try {
     let response = await fetch(url, {
       credentials: 'include',
       ...options,
     })
 
-    if (!response.ok) {
+    if (!response.ok && !skipRetry) {
       const { status } = response
 
       if (status === 401) {
@@ -70,7 +70,7 @@ export const searchHistoryAPICall = (searchQuery: string) =>
   makeAPICall(`${TARGET_HOST + API.SEARCH_HISTORY}?searchQuery=${searchQuery}`)
 
 export const getClippingListAPICall = () =>
-  makeAPICall(`${TARGET_HOST + API.CLIPPING}?groupByDataSource=true`)
+  makeAPICall(`${TARGET_HOST + API.CLIPPING}?groupByDataSource=true`, {}, true)
 
 export const fetchSavedDSListAPICall = () =>
-  makeAPICall(`${TARGET_HOST + API.DATA_SOURCE}?type=web_page`)
+  makeAPICall(`${TARGET_HOST + API.DATA_SOURCE}?type=web_page`, {}, true)
