@@ -151,10 +151,14 @@ export const useRunnerState = () => {
         },
         onEventEnd: async (flowId, event) => {
           await onEventEnd(flowId, event, task.id)
-          setRunnerState((prev) => ({
-            ...prev,
-            eventsList: [...prev.eventsList, event],
-          }))
+          setRunnerState((prev) => {
+            const eventExists = prev.eventsList.some((e) => e.id === event.id)
+            if (eventExists) return prev
+            return {
+              ...prev,
+              eventsList: [...prev.eventsList, event],
+            }
+          })
         },
       })
 
