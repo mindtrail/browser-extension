@@ -111,6 +111,7 @@ export const EVENT_TYPES = {
   CLICK: 'click',
   INPUT: 'input',
   NAV: 'navigation',
+  EXTRACT: 'extract',
   BASE: 'base',
 }
 

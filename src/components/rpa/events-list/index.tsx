@@ -1,9 +1,18 @@
+import {
+  MousePointerClickIcon,
+  GlobeIcon,
+  PenLineIcon,
+  TextSelectIcon,
+} from 'lucide-react'
+
+import { EVENT_TYPES } from '~lib/constants'
 import { Event } from './event'
-import { MousePointerClickIcon, GlobeIcon, PenLineIcon } from 'lucide-react'
 
 const EVENT_ICONS = {
-  input: PenLineIcon,
-  click: MousePointerClickIcon,
+  [EVENT_TYPES.INPUT]: PenLineIcon,
+  [EVENT_TYPES.CLICK]: MousePointerClickIcon,
+  [EVENT_TYPES.EXTRACT]: TextSelectIcon,
+  [EVENT_TYPES.NAV]: GlobeIcon,
   default: GlobeIcon,
 }
 
@@ -21,8 +30,8 @@ export function EventsList(props: EventProps) {
 
   const eventsToDisplay = []
 
-  eventsList.forEach((event) => {
-    const value = event.value || event.textContent
+  eventsList.forEach((event = {}) => {
+    const { value } = event
 
     eventsToDisplay.push({
       ...event,

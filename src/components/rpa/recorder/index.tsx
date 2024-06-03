@@ -32,15 +32,20 @@ export function FlowRecorder() {
   useEffect(() => {
     if (!isRecording) return
 
-    const handleEscape = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isRecording) {
         resetRecorderState()
       }
+
+      // If event key is alt/options, pause recording
+      if (event.key === 'Alt' && isRecording) {
+        // togglePause()
+      }
     }
 
-    window.addEventListener('keydown', handleEscape)
+    window.addEventListener('keydown', handleKeyDown)
     return () => {
-      window.removeEventListener('keydown', handleEscape)
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [isRecording])
 
@@ -61,13 +66,12 @@ export function FlowRecorder() {
   // let lastKey = ''
   function recordEvent(event) {
     setRecorderState((prevState) => {
-      console.log(prevState)
-      const prevEvents = prevState?.eventsList
-
       // @TODO: reimplement this
+      // const prevEvents = prevState?.eventsList
       // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
       // use array for each key instead of single event (potentially useful for repetitive events)
 
+      console.log(event, prevState)
       const eventAlreadyInList = prevState?.eventsList.find(
         (e) => e.selector === event.selector,
       )

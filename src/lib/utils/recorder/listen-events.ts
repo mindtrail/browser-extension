@@ -38,7 +38,5 @@ export function listenEvents(callback, shouldListen) {
     removeEventListeners(eventHandler)
   }
 
-  return () => {
-    removeEventListeners(eventHandler)
-  }
+  return () => removeEventListeners(eventHandler)
 }
