@@ -1,5 +1,5 @@
-import { waitForUrl } from '../wait-for-url'
-import { waitForElement } from '../wait-for-element'
+import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
+import { waitForElement } from '~/lib/utils/runner/wait-for-element'
 
 async function triggerClickEvent(event, callback) {
   try {
