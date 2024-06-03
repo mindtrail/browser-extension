@@ -121,4 +121,7 @@ export const DEFAULT_RUNNER_STATE = {
   eventsList: [],
 }
 
-export const SUPABASE_FLOWS_CHANNEL = 'flows-channel'
+export const SUPABASE_CHANNELS = {
+  FLOWS: 'flows-channel',
+  TASKS: 'tasks-channel',
+}
