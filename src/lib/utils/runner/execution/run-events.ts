@@ -3,6 +3,7 @@ import { clickComponent } from './components/click'
 import { loopComponent } from './components/loop'
 import { extractComponent } from './components/extract'
 import { navigationComponent } from './components/navigation'
+import { googleSheetsSyncComponent } from './components/google-sheets-sync'
 
 const components = {
   input: inputComponent,
@@ -10,6 +11,7 @@ const components = {
   loop: loopComponent,
   extract: extractComponent,
   navigation: navigationComponent,
+  'google-sheets-sync': googleSheetsSyncComponent,
 }
 
 export async function runEvents({

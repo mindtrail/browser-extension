@@ -97,6 +97,20 @@ export const extractPropertiesPrompt = ({ entities }) => [
   },
 ]
 
+export const extractListEntitiesPrompt = ({ html }) => [
+  {
+    role: 'system',
+    content: `
+    Output Requirement: Only respond with JSON array format and absolute no explanation. ONLY ARRAY !
+    Output: Response should always be a JSON array in this format: [{}, {}, etc.]. Always ARRAY !
+    `,
+  },
+  {
+    role: 'user',
+    content: `Export this html into a structured data JSON array: ${html}. Always return an array !`,
+  },
+]
+
 export const generateMetadataPrompt = (query) => [
   {
     role: 'system',

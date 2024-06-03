@@ -8,6 +8,7 @@ import {
   searchPrompt,
   extractPropertiesPrompt,
   splitNQLPrompt,
+  extractListEntitiesPrompt,
 } from './prompts'
 
 const openai = new OpenAI({
@@ -105,6 +106,21 @@ export async function extractProperties({ entities }) {
     model: 'gpt-4o',
     temperature: 0.1,
     response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
+  console.log('extractProperties', result)
+  return JSON.parse(result)
+}
+
+export async function extractListEntities({ html }) {
+  if (!html) return []
+  const completion = await openai.chat.completions.create({
+    messages: extractListEntitiesPrompt({
+      html,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    // response_format: { type: 'json_object' },
   })
   const result = completion.choices[0].message.content
   console.log('extractProperties', result)
