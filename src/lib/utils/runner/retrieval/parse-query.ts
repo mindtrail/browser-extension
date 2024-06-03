@@ -1,4 +1,4 @@
-import { detectFlow, splitQuery } from '../../utils/groq'
+import { detectFlow, splitQuery } from '~lib/llm/groq'
 import { groupByFlowAndQuery } from './group-by-flow'
 
 export async function parseQuery(query, flows) {

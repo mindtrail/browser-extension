@@ -1,4 +1,4 @@
-import { getFlowEvents } from '../../utils/get-flow-events'
+import { getFlowEvents } from '~lib/utils/runner/get-flow-events'
 import { runEvents } from './run-events'
 import { processQuery } from './process-query'
 

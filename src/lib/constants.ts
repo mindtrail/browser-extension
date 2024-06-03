@@ -113,3 +113,12 @@ export const EVENT_TYPES = {
   NAV: 'navigation',
   BASE: 'base',
 }
+
+export const DEFAULT_RUNNER_STATE = {
+  query: '',
+  flows: [],
+  flowsRunning: [],
+  eventsList: [],
+}
+
+export const SUPABASE_FLOWS_CHANNEL = 'flows-channel'
