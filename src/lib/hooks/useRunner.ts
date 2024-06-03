@@ -2,7 +2,11 @@ import { useCallback, useEffect } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
-import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
+import {
+  STORAGE_AREA,
+  DEFAULT_RUNNER_STATE,
+  SUPABASE_FLOWS_CHANNEL,
+} from '~/lib/constants'
 import {
   getFlows,
   onFlowsChange,
@@ -112,7 +116,7 @@ export const useRunnerState = () => {
       setRunnerState((prev) => ({ ...prev, flows: data }))
     }
     fetchFlows()
-    const unsubscribe = onFlowsChange(fetchFlows, 'extension-flows-channel')
+    const unsubscribe = onFlowsChange(fetchFlows, SUPABASE_FLOWS_CHANNEL)
     return () => unsubscribe()
   }, [setRunnerState])
 

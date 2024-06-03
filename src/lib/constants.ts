@@ -112,3 +112,5 @@ export const DEFAULT_RUNNER_STATE = {
   flowsRunning: [],
   eventsList: [],
 }
+
+export const SUPABASE_FLOWS_CHANNEL = 'flows-channel'
