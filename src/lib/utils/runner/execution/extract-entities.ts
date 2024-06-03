@@ -1,4 +1,4 @@
-import { extractProperties } from '~/components/rpa/utils/openai'
+import { extractProperties } from '~lib/llm/openai'
 import { getSelector } from '~/lib/utils/recorder/find-selector'
 
 export async function extractTableEntities({ columns, entitySelectorPattern }) {

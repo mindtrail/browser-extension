@@ -1,5 +1,5 @@
 import { parseQuery } from './parse-query'
-import { getFlowEvents } from '~/components/rpa/utils/get-flow-events'
+import { getFlowEvents } from '~lib/utils/runner/get-flow-events'
 
 export async function getFlowsToRun({ flows, flowId, query }) {
   return flowId
