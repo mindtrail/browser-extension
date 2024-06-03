@@ -3,17 +3,102 @@ import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
-import { getFlows, onFlowsChange, getTasks, deleteFlow, updateFlow } from '~/lib/supabase'
+import {
+  getFlows,
+  onFlowsChange,
+  getTasks,
+  deleteFlow,
+  updateFlow,
+  createTask,
+  getTask,
+  updateTask,
+} from '~/lib/supabase'
 import { getFlowsToRun } from '~/components/rpa/runner/retrieval/get-flows-to-run'
 import { runFlows } from '~/components/rpa/runner/execution/run-flows'
-import { onTaskStart } from '~/components/rpa/runner/execution/on-task-start'
-import { onEventStart } from '~/components/rpa/runner/execution/on-event-start'
-import { onEventEnd } from '~/components/rpa/runner/execution/on-event-end'
-import { onTaskEnd } from '~/components/rpa/runner/execution/on-task-end'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
   instance: new Storage({ area: 'local' }),
+}
+
+async function onTaskStart(flowId) {
+  const newTaskRes = await createTask({
+    state: {
+      status: 'started',
+      variables: {},
+      flowId,
+    },
+    logs: [],
+  })
+  return newTaskRes.data
+}
+
+async function onTaskEnd(flowId, taskId) {
+  const taskRes = await getTask(taskId)
+  const task: any = taskRes.data
+
+  // Update task state to 'ended' if all events are ended
+  const logs = task.logs || []
+  const lastLog = logs[logs.length - 1]
+  if (lastLog && lastLog.status === 'ended') {
+    return updateTask(task.id, {
+      ...task,
+      state: {
+        ...task.state,
+        status: 'ended',
+      },
+    })
+  }
+
+  return task
+}
+
+async function onEventStart(flowId, event, taskId) {
+  const taskRes = await getTask(taskId)
+  const task: any = taskRes.data
+
+  // Check if the eventId already exists in the logs
+  const eventExists = task.logs.some((log) => log.eventId === event.id)
+
+  // Only add the log if the eventId does not exist
+  if (!eventExists) {
+    await updateTask(task.id, {
+      ...task,
+      state: {
+        ...task.state,
+        status: 'running',
+      },
+      logs: [
+        ...task.logs,
+        {
+          flowId,
+          eventId: event.id,
+          status: 'running',
+        },
+      ],
+    })
+  }
+}
+
+async function onEventEnd(flowId, event, taskId) {
+  const taskRes = await getTask(taskId)
+  const task: any = taskRes.data
+  await updateTask(task.id, {
+    ...task,
+    state: {
+      ...task.state,
+      status: 'running',
+    },
+    logs: task.logs.map((log) => {
+      if (log.eventId === event.id) {
+        return {
+          ...log,
+          status: 'ended',
+        }
+      }
+      return log
+    }),
+  })
 }
 
 export const useRunnerState = () => {
