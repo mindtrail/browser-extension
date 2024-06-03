@@ -9,8 +9,8 @@ import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
 
 import { addHttpsIfMissing } from '~lib/utils'
-import { MESSAGES, URL_REGEX } from '~/lib/constants'
-
+import { MESSAGES, MESSAGE_AREAS, URL_REGEX } from '~/lib/constants'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { useSettingsStorage } from '~/lib/hooks/storage'
 
 export function Settings() {
@@ -59,8 +59,8 @@ export function Settings() {
       autoSave: autoSaveStatus,
     })
 
-    chrome.runtime.sendMessage({
-      message: MESSAGES.UPDATE_ICON,
+    sendMessageToBg({
+      name: MESSAGE_AREAS.UPDATE_ICON,
     })
   }, [autoSave])
 

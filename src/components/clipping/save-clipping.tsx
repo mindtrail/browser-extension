@@ -8,7 +8,7 @@ import { Button } from '~/components/ui/button'
 import { IconSpinner } from '~components/icons/spinner'
 
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
-import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
+import { MESSAGES, MESSAGE_AREAS, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import {
   getClippingData,
   getSaveClippingBtnPosition,
@@ -73,7 +73,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     console.log('Clipping To Save', payload)
 
     const response = await sendMessageToBg({
-      name: 'clippings',
+      name: MESSAGE_AREAS.CLIPPINGS,
       body: {
         type: MESSAGES.SAVE_CLIPPING,
         payload,

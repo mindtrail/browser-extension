@@ -7,7 +7,7 @@ import { Typography } from '~components/typography'
 import { EventsList } from '../events-list'
 import { generateMetadata } from '../utils/openai'
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
-import { MESSAGES } from '~/lib/constants'
+import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
 import { useRecorderState } from '~/lib/hooks/useRecorder'
 
 import { CancelRecordingButton } from './cancel-recording-button'
@@ -73,14 +73,14 @@ export function FlowRecorder() {
       )
       const updatedEventsList = eventAlreadyInList
         ? prevState?.eventsList.map((e) => {
-          if (e.selector === event.selector) {
-            return {
-              ...event,
-              count: e.count + 1,
+            if (e.selector === event.selector) {
+              return {
+                ...event,
+                count: e.count + 1,
+              }
             }
-          }
-          return e
-        })
+            return e
+          })
         : [...prevState?.eventsList, event]
 
       return {
@@ -137,7 +137,7 @@ export function FlowRecorder() {
     }))
 
     sendMessageToBg({
-      name: 'flows',
+      name: MESSAGE_AREAS.FLOWS,
       body: {
         type: MESSAGES.CREATE_FLOW,
         payload: flow,

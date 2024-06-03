@@ -1,11 +1,19 @@
 export const AUTO_SAVE_DELAY = 60 // seconds
 export const MIN_TEXT_FOR_CLIPPING = 10
 
+export enum MESSAGE_AREAS {
+  CLIPPINGS = 'clippings',
+  DATA_SOURCEs = 'data-sources',
+  FLOWS = 'flows',
+  SEARCH_HISTORY = 'search-history',
+  UPDATE_ICON = 'extension-icon',
+}
+
 export const MESSAGES = {
   SAVE_PAGE: 'save-page',
   SAVE_CLIPPING: 'save-clipping',
   SEARCH_HISTORY: 'search-history',
-  UPDATE_ICON: 'update-icon',
+  UPDATE_ICON: 'extension-icon',
   GET_CLIPPING_LIST: 'get-clipping-list',
   DELETE_CLIPPING: 'delete-clipping',
   AUTH_REDIRECT: 'auth-redirect',

@@ -8,6 +8,7 @@ import { getPageData } from '~/lib/page-data'
 import { getBaseResourceURL } from '~lib/utils'
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { useSavedWebsitesStorage } from '~/lib/hooks/storage'
+import { MESSAGE_AREAS } from '~/lib/constants'
 
 import {
   DEFAULT_EXTENSION_SETTINGS,
@@ -59,7 +60,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
     const payload = getPageData()
 
     const result = await sendMessageToBg({
-      name: 'data-sources',
+      name: MESSAGE_AREAS.DATA_SOURCEs,
       body: {
         type: MESSAGES.SAVE_PAGE,
         payload,
