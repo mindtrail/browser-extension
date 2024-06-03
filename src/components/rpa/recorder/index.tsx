@@ -229,7 +229,7 @@ export function FlowRecorder() {
           disabled
         >
           <LoaderCircleIcon className='w-5 h-5 animate-spin' />
-          <Typography>isSaving Workflow...</Typography>
+          <Typography>Saving Workflow...</Typography>
         </Button>
       ) : (
         <RecordButton
