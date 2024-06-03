@@ -13,8 +13,8 @@ import {
   getTask,
   updateTask,
 } from '~/lib/supabase'
-import { getFlowsToRun } from '~/components/rpa/runner/retrieval/get-flows-to-run'
-import { runFlows } from '~/components/rpa/runner/execution/run-flows'
+import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
+import { runFlows } from '~lib/utils/runner/execution/run-flows'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,

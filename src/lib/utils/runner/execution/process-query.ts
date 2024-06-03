@@ -1,5 +1,5 @@
-import { extractParams } from '../../utils/openai'
-import { search } from '../../utils/openai'
+import { extractParams } from '~/components/rpa/utils/openai'
+import { search } from '~/components/rpa/utils/openai'
 import { buildParamsSchema } from './build-params-schema'
 import { runEvents } from './run-events'
 import { extractTableEntities } from './extract-entities'
