@@ -1,10 +1,8 @@
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
 import { generateMetadata } from '~/lib/llm/openai'
-import { useRecorderState } from '~lib/hooks/use-recorder-state'
 
-export const updateRecordedEvents = (event) => {
-  const { setRecorderState } = useRecorderState()
+export const updateRecordedEvents = (event, setRecorderState) => {
   // @TODO: reimplement this
   // const prevEvents = prevState?.eventsList
   // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
@@ -33,9 +31,7 @@ export const updateRecordedEvents = (event) => {
   })
 }
 
-export const deleteEvent = (index: number) => {
-  const { setRecorderState } = useRecorderState()
-
+export const deleteEvent = (index: number, setRecorderState) => {
   setRecorderState((prevState) => {
     const remainingEvents = prevState?.eventsList.filter((_e, i) => i !== index)
     return {
@@ -45,9 +41,8 @@ export const deleteEvent = (index: number) => {
   })
 }
 
-export const toggleRecording = async () => {
-  const { isRecording, eventsList, setRecorderState, resetRecorderState } =
-    useRecorderState()
+export const toggleRecording = async (props) => {
+  const { isRecording, eventsList, setRecorderState, resetRecorderState } = props
 
   if (!isRecording) {
     setRecorderState((prevState) => ({
@@ -95,9 +90,7 @@ export const toggleRecording = async () => {
   resetRecorderState()
 }
 
-export const togglePause = () => {
-  const { setRecorderState } = useRecorderState()
-
+export const togglePause = (setRecorderState) => {
   setRecorderState((prevState) => ({
     ...prevState,
     isPaused: !prevState.isPaused,

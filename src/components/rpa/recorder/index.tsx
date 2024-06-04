@@ -3,25 +3,29 @@ import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
-import { useRecorderState } from '~lib/hooks/use-recorder-state'
 import {
   listenEventsToRecord,
   listenEventsForUIState,
 } from '~lib/utils/recorder/listen-events'
-import {
-  updateRecordedEvents,
-  deleteEvent,
-  toggleRecording,
-  togglePause,
-} from '~lib/hooks/use-recorder-events'
+
+import { useRecorderState } from '~lib/hooks/use-recorder-state'
 
 import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-recording-button'
 import { RecordButton } from './record-button'
 
 export function FlowRecorder() {
-  const { isRecording, isPaused, isSaving, eventsList, resetRecorderState } =
-    useRecorderState()
+  const {
+    isRecording,
+    isPaused,
+    isSaving,
+    eventsList,
+    resetRecorderState,
+    updateRecordedEvents,
+    deleteEvent,
+    toggleRecording,
+    togglePause,
+  } = useRecorderState()
 
   useEffect(() => {
     const shouldListen = isRecording && !isPaused

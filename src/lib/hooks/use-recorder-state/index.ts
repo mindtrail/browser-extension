@@ -3,6 +3,12 @@ import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
 import { STORAGE_AREA, DEFAULT_RECORDER_STATE } from '~/lib/constants'
+import {
+  updateRecordedEvents,
+  deleteEvent,
+  togglePause,
+  toggleRecording,
+} from './recorder-event-handlers'
 
 const RECORDER_CONFIG = {
   key: STORAGE_AREA.RECORDER,
@@ -56,9 +62,12 @@ export const useRecorderState = () => {
     }
   }, [recorderState.isRecording, startRecording, stopRecording])
 
+  const baseState = { ...recorderState, resetRecorderState, setRecorderState }
   return {
-    ...recorderState,
-    resetRecorderState,
-    setRecorderState,
+    ...baseState,
+    updateRecordedEvents: (args) => updateRecordedEvents(args, setRecorderState),
+    deleteEvent: (args) => deleteEvent(args, setRecorderState),
+    toggleRecording: () => toggleRecording(baseState),
+    togglePause: () => togglePause(setRecorderState),
   }
 }
