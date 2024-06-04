@@ -1,4 +1,4 @@
-import { addOutlineStyles, removeOutlineStyles } from './dom-styles'
+import { addOutlineStyles, removeOutlineStyles } from '~/lib/utils/recorder/dom-styles'
 
 let hoveredEl = null
 

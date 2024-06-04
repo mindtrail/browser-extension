@@ -1,9 +1,6 @@
 import { DOM_EVENT } from '~/lib/constants'
 import { addEventListeners, removeEventListeners } from './add-remove-listeners'
-import {
-  addOutlineStyles,
-  removeOutlineStyles,
-} from './event-handlers/ui-state/dom-styles'
+import { addOutlineStyles, removeOutlineStyles } from './dom-styles'
 
 const { MOUSEOVER, KEYDOWN, KEYUP } = DOM_EVENT
 

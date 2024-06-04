@@ -5,7 +5,7 @@ import {
   handleMouseOver,
   handleKeyDown,
   handleKeyUp,
-} from '~lib/utils/recorder/event-handlers/ui-state'
+} from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
 const { CLICK, INPUT, MOUSEOVER, KEYDOWN, KEYUP } = DOM_EVENT
 
