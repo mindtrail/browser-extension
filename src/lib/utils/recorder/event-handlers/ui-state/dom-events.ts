@@ -3,6 +3,7 @@ import { addOutlineStyles, removeOutlineStyles } from '~/lib/utils/recorder/dom-
 let hoveredEl = null
 
 export const handleMouseOver = (event: MouseEvent) => {
+  console.log(123)
   removeOutlineStyles(hoveredEl)
   hoveredEl = event.target
 

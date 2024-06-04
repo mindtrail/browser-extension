@@ -1,14 +1,10 @@
-import { useEffect } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
-import {
-  listenEventsToRecord,
-  listenEventsForUIState,
-} from '~lib/utils/recorder/listen-events'
-
+import { useEventListeners } from '~lib/utils/recorder/listen-events'
 import { useRecorderState } from '~lib/hooks/use-recorder-state'
+import { useAudioRecorder } from '~lib/hooks/use-audio-recorder'
 
 import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-recording-button'
@@ -27,18 +23,8 @@ export function FlowRecorder() {
     togglePause,
   } = useRecorderState()
 
-  useEffect(() => {
-    const shouldListen = isRecording && !isPaused
-    if (!shouldListen) return
-
-    const recordingCleanup = listenEventsToRecord(updateRecordedEvents)
-    const uiStateCleanup = listenEventsForUIState(resetRecorderState)
-
-    return () => {
-      recordingCleanup()
-      uiStateCleanup()
-    }
-  }, [isRecording, isPaused])
+  useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
+  useAudioRecorder(isRecording)
 
   return (
     <div
@@ -55,7 +41,7 @@ export function FlowRecorder() {
 
       {isRecording && !eventsList?.length && (
         <Typography className='w-full text-center mb-6'>
-          {isPaused ? 'isPaused Recording' : 'Recording Workflow...'}
+          {isPaused ? 'Paused Recording' : 'Recording Workflow...'}
         </Typography>
       )}
 
