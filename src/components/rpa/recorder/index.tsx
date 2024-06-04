@@ -8,7 +8,7 @@ import { EventsList } from '../events-list'
 import { generateMetadata } from '~/lib/llm/openai'
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
-import { useRecorderState } from '~/lib/hooks/useRecorder'
+import { useRecorderState } from '~lib/hooks/use-recorder-state'
 
 import { CancelRecordingButton } from './cancel-recording-button'
 import { listenEvents } from '~/lib/utils/recorder/listen-events'
@@ -33,36 +33,44 @@ export function FlowRecorder() {
     if (!isRecording) return
 
     let currentOutlinedElement = null
+    let isAltKeyPressed = false
 
     const handleMouseOver = (event: KeyboardEvent) => {
-      if (currentOutlinedElement) {
-        removeOutlineStyles(currentOutlinedElement)
-      }
-
+      removeOutlineStyles(currentOutlinedElement)
       currentOutlinedElement = event.target
-      addOutlineStyles(currentOutlinedElement)
+
+      if (isAltKeyPressed) {
+        addOutlineStyles(currentOutlinedElement)
+      }
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log(222, event)
+
+      // @TODO: Check if the event is not coming from the input field
       if (event.key === 'Escape') {
         resetRecorderState()
       }
 
       if (event.key === 'Alt') {
-        window.addEventListener('mouseover', handleMouseOver)
+        isAltKeyPressed = true
+
+        if (currentOutlinedElement) {
+          currentOutlinedElement?.dispatchEvent(
+            new MouseEvent('mouseover', { bubbles: true }),
+          )
+        }
       }
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === 'Alt') {
-        if (currentOutlinedElement) {
-          removeOutlineStyles(currentOutlinedElement)
-          currentOutlinedElement = null
-        }
-        window.removeEventListener('mouseover', handleMouseOver)
+        isAltKeyPressed = false
+        removeOutlineStyles(currentOutlinedElement)
       }
     }
 
+    window.addEventListener('mouseover', handleMouseOver)
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
 
@@ -81,7 +89,7 @@ export function FlowRecorder() {
     element.style.outlineOffset = '1px'
     element.style.borderRadius = '4px'
     element.style.cursor = 'pointer'
-    element.style.backgroundColor = 'rgba(0, 255, 0, 0.05)'
+    element.style.backgroundColor = 'rgba(0, 255, 0, 0.07)'
   }
 
   function removeOutlineStyles(element: HTMLElement) {

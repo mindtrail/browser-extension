@@ -7,7 +7,7 @@ import { SavePage } from '~/components/right-sidebar/save-page'
 import { getPageData } from '~/lib/page-data'
 import { getBaseResourceURL } from '~lib/utils'
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
-import { useSavedWebsitesStorage } from '~/lib/hooks/storage'
+import { useSavedWebsitesStorage } from '~lib/hooks/use-storage'
 import { MESSAGE_AREAS } from '~/lib/constants'
 
 import {

@@ -11,7 +11,7 @@ import { Switch } from '~/components/ui/switch'
 import { addHttpsIfMissing } from '~lib/utils'
 import { MESSAGES, MESSAGE_AREAS, URL_REGEX } from '~/lib/constants'
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
-import { useSettingsStorage } from '~/lib/hooks/storage'
+import { useSettingsStorage } from '~lib/hooks/use-storage'
 
 export function Settings() {
   const [settings, setSettings] = useSettingsStorage()
