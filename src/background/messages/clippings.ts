@@ -19,8 +19,6 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       const newClipping = await saveClipping(payload)
       fetchClippingList() // Update storage data afeter a new item added
       // fetchSavedDSList() // Update storage data after a new page added
-
-      console.log(newClipping)
       res.send(newClipping)
       break
     case MESSAGES.DELETE_CLIPPING:

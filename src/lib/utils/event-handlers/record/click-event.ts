@@ -21,9 +21,9 @@ export function handleClickEvent(event: MouseEvent, callback) {
   }
 
   const href = getHref(target)
-  const eventType = altKey ? EXTRACT : CLICK
+  const actionType = altKey ? EXTRACT : CLICK
 
-  let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: eventType })
+  let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: actionType })
   eventDetails = {
     ...eventDetails,
     ...(href !== null && { href }),

@@ -21,7 +21,6 @@ async function makeAPICall(url: string, options = {}, skipRetry = false) {
         console.log('Authenticating')
         const authSuccess = await authExtension()
 
-        console.log(222, authSuccess)
         if (!authSuccess) {
           return { error: { status: 'Could not log in.', message: '' } }
         }

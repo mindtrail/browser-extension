@@ -8,7 +8,6 @@ const { INPUT } = ACTION_TYPE
 export function handleInputEvent(event, callback) {
   const { target } = event
   const selector = getSelector(target)
-  console.log(event)
 
   if (!target || (selector && selector.includes('plasmo-csui'))) {
     return
