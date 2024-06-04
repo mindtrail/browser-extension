@@ -9,8 +9,9 @@ const handleStop = () => {
   console.log(3333, 'stopped')
 }
 
+let mediaRecorder: MediaRecorder | null = null
+
 export const useAudioRecorder = (isRecording) => {
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const startRecording = useCallback(async () => {
@@ -21,7 +22,7 @@ export const useAudioRecorder = (isRecording) => {
       newRecorder.ondataavailable = handleDataAvailable
       newRecorder.onstop = handleStop
       newRecorder.start(1000)
-      setMediaRecorder(newRecorder)
+      mediaRecorder = newRecorder
       setError(null)
     } catch (error) {
       console.error('Error accessing microphone:', error)
@@ -35,8 +36,8 @@ export const useAudioRecorder = (isRecording) => {
 
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach((track) => track.stop())
-    setMediaRecorder(null)
-  }, [isRecording])
+    mediaRecorder = null
+  }, [])
 
   useEffect(() => {
     if (isRecording) {

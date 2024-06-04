@@ -8,7 +8,7 @@ import {
   deleteEvent,
   togglePause,
   toggleRecording,
-} from './recorder-event-handlers'
+} from './recorder-state-events'
 
 const RECORDER_CONFIG = {
   key: STORAGE_AREA.RECORDER,
@@ -27,7 +27,7 @@ export const useRecorderState = () => {
   )
 
   const baseState = { ...recorderState, resetRecorderState, setRecorderState }
-  const handlers = useMemo(
+  const eventHandlers = useMemo(
     () => ({
       updateRecordedEvents: (args) => updateRecordedEvents(args, setRecorderState),
       deleteEvent: (args) => deleteEvent(args, setRecorderState),
@@ -39,6 +39,6 @@ export const useRecorderState = () => {
 
   return {
     ...baseState,
-    ...handlers,
+    ...eventHandlers,
   }
 }
