@@ -2,7 +2,7 @@ import { LoaderCircleIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
-import { useEventListeners } from '~lib/utils/recorder/listen-events'
+import { useEventListeners } from '~lib/hooks/use-events-listener'
 import { useRecorderState } from '~lib/hooks/use-recorder-state'
 import { useAudioRecorder } from '~lib/hooks/use-audio-recorder'
 
