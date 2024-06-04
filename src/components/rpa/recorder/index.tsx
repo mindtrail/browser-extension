@@ -4,14 +4,15 @@ import { LoaderCircleIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Typography } from '~components/typography'
 
-import { EventsList } from '../events-list'
-import { generateMetadata } from '~/lib/llm/openai'
-import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
+import { generateMetadata } from '~/lib/llm/openai'
 import { useRecorderState } from '~lib/hooks/use-recorder-state'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
+import { listenForActions } from '~/lib/utils/recorder/listen-recording-events'
+import { listenHighlightEvents } from '~/lib/utils/recorder/listen-highlighting-events'
 
+import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-recording-button'
-import { listenEvents } from '~/lib/utils/recorder/listen-events'
 import { RecordButton } from './record-button'
 
 export function FlowRecorder() {
@@ -24,83 +25,20 @@ export function FlowRecorder() {
     setRecorderState,
   } = useRecorderState()
 
-  useEffect(
-    () => listenEvents(recordEvent, isRecording && !isPaused),
-    [isRecording, isPaused],
-  )
-
   useEffect(() => {
-    if (!isRecording) return
+    const shouldListen = isRecording && !isPaused
 
-    let currentOutlinedElement = null
-    let isAltKeyPressed = false
-
-    const handleMouseOver = (event: KeyboardEvent) => {
-      removeOutlineStyles(currentOutlinedElement)
-      currentOutlinedElement = event.target
-
-      if (isAltKeyPressed) {
-        addOutlineStyles(currentOutlinedElement)
-      }
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      console.log(222, event)
-
-      // @TODO: Check if the event is not coming from the input field
-      if (event.key === 'Escape') {
-        resetRecorderState()
-      }
-
-      if (event.key === 'Alt') {
-        isAltKeyPressed = true
-
-        if (currentOutlinedElement) {
-          currentOutlinedElement?.dispatchEvent(
-            new MouseEvent('mouseover', { bubbles: true }),
-          )
-        }
-      }
-    }
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'Alt') {
-        isAltKeyPressed = false
-        removeOutlineStyles(currentOutlinedElement)
-      }
-    }
-
-    window.addEventListener('mouseover', handleMouseOver)
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
+    const recordingCleanup = listenForActions({
+      callback: recordEvent,
+      shouldListen,
+    })
+    // const metaCleanup = listenHighlightEvents(shouldListen, resetRecorderState)
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-      window.removeEventListener('mouseover', handleMouseOver)
+      recordingCleanup()
+      // metaCleanup()
     }
-  }, [isRecording, resetRecorderState])
-
-  // @TODO: Add an absolute position overlay with a high Z-Index and BG
-  function addOutlineStyles(element: HTMLElement) {
-    if (!element) return
-
-    element.style.outline = '2px dashed green'
-    element.style.outlineOffset = '1px'
-    element.style.borderRadius = '4px'
-    element.style.cursor = 'pointer'
-    element.style.backgroundColor = 'rgba(0, 255, 0, 0.07)'
-  }
-
-  function removeOutlineStyles(element: HTMLElement) {
-    if (!element) return
-
-    element.style.outline = ''
-    element.style.outlineOffset = ''
-    element.style.borderRadius = ''
-    element.style.cursor = ''
-    element.style.backgroundColor = ''
-  }
+  }, [isRecording, isPaused])
 
   function generateKey(eventKey, lastKey, prevEvents = []) {
     let key = eventKey
@@ -124,7 +62,6 @@ export function FlowRecorder() {
       // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
       // use array for each key instead of single event (potentially useful for repetitive events)
 
-      console.log(event, prevState)
       const eventAlreadyInList = prevState?.eventsList.find(
         (e) => e.selector === event.selector,
       )

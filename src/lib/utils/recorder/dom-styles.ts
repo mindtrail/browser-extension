@@ -1,3 +1,4 @@
+// @TODO: Add an absolute position overlay with a high Z-Index
 export function addOutlineStyles(element: HTMLElement) {
   if (!element) return
 
