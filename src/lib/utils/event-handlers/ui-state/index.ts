@@ -25,6 +25,7 @@ export const handleKeyDown = (event: KeyboardEvent, resetRecorderState: () => vo
   if (event.key === 'Alt') {
     isAltKeyPressed = true
 
+    // Instant highlighting - mouseover will not trigger if already on the element
     if (hoveredEl) {
       hoveredEl?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
     }

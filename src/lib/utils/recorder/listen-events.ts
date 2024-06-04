@@ -6,9 +6,22 @@ import {
   handleKeyDown,
   handleKeyUp,
 } from '~/lib/utils/event-handlers/ui-state'
-import { addEventListeners, removeEventListeners } from './add-remove-listeners'
 
 const { CLICK, INPUT, MOUSEOVER, KEYDOWN, KEYUP } = DOM_EVENT
+
+type Event = {
+  type: DOM_EVENT
+  handler: (event: any) => any
+}
+function addEventListeners(eventList: Event[]) {
+  eventList.forEach(({ type, handler }) => document.addEventListener(type, handler, true))
+}
+
+function removeEventListeners(eventList: Event[]) {
+  eventList.forEach(({ type, handler }) =>
+    document.removeEventListener(type, handler, true),
+  )
+}
 
 export function listenEventsToRecord(callback) {
   const clickEvents = [
