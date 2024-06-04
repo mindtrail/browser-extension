@@ -1,11 +1,11 @@
 import { DOM_EVENT } from '~/lib/constants'
-import { handleClickEvent } from '~/lib/utils/event-handlers/record/click-event'
-import { handleInputEvent } from '~/lib/utils/event-handlers/record/input-event'
+import { handleClickEvent } from '~lib/utils/recorder/event-handlers/click-event'
+import { handleInputEvent } from '~lib/utils/recorder/event-handlers/input-event'
 import {
   handleMouseOver,
   handleKeyDown,
   handleKeyUp,
-} from '~/lib/utils/event-handlers/ui-state'
+} from '~lib/utils/recorder/event-handlers/ui-state'
 
 const { CLICK, INPUT, MOUSEOVER, KEYDOWN, KEYUP } = DOM_EVENT
 

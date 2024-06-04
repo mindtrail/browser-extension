@@ -1,5 +1,5 @@
 import { ACTION_TYPE } from '~/lib/constants'
-import { createBaseEvent } from '~lib/utils/event-handlers/record/base-event'
+import { createBaseEvent } from '~lib/utils/recorder/event-handlers/base-event'
 
 import { getRecorderState, setRecorderState } from './storage/recorder'
 
