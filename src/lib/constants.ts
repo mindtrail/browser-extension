@@ -107,12 +107,11 @@ export const DEFAULT_RECORDER_STATE = {
   eventsList: [],
 }
 
-export const EVENT_TYPES = {
+export const ACTION_TYPES = {
   CLICK: 'click',
   INPUT: 'input',
   NAV: 'navigation',
   EXTRACT: 'extract',
-  BASE: 'base',
 }
 
 export const DEFAULT_RUNNER_STATE = {

@@ -5,14 +5,14 @@ import {
   TextSelectIcon,
 } from 'lucide-react'
 
-import { EVENT_TYPES } from '~lib/constants'
+import { ACTION_TYPES } from '~lib/constants'
 import { Event } from './event'
 
 const EVENT_ICONS = {
-  [EVENT_TYPES.INPUT]: PenLineIcon,
-  [EVENT_TYPES.CLICK]: MousePointerClickIcon,
-  [EVENT_TYPES.EXTRACT]: TextSelectIcon,
-  [EVENT_TYPES.NAV]: GlobeIcon,
+  [ACTION_TYPES.INPUT]: PenLineIcon,
+  [ACTION_TYPES.CLICK]: MousePointerClickIcon,
+  [ACTION_TYPES.EXTRACT]: TextSelectIcon,
+  [ACTION_TYPES.NAV]: GlobeIcon,
   default: GlobeIcon,
 }
 
