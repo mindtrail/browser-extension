@@ -1,15 +1,15 @@
-import { ACTION_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 import { handleClickEvent } from '~lib/utils/event-handlers/click-event'
 import { handleInputEvent } from '~lib/utils/event-handlers/input-event'
 
-const { CLICK, INPUT } = ACTION_TYPES
+const { CLICK, INPUT } = ACTION_TYPE
 function createRecordingEventHandler(callback) {
   return (event) => {
     switch (event.type) {
-      case ACTION_TYPES.CLICK:
+      case ACTION_TYPE.CLICK:
         handleClickEvent(event, callback)
         break
-      case ACTION_TYPES.INPUT:
+      case ACTION_TYPE.INPUT:
         handleInputEvent(event, callback)
         break
       default:

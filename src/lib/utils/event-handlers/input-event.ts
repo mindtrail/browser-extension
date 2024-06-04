@@ -1,9 +1,9 @@
 import { getSelector } from '~lib/utils/recorder/find-selector'
-import { ACTION_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 import { debounceEvent } from './debounce-event'
 import { createBaseEvent } from './base-event'
 
-const { INPUT } = ACTION_TYPES
+const { INPUT } = ACTION_TYPE
 
 export function handleInputEvent(event, callback) {
   const { target } = event

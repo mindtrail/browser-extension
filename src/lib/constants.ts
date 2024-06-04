@@ -107,9 +107,17 @@ export const DEFAULT_RECORDER_STATE = {
   eventsList: [],
 }
 
-export const ACTION_TYPES = {
+export const DOM_EVENT = {
+  MOUSEOVER: 'mouseover',
+  KEYDOWN: 'keydown',
+  KEYUP: 'keyup',
   CLICK: 'click',
   INPUT: 'input',
+}
+
+export const ACTION_TYPE = {
+  CLICK: DOM_EVENT.CLICK,
+  INPUT: DOM_EVENT.INPUT,
   NAV: 'navigation',
   EXTRACT: 'extract',
 }

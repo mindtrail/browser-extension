@@ -1,6 +1,6 @@
 import { getRecorderState, setRecorderState } from './storage/recorder'
 
-import { ACTION_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 import { createBaseEvent } from '~/lib/utils/event-handlers/base-event'
 
 let listenersAdded = false
@@ -36,11 +36,11 @@ export function listenForNavigationEvents() {
 
 async function createNavEvent(url: string) {
   const recorderState = await getRecorderState()
-  const newEvent = { type: ACTION_TYPES.NAV, url }
+  const newEvent = { type: ACTION_TYPE.NAV, url }
 
   const { eventDetails } = createBaseEvent({
     event: newEvent,
-    type: ACTION_TYPES.NAV,
+    type: ACTION_TYPE.NAV,
   })
 
   const { eventsList = [] } = recorderState

@@ -1,5 +1,5 @@
 import { getValue } from '~lib/utils/recorder/get-value'
-import { ACTION_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 
 interface BaseEventProps {
   event: any
@@ -12,10 +12,10 @@ export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) 
 
   const timeStamp = Date.now()
 
-  const eventIdentifier = type === ACTION_TYPES.NAV ? url : selector
+  const eventIdentifier = type === ACTION_TYPE.NAV ? url : selector
   const eventKey = `${type}-${eventIdentifier}`
 
-  const value = type === ACTION_TYPES.NAV ? url : getValue({ type, target })
+  const value = type === ACTION_TYPE.NAV ? url : getValue({ type, target })
 
   const eventDetails = {
     id: `${timeStamp}`,

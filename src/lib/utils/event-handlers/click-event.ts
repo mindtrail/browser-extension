@@ -1,11 +1,11 @@
 import { type MouseEvent } from 'react'
 import { getSelector } from '~lib/utils/recorder/find-selector'
 import { getHref } from '~lib/utils/recorder/find-href'
-import { ACTION_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 import { debounceEvent } from './debounce-event'
 import { createBaseEvent } from './base-event'
 
-const { CLICK, EXTRACT } = ACTION_TYPES
+const { CLICK, EXTRACT } = ACTION_TYPE
 
 export function handleClickEvent(event: MouseEvent, callback) {
   const { altKey } = event
