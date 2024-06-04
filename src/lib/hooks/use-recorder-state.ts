@@ -50,9 +50,9 @@ export const useRecorderState = () => {
   }, [])
   useEffect(() => {
     if (recorderState.isRecording) {
-      // startRecording()
+      startRecording()
     } else {
-      // stopRecording()
+      stopRecording()
     }
   }, [recorderState.isRecording, startRecording, stopRecording])
 
