@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
 
 const handleDataAvailable = (event: BlobEvent) => {
-  console.log(123)
-  // Process each chunk, e.g., send to backend
+  // @TODO: Process each chunk, i.e. stream to backend
+  console.log(123, event)
 }
 
 const handleStop = () => {
-  console.log(3333, 'stopped')
+  console.log('Recording stopped')
 }
 
 let mediaRecorder: MediaRecorder | null = null
@@ -32,7 +32,6 @@ export const useAudioRecorder = (isRecording) => {
 
   const stopRecording = useCallback(() => {
     if (!mediaRecorder) return
-    console.log(222, mediaRecorder)
 
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach((track) => track.stop())
@@ -41,7 +40,6 @@ export const useAudioRecorder = (isRecording) => {
 
   useEffect(() => {
     if (isRecording) {
-      console.log(111)
       startRecording()
     } else {
       stopRecording()
