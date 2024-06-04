@@ -1,14 +1,14 @@
 import { addOutlineStyles, removeOutlineStyles } from './dom-styles'
 
-let currentOutlinedElement = null
+let hoveredEl = null
 let isAltKeyPressed = false
 
-export const handleMouseOver = (event: KeyboardEvent) => {
-  removeOutlineStyles(currentOutlinedElement)
-  currentOutlinedElement = event.target
+export const handleMouseOver = (event: MouseEvent) => {
+  removeOutlineStyles(hoveredEl)
+  hoveredEl = event.target
 
   if (isAltKeyPressed) {
-    addOutlineStyles(currentOutlinedElement)
+    addOutlineStyles(hoveredEl)
   }
 }
 
@@ -25,17 +25,16 @@ export const handleKeyDown = (event: KeyboardEvent, resetRecorderState: () => vo
   if (event.key === 'Alt') {
     isAltKeyPressed = true
 
-    if (currentOutlinedElement) {
-      currentOutlinedElement?.dispatchEvent(
-        new MouseEvent('mouseover', { bubbles: true }),
-      )
+    if (hoveredEl) {
+      hoveredEl?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
     }
   }
 }
 
 export const handleKeyUp = (event: KeyboardEvent) => {
   if (event.key === 'Alt') {
+    removeOutlineStyles(hoveredEl)
     isAltKeyPressed = false
-    removeOutlineStyles(currentOutlinedElement)
+    hoveredEl = null
   }
 }

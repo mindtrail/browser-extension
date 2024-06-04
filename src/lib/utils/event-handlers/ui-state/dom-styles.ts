@@ -1,6 +1,6 @@
 // @TODO: Add an absolute position overlay with a high Z-Index
 export function addOutlineStyles(element: HTMLElement) {
-  if (!element) return
+  if (!element || !element.style) return
 
   element.style.outline = '2px dashed green'
   element.style.outlineOffset = '1px'
@@ -10,7 +10,7 @@ export function addOutlineStyles(element: HTMLElement) {
 }
 
 export function removeOutlineStyles(element: HTMLElement) {
-  if (!element) return
+  if (!element || !element.style) return
 
   element.style.outline = ''
   element.style.outlineOffset = ''
