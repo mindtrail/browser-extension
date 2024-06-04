@@ -8,8 +8,10 @@ import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
 import { generateMetadata } from '~/lib/llm/openai'
 import { useRecorderState } from '~lib/hooks/use-recorder-state'
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
-import { listenForActions } from '~/lib/utils/recorder/listen-recording-events'
-import { listenHighlightEvents } from '~/lib/utils/recorder/listen-highlighting-events'
+import {
+  listenEventsToRecord,
+  listenEventsForUIState,
+} from '~lib/utils/recorder/listen-events'
 
 import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-recording-button'
@@ -27,16 +29,14 @@ export function FlowRecorder() {
 
   useEffect(() => {
     const shouldListen = isRecording && !isPaused
+    if (!shouldListen) return
 
-    const recordingCleanup = listenForActions({
-      callback: recordEvent,
-      shouldListen,
-    })
-    // const metaCleanup = listenHighlightEvents(shouldListen, resetRecorderState)
+    const recordingCleanup = listenEventsToRecord(updateRecordedEvents)
+    const uiStateCleanup = listenEventsForUIState(resetRecorderState)
 
     return () => {
       recordingCleanup()
-      // metaCleanup()
+      uiStateCleanup()
     }
   }, [isRecording, isPaused])
 
@@ -55,7 +55,7 @@ export function FlowRecorder() {
   }
 
   // let lastKey = ''
-  function recordEvent(event) {
+  function updateRecordedEvents(event) {
     setRecorderState((prevState) => {
       // @TODO: reimplement this
       // const prevEvents = prevState?.eventsList
