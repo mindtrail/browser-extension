@@ -1,11 +1,19 @@
 export const AUTO_SAVE_DELAY = 60 // seconds
 export const MIN_TEXT_FOR_CLIPPING = 10
 
+export enum MESSAGE_AREAS {
+  CLIPPINGS = 'clippings',
+  DATA_SOURCEs = 'data-sources',
+  FLOWS = 'flows',
+  SEARCH_HISTORY = 'search-history',
+  UPDATE_ICON = 'extension-icon',
+}
+
 export const MESSAGES = {
   SAVE_PAGE: 'save-page',
   SAVE_CLIPPING: 'save-clipping',
   SEARCH_HISTORY: 'search-history',
-  UPDATE_ICON: 'update-icon',
+  UPDATE_ICON: 'extension-icon',
   GET_CLIPPING_LIST: 'get-clipping-list',
   DELETE_CLIPPING: 'delete-clipping',
   AUTH_REDIRECT: 'auth-redirect',
@@ -99,11 +107,19 @@ export const DEFAULT_RECORDER_STATE = {
   eventsList: [],
 }
 
-export const EVENT_TYPES = {
-  CLICK: 'click',
-  INPUT: 'input',
+export enum DOM_EVENT {
+  MOUSEOVER = 'mouseover',
+  KEYDOWN = 'keydown',
+  KEYUP = 'keyup',
+  CLICK = 'click',
+  INPUT = 'input',
+}
+
+export const ACTION_TYPE = {
+  CLICK: DOM_EVENT.CLICK,
+  INPUT: DOM_EVENT.INPUT,
   NAV: 'navigation',
-  BASE: 'base',
+  EXTRACT: 'extract',
 }
 
 export const DEFAULT_RUNNER_STATE = {
@@ -113,4 +129,7 @@ export const DEFAULT_RUNNER_STATE = {
   eventsList: [],
 }
 
-export const SUPABASE_FLOWS_CHANNEL = 'flows-channel'
+export const SUPABASE_CHANNELS = {
+  FLOWS: 'flows-channel',
+  TASKS: 'tasks-channel',
+}

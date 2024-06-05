@@ -17,7 +17,6 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   switch (type) {
     case MESSAGES.SAVE_CLIPPING:
       const newClipping = await saveClipping(payload)
-      console.log('save 111', newClipping)
       fetchClippingList() // Update storage data afeter a new item added
       // fetchSavedDSList() // Update storage data after a new page added
       res.send(newClipping)
@@ -36,12 +35,10 @@ export default handler
 
 export const saveClipping = async (payload: SavedClipping) => {
   const { pageData, ...rest } = payload
+  const { dataSource, error } = await api.savePageAPICall(pageData)
 
-  const { dataSource } = await api.savePageAPICall(pageData)
-  console.log('dataSource', dataSource)
-
-  if (!dataSource) {
-    throw new Error('No dataSource', { cause: { error: 'No dataSource' } })
+  if (error || !dataSource) {
+    return { error }
   }
 
   const saveClippingPayload = {
@@ -49,31 +46,27 @@ export const saveClipping = async (payload: SavedClipping) => {
     dataSourceId: dataSource.id,
   }
 
-  console.log('payload', saveClippingPayload)
-
   const newClipping = await api.saveClippingAPICall(saveClippingPayload)
-  console.log('newClipping', newClipping)
 
   return newClipping
 }
 
 export const fetchClippingList = async () => {
-  try {
-    const clippingList = await api.getClippingListAPICall()
+  const result = (await api.getClippingListAPICall()) || []
 
-    const clippingsMap = clippingList.reduce((acc: any, item: ClippingByDataSource) => {
-      acc[item.dataSourceName] = item.clippingList
-      return acc
-    }, {})
-
-    const storage = await getStorage()
-    await storage.set(STORAGE_AREA.CLIPPINGS_BY_DS, clippingsMap)
-
-    return clippingList
-  } catch (error) {
-    console.error('error Clippings', error, error?.cause)
+  if (result?.error) {
     return []
   }
+
+  const clippingsMap = result?.reduce((acc: any, item: ClippingByDataSource) => {
+    acc[item.dataSourceName] = item.clippingList
+    return acc
+  }, {})
+
+  const storage = await getStorage()
+  await storage.set(STORAGE_AREA.CLIPPINGS_BY_DS, clippingsMap)
+
+  return result
 }
 
 export const deleteClipping = async ({ clippingId }) => {

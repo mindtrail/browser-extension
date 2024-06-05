@@ -75,6 +75,7 @@ declare global {
   type CreatePageResponse = {
     result: string
     dataSource: DataSource
+    error?: string
   }
 
   interface HTMLFile {

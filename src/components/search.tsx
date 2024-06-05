@@ -6,8 +6,9 @@ import { Typography } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { ScrollArea } from '~/components/ui/scroll-area'
-import { MESSAGES } from '~/lib/constants'
+import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
 import { addHttpsIfMissing } from '~lib/utils'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
 
 type SearchResult = {
   hostName: string
@@ -38,9 +39,9 @@ export function Search() {
       searchQuery: searchQuery.trim(),
     }
 
-    const websites = await chrome.runtime.sendMessage({
-      message: MESSAGES.SEARCH_HISTORY,
-      payload,
+    const websites = await sendMessageToBg({
+      name: MESSAGE_AREAS.SEARCH_HISTORY,
+      body: payload,
     })
 
     setProcessing(false)

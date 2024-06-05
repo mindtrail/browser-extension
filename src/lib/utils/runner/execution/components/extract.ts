@@ -32,7 +32,7 @@ export async function extractComponent({
       ...task.state,
       variables: {
         ...task.variables,
-        entities,
+        ...(entities && { entities }),
       },
     },
   })

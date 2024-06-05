@@ -1,13 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
+import { SUPABASE_CHANNELS } from '~/lib/constants'
 
 const supabaseUrl = process.env.PLASMO_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.PLASMO_PUBLIC_SUPABASE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export function onFlowsChange(onChange, channelName?: string) {
+export function onFlowsChange(onChange, channelName = SUPABASE_CHANNELS.FLOWS) {
   const channel = supabase
-    .channel(channelName || 'flows-channel')
+    .channel(channelName)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'flows' }, onChange)
     .subscribe()
   return () => {
@@ -31,9 +32,12 @@ export async function updateFlow(id, flow) {
   return supabase.from('flows').update(flow).match({ id })
 }
 
-export function onTasksChange(onChange: (payload: any) => void, channelName?: string) {
+export function onTasksChange(
+  onChange: (payload: any) => void,
+  channelName = SUPABASE_CHANNELS.TASKS,
+) {
   const channel = supabase
-    .channel(channelName || 'tasks-channel')
+    .channel(channelName)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, onChange)
     .subscribe()
   return () => {

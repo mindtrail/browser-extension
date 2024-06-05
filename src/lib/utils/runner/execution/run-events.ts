@@ -31,6 +31,7 @@ export async function runEvents({
     }
     const component = components[event.type]
     if (!component) break
+
     await component({
       task,
       flowId,

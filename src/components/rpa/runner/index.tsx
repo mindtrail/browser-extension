@@ -4,7 +4,7 @@ import { SearchIcon } from 'lucide-react'
 import { Input } from '~/components/ui/input'
 
 import { RunItem } from './run-item'
-import { useRunnerState } from '~/lib/hooks/useRunner'
+import { useRunnerState } from '~lib/hooks/use-runner-state'
 
 export function FlowRunner() {
   const {

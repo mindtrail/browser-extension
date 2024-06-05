@@ -7,7 +7,7 @@ import { ClippingOverlay } from '~/components/clipping'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
 import { isHostExcluded } from '~lib/utils'
-import { useSettingsStorage } from '~/lib/hooks/storage'
+import { useSettingsStorage } from '~lib/hooks/use-storage'
 
 const SidePanelRPA = () => {
   const [overlayVisible, setOverlayVisible] = useState(true)

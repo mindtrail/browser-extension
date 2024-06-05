@@ -1,4 +1,4 @@
-import { EVENT_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 
 let eventQueue = []
 let processingQueue = false
@@ -28,7 +28,7 @@ function processQueue() {
 }
 
 export function debounceEvent(eventKey, event, callback, debounceDuration = 1000) {
-  const { NAV, CLICK } = EVENT_TYPES
+  const { NAV, CLICK } = ACTION_TYPE
   // Process immediately
   if (event.type === NAV || (event.type === CLICK && event.href)) {
     eventQueue.push({ event, callback })

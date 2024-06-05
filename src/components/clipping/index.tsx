@@ -7,7 +7,7 @@ import { highlightClipping } from '~/lib/clipping/highlight'
 import { removeHighlightClassAndAttr } from '~/lib/clipping/delete'
 import { HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getBaseResourceURL } from '~lib/utils'
-import { useClippingsStorage } from '~/lib/hooks/storage'
+import { useClippingsStorage } from '~lib/hooks/use-storage'
 
 const pageBaseURL = getBaseResourceURL(window.location.href)
 

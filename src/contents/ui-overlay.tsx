@@ -8,7 +8,7 @@ import { RightSidebar } from '~/components/right-sidebar'
 import { SidebarRPA } from '~components/rpa/sidebar'
 
 import { isHostExcluded } from '~lib/utils'
-import { useSettingsStorage } from '~/lib/hooks/storage'
+import { useSettingsStorage } from '~lib/hooks/use-storage'
 
 // Needed to inject the CSS into the page
 export const getStyle = () => {
