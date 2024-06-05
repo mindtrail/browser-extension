@@ -24,10 +24,9 @@ export interface Action {
 }
 
 export interface DOMEvent {
+  name: string
   selector: string
+  timeStamp: number
   type: string
   value?: string
-  name: string
-  textContent: string
-  timeStamp: number
 }

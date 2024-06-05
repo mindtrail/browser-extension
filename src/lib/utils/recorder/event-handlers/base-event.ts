@@ -1,6 +1,5 @@
-import { getContent } from '~lib/utils/recorder/get-content'
 import { getValue } from '~lib/utils/recorder/get-value'
-import { EVENT_TYPES } from '~/lib/constants'
+import { ACTION_TYPE } from '~/lib/constants'
 
 interface BaseEventProps {
   event: any
@@ -13,11 +12,10 @@ export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) 
 
   const timeStamp = Date.now()
 
-  const eventIdentifier = type === EVENT_TYPES.NAV ? url : selector
+  const eventIdentifier = type === ACTION_TYPE.NAV ? url : selector
   const eventKey = `${type}-${eventIdentifier}`
 
-  const value = type === EVENT_TYPES.NAV ? url : getValue({ type, target })
-  const textContent = getContent({ type, target })
+  const value = type === ACTION_TYPE.NAV ? url : getValue({ type, target })
 
   const eventDetails = {
     id: `${timeStamp}`,
@@ -25,7 +23,6 @@ export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) 
     type,
     ...(selector && { selector }),
     ...(value !== null && { value }),
-    ...(textContent !== null && { textContent }),
     ...(target.name !== null && { name: target.name }),
     ...(target.baseURI !== null && { baseURI: target.baseURI }),
     ...(target.type !== null && { targetType: target.type }),

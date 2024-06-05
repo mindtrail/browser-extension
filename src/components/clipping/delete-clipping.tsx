@@ -9,7 +9,7 @@ import { Button } from '~/components/ui/button'
 import { IconSpinner } from '~components/icons/spinner'
 
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
-import { MESSAGES, HIGHLIGHT_CLASS } from '~/lib/constants'
+import { MESSAGES, MESSAGE_AREAS, HIGHLIGHT_CLASS } from '~/lib/constants'
 import { getDeleteBtnCoordinates } from '~/lib/clipping/delete'
 
 interface DeleteClippingProps {
@@ -69,8 +69,6 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
   }, [])
 
   const handleBtnMouseEnter = useCallback(() => {
-    console.log(hoveredClippingId)
-
     clearTimeout(hideTimeout.current) // Clear the timeout to prevent hiding
   }, [])
 
@@ -102,12 +100,11 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
     async (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
 
-      console.log(hoveredClippingId)
       toggleLoading()
       const payload = { clippingId: hoveredClippingId }
 
       const response = await sendMessageToBg({
-        name: 'clippings',
+        name: MESSAGE_AREAS.CLIPPINGS,
         body: {
           type: MESSAGES.DELETE_CLIPPING,
           payload,
@@ -135,8 +132,6 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
   }
 
   const { left, top } = btnCoorindates
-
-  console.log(hoveredClippingId)
 
   return (
     <Tooltip>
