@@ -1,6 +1,5 @@
 import { getTask } from '~/lib/supabase'
 import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
-import axios from 'axios'
 
 export async function googleSheetsComponent({
   flowId,
@@ -15,12 +14,19 @@ export async function googleSheetsComponent({
     const taskRes = await getTask(task.id)
     task = taskRes.data
 
-    const result = await axios.post('http://localhost:8000/google-sheets/save', {
-      sheetId: event.sheetId,
-      values: task.state.variables[event.values],
+    const response = await fetch('http://localhost:8000/google-sheets/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sheetId: event.sheetId,
+        values: task.state.variables[event.values],
+      }),
     })
-    event.sheetId = result.data.sheetId
-    event.baseURI = result.data.url
+    const result = await response.json()
+    event.sheetId = result.sheetId
+    event.baseURI = result.url
 
     const urlMatch = await waitForUrl(event.baseURI)
     if (!urlMatch) {
