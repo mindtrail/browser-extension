@@ -24,8 +24,7 @@ export function FlowRecorder() {
   } = useRecorderState()
 
   useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
-  useAudioRecorder(isRecording)
-
+  const { transcript } = useAudioRecorder(isRecording)
   return (
     <div
       className={`${isRecording ? 'h-[calc(100%-52px)]' : 'h-auto'}
@@ -41,7 +40,11 @@ export function FlowRecorder() {
 
       {isRecording && !eventsList?.length && (
         <Typography className='w-full text-center mb-6'>
-          {isPaused ? 'Paused Recording' : 'Recording Workflow...'}
+          {isPaused
+            ? 'Paused Recording'
+            : !!transcript
+            ? transcript
+            : 'Recording Workflow...'}
         </Typography>
       )}
 

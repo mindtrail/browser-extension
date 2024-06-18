@@ -11,6 +11,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@deepgram/sdk": "^3.3.3",
     "@medv/finder": "^3.2.0",
     "@plasmohq/messaging": "^0.6.2",
     "@plasmohq/storage": "^1.10.0",
