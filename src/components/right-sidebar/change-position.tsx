@@ -1,10 +1,10 @@
-import { CaretDownIcon, CaretUpIcon } from '@radix-ui/react-icons'
+import { ChevronUpIcon, ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 import { MoveDirection, OverlayPosition } from '~/lib/constants'
-import { cn } from '~/lib/utils'
+import { cn } from '~lib/utils'
 
 interface ChangePositionProps {
   handleClick: (direction: MoveDirection) => void
@@ -27,7 +27,7 @@ export const ChangePosition = ({
     return null
   }
 
-  const Icon = direction === MoveDirection.up ? CaretUpIcon : CaretDownIcon
+  const Icon = direction === MoveDirection.up ? ChevronUpIcon : ChevronDownIcon
   return (
     <Tooltip>
       <TooltipTrigger asChild>

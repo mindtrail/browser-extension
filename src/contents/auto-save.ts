@@ -1,6 +1,6 @@
 import { Storage } from '@plasmohq/storage'
 
-import { AUTO_SAVE_DELAY, MESSAGES, STORAGE_KEY } from '~/lib/constants'
+import { AUTO_SAVE_DELAY, MESSAGES, STORAGE_AREA } from '~/lib/constants'
 import { getPageData } from '~/lib/page-data'
 import { getBaseResourceURL } from '~lib/utils'
 
@@ -50,13 +50,13 @@ function savePageContent() {
 }
 
 async function initAutoSave() {
-  const settings = (await storage.get(STORAGE_KEY.SETTINGS)) as SettingsStored
+  const settings = (await storage.get(STORAGE_AREA.SETTINGS)) as SettingsStored
 
   if (settings?.autoSave) {
-    const savedWebsites = (await storage.get(STORAGE_KEY.SAVED_WEBSITES)) as string[]
+    const savedWebsites = (await storage.get(STORAGE_AREA.SAVED_WEBSITES)) as string[]
     const pageBaseURL = getBaseResourceURL(window.location.href)
 
-    if (savedWebsites.includes(pageBaseURL)) {
+    if (savedWebsites?.includes(pageBaseURL)) {
       return
     }
 

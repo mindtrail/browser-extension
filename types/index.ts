@@ -12,7 +12,9 @@ declare global {
     saveDelay: number
     excludeList: string[]
     overlayPosition?: OverlayPosition
+    isSidebarOpen?: boolean
   }
+
   interface ClippingRange {
     startContainer: string
     startOffset: number
@@ -73,6 +75,7 @@ declare global {
   type CreatePageResponse = {
     result: string
     dataSource: DataSource
+    error?: string
   }
 
   interface HTMLFile {
@@ -80,4 +83,6 @@ declare global {
     html: string
     metadata: Partial<PageData>
   }
+
+  type ContentScriptResponse = (resp: any) => void
 }

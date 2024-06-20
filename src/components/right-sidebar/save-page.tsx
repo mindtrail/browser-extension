@@ -1,6 +1,6 @@
 import Brain from 'react:~/assets/brain.svg'
 
-import { IconSpinner } from '~/components/icon-spinner'
+import { IconSpinner } from '~components/icons/spinner'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 

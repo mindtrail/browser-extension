@@ -1,9 +1,9 @@
 {
-  "name": "mind-trail",
-  "displayName": "Mind Trail",
-  "version": "0.0.2",
-  "description": "Your AI memory",
-  "author": "Indie AI",
+  "name": "ez-rpa",
+  "displayName": "EZ RPA",
+  "version": "0.0.3",
+  "description": "Your AI Coworker",
+  "author": "ez-rpa",
   "scripts": {
     "dev": "plasmo dev",
     "dev-verbose": "plasmo dev --verbose",
@@ -11,25 +11,32 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@deepgram/sdk": "^3.3.3",
+    "@medv/finder": "^3.2.0",
     "@plasmohq/messaging": "^0.6.2",
-    "@plasmohq/storage": "^1.9.0",
-    "@radix-ui/react-icons": "^1.3.0",
+    "@plasmohq/storage": "^1.10.0",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@supabase/supabase-js": "^2.42.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "groq-sdk": "^0.3.2",
     "html2canvas": "^1.4.1",
+    "lucide-react": "^0.373.0",
     "minimatch": "^9.0.3",
-    "plasmo": "0.84.0",
+    "openai": "^4.38.5",
+    "plasmo": "0.85.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/chrome": "0.0.245",
@@ -53,7 +60,10 @@
       "activeTab",
       "scripting",
       "storage",
-      "unlimitedStorage"
+      "unlimitedStorage",
+      "tabs",
+      "windows",
+      "webNavigation"
     ],
     "content_scripts": [
       {

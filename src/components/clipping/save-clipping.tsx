@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import type { MouseEvent } from 'react'
 
-import { ClipboardCopyIcon } from '@radix-ui/react-icons'
+import { HighlighterIcon } from 'lucide-react'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { Button } from '~/components/ui/button'
-import { IconSpinner } from '~/components/icon-spinner'
+import { IconSpinner } from '~components/icons/spinner'
 
-import { MESSAGES, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
+import { MESSAGES, MESSAGE_AREAS, MIN_TEXT_FOR_CLIPPING } from '~/lib/constants'
 import {
   getClippingData,
   getSaveClippingBtnPosition,
@@ -71,15 +72,18 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
     const payload = getClippingData(range)
     console.log('Clipping To Save', payload)
 
-    const response = await chrome.runtime.sendMessage({
-      message: MESSAGES.SAVE_CLIPPING,
-      payload,
+    const response = await sendMessageToBg({
+      name: MESSAGE_AREAS.CLIPPINGS,
+      body: {
+        type: MESSAGES.SAVE_CLIPPING,
+        payload,
+      },
     })
 
     toggleLoading()
     if (response?.error) {
       const { message, status } = response.error
-      alert(`${status}: ${message}`) // TODO: use toast (status message)
+      alert(`${status} ${message}`) // TODO: use toast (status message)
 
       console.error(`${status}: ${message}`)
       return
@@ -111,7 +115,7 @@ export const SaveClipping = ({ addClippingToList }: SaveClippingProps) => {
               transform transition-transform duration-200 ease-out
               disabled:opacity-80`}
         >
-          <ClipboardCopyIcon width={22} height={22} />
+          <HighlighterIcon width={22} height={22} />
           {loading && (
             <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center rounded-full'>
               <IconSpinner />

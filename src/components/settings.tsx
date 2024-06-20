@@ -1,9 +1,6 @@
 import { useCallback } from 'react'
 import type { KeyboardEvent } from 'react'
-import { Cross1Icon, GlobeIcon } from '@radix-ui/react-icons'
-
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
+import { XIcon, GlobeIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -11,16 +8,13 @@ import { Label } from '~/components/ui/label'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Switch } from '~/components/ui/switch'
 
-import { addHttpsIfMissing } from '~/lib/utils'
-import { MESSAGES, STORAGE_KEY, DEFAULT_SETTINGS, URL_REGEX } from '~/lib/constants'
-
-const SETTINGS_CONFIG = {
-  key: STORAGE_KEY.SETTINGS,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
+import { addHttpsIfMissing } from '~lib/utils'
+import { MESSAGES, MESSAGE_AREAS, URL_REGEX } from '~/lib/constants'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
+import { useSettingsStorage } from '~lib/hooks/use-storage'
 
 export function Settings() {
-  const [settings, setSettings] = useStorage(SETTINGS_CONFIG, DEFAULT_SETTINGS)
+  const [settings, setSettings] = useSettingsStorage()
   const { autoSave, excludeList, saveDelay } = settings
 
   const updateSettings = useCallback((newSettings: Partial<SettingsStored>) => {
@@ -65,8 +59,8 @@ export function Settings() {
       autoSave: autoSaveStatus,
     })
 
-    chrome.runtime.sendMessage({
-      message: MESSAGES.UPDATE_ICON,
+    sendMessageToBg({
+      name: MESSAGE_AREAS.UPDATE_ICON,
     })
   }, [autoSave])
 
@@ -136,7 +130,7 @@ export function Settings() {
                       className=' group-hover:visible shrink-0'
                       onClick={() => removeDomainFromExcludeList(item)}
                     >
-                      <Cross1Icon />
+                      <XIcon />
                     </Button>
                   </li>
                 ))}

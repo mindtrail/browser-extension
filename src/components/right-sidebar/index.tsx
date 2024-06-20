@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
 
-import { ChangePosition } from '~components/right-sidebar/change-position'
-import { SavePage } from '~components/right-sidebar/save-page'
+import { ChangePosition } from '~/components/right-sidebar/change-position'
+import { SavePage } from '~/components/right-sidebar/save-page'
 
 import { getPageData } from '~/lib/page-data'
 import { getBaseResourceURL } from '~lib/utils'
+import { sendMessageToBg } from '~lib/utils/bg-messaging'
+import { useSavedWebsitesStorage } from '~lib/hooks/use-storage'
+import { MESSAGE_AREAS } from '~/lib/constants'
 
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
-  STORAGE_KEY,
   MoveDirection,
   OverlayPosition,
 } from '~/lib/constants'
@@ -44,13 +44,8 @@ const OVERLAY_NEXT_POS = {
 
 const DEFAULT_OVERLAY_POS = DEFAULT_EXTENSION_SETTINGS.overlayPosition
 
-const SAVED_WEBSITES_CONFIG = {
-  key: STORAGE_KEY.SAVED_WEBSITES,
-  instance: new Storage({ area: 'local' }), // Use localStorage instead of sync
-}
-
 export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
-  const [savedWebsites, setSavedWebsites] = useStorage(SAVED_WEBSITES_CONFIG, [])
+  const [savedWebsites, setSavedWebsites] = useSavedWebsitesStorage()
   const [currentPageIsSaved, setCurrentPageIsSaved] = useState(false)
   const [loading, toggleLoading] = useReducer((c) => !c, false)
 
@@ -64,9 +59,12 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
     toggleLoading()
     const payload = getPageData()
 
-    const result = await chrome.runtime.sendMessage({
-      message: MESSAGES.SAVE_PAGE,
-      payload,
+    const result = await sendMessageToBg({
+      name: MESSAGE_AREAS.DATA_SOURCEs,
+      body: {
+        type: MESSAGES.SAVE_PAGE,
+        payload,
+      },
     })
 
     toggleLoading()
@@ -79,7 +77,7 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
       return
     }
 
-    setSavedWebsites((prev) => [...prev, payload.url])
+    setSavedWebsites((prev) => [...prev, payload?.url])
   }, [])
 
   const handlePositionChange = useCallback(
@@ -92,13 +90,13 @@ export const RightSidebar = ({ settings, setSettings }: RightSidebarProps) => {
   )
 
   useEffect(() => {
-    const saveStatus = savedWebsites.includes(getBaseResourceURL(window.location.href))
+    const saveStatus = savedWebsites?.includes(getBaseResourceURL(window.location.href))
     setCurrentPageIsSaved(saveStatus)
   }, [savedWebsites])
 
   return (
     <div
-      className={`z-50 fixed group -right-8 drop-shadow-xl w-12 h-12
+      className={`z-20 fixed group -right-8 drop-shadow-xl w-12 h-12
         flex flex-col justify-center ${YPos}`}
     >
       <div
