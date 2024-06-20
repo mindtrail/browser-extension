@@ -10,6 +10,7 @@ type TypographyProps = {
     | 'h5'
     | 'p'
     | 'strong'
+    | 'semi'
     | 'small'
     | 'small-semi'
     | 'text-lg'
@@ -24,6 +25,7 @@ const HTMLTagMap = {
   h5: 'h5',
   p: 'p',
   strong: 'strong',
+  semi: 'span',
   small: 'span', // Note: 'small' is a valid HTML element, but might not suit your design system if custom styling is expected
   'small-semi': 'span', // Assuming 'small-semi' should be rendered in a 'span'
   'text-lg': 'span', // Assuming 'text-lg' should be rendered in a 'span'; adjust as needed
@@ -38,6 +40,7 @@ const TEXT_STYLES = {
   h5: 'scroll-m-20 text-lg font-semibold tracking-tight',
   p: 'leading-none',
   small: 'text-sm leading-none',
+  semi: 'leading-none font-medium',
   'small-semi': 'text-sm font-medium leading-none',
   'text-lg': 'text-lg',
   'text-lg-semi': 'text-lg font-semibold',
