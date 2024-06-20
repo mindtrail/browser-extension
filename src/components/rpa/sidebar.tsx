@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 
 import { Typography } from '~components/typography'
 import { Button } from '~/components/ui/button'
@@ -28,12 +28,16 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
     >
       {isSidebarOpen ? (
         <>
-          <div className='flex items-center py-2 px-4 gap-2 border-b'>
-            <Button onClick={toggleSidebar} variant='ghost' size='icon'>
-              <ChevronDownIcon className='w-5 h-5' />
-            </Button>
+          <Button
+            onClick={toggleSidebar}
+            variant='ghost'
+            className='flex items-center justify-start h-auto py-2 px-4 gap-2 border-b group rounded-es-none rounded-ee-none'
+          >
+            <ProcessIcon className='w-8 h-8 text-primary/70' />
             <Typography variant='semi'>EZ Process Automation</Typography>
-          </div>
+
+            <ChevronDownIcon className='w-5 h-5 absolute right-4 invisible group-hover:visible' />
+          </Button>
 
           <div className='flex flex-col flex-1'>
             <FlowRunner />
@@ -41,9 +45,8 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
           </div>
         </>
       ) : (
-        <Button onClick={toggleSidebar} variant='ghost' size='icon' className='group'>
+        <Button onClick={toggleSidebar} variant='ghost' size='icon'>
           <ProcessIcon className='w-8 h-8 text-primary/70' />
-          <ChevronUpIcon className='w-5 h-5 text-primary/70 absolute hidden group-hover:block bg-white rounded-full' />
         </Button>
       )}
     </div>
