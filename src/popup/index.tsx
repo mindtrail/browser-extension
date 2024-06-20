@@ -11,7 +11,7 @@ const DEFAULT_TAB = 'settings'
 function IndexPopup() {
   return (
     <div className='flex h-[500px] w-96'>
-      <Tabs defaultValue={DEFAULT_TAB} className='flex flex-col w-full text-'>
+      <Tabs defaultValue={DEFAULT_TAB} className='flex flex-col w-full'>
         <TabsList className='flex w-full relative justify-between border-b bg-inherit rounded-none'>
           {/* <TabsTrigger disabled value='search'>
             Search

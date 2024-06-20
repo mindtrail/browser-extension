@@ -1,9 +1,9 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { ChevronDownIcon } from 'lucide-react'
+import { ChevronDownIcon, XIcon } from 'lucide-react'
 
-import { Typography } from '~components/typography'
 import { Button } from '~/components/ui/button'
-import { ProcessIcon } from '~components/icons/process'
+import { ProcessIcon } from '~/components/icons/process'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 
 import { FlowRecorder } from './recorder'
 import { FlowRunner } from './runner'
@@ -21,29 +21,47 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
 
   return (
     <div
-      className={`fixed right-2 bottom-4 flex flex-col justify-center
+      className={`fixed right-2 bottom-4 flex flex-col
         font-sans text-foreground bg-white border rounded-lg drop-shadow-xl
         ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-auto w-auto'}
       `}
     >
       {isSidebarOpen ? (
-        <>
+        <div className='flex flex-col'>
+          <Tabs defaultValue='recorder'>
+            <TabsList className='flex justify-start'>
+              <TabsTrigger
+                value='recorder'
+                className='h-10 rounded-es-none rounded-ee-none'
+              >
+                <ProcessIcon className='w-6 h-6 text-primary/70' />
+              </TabsTrigger>
+
+              <TabsTrigger
+                value='runner'
+                className='h-10 rounded-es-none rounded-ee-none'
+              >
+                Flows
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value='recorder' className='flex flex-col flex-1'>
+              Chat... this will be the main screen
+            </TabsContent>
+            <TabsContent value='runner' className='flex flex-col flex-1'>
+              <FlowRunner />
+              <FlowRecorder />
+            </TabsContent>
+          </Tabs>
+
           <Button
             onClick={toggleSidebar}
             variant='ghost'
-            className='flex items-center justify-start h-auto py-2 px-4 gap-2 border-b group rounded-es-none rounded-ee-none'
+            className='absolute right-0 top-0.5 text-foreground/50'
           >
-            <ProcessIcon className='w-8 h-8 text-primary/70' />
-            <Typography variant='semi'>EZ Process Automation</Typography>
-
-            <ChevronDownIcon className='w-5 h-5 absolute right-4 invisible group-hover:visible' />
+            <XIcon className='w-4 h-4' />
           </Button>
-
-          <div className='flex flex-col flex-1'>
-            <FlowRunner />
-            <FlowRecorder />
-          </div>
-        </>
+        </div>
       ) : (
         <Button onClick={toggleSidebar} variant='ghost' size='icon'>
           <ProcessIcon className='w-8 h-8 text-primary/70' />
