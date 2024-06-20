@@ -24,7 +24,7 @@ export function FlowRunner() {
     <>
       <div
         ref={runnerContainerRef}
-        className='flex flex-col gap-4 px-4 py-1 overflow-auto'
+        className='flex flex-col gap-4 px-4 py-1 overauto'
       >
         <form
           className='flex items-center'

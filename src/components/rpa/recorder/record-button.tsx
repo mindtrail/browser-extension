@@ -1,4 +1,4 @@
-import { CirclePauseIcon, SaveIcon } from 'lucide-react'
+import { CirclePauseIcon, SaveIcon, LoaderCircleIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { RecordIcon } from '~/components/icons/record'
 
@@ -7,9 +7,10 @@ interface RecordButtonProps {
   onPause: () => void
   isRecording: boolean
   isPaused: boolean
+  isSaving: boolean
 }
 export function RecordButton(props: RecordButtonProps) {
-  const { onPause, onToggleRecording, isRecording, isPaused } = props
+  const { onPause, onToggleRecording, isRecording, isPaused, isSaving } = props
 
   return isRecording ? (
     <div className='flex w-full gap-2 items-center'>
@@ -30,13 +31,17 @@ export function RecordButton(props: RecordButtonProps) {
         variant='default'
         onClick={onToggleRecording}
       >
-        <SaveIcon className='w-5 h-5 ' />
-        Save
+        {isSaving ? (
+          <LoaderCircleIcon className='w-5 h-5' />
+        ) : (
+          <SaveIcon className='w-5 h-5' />
+        )}
+        {isSaving ? 'Saving Workflow...' : 'Save'}
       </Button>
     </div>
   ) : (
     <Button
-      className='flex w-full gap-4 items-center'
+      className='flex gap-4 items-center'
       variant='outline'
       onClick={onToggleRecording}
     >

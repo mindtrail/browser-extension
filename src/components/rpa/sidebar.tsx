@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { ChevronDownIcon, XIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { ProcessIcon } from '~/components/icons/process'
@@ -28,29 +28,23 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
     >
       {isSidebarOpen ? (
         <div className='flex flex-col'>
-          <Tabs defaultValue='recorder'>
+          <Tabs defaultValue='flows'>
             <TabsList className='flex justify-start'>
-              <TabsTrigger
-                value='recorder'
-                className='h-10 rounded-es-none rounded-ee-none'
-              >
+              <TabsTrigger value='main' className='h-10 rounded-es-none rounded-ee-none'>
                 <ProcessIcon className='w-6 h-6 text-primary/70' />
               </TabsTrigger>
 
-              <TabsTrigger
-                value='runner'
-                className='h-10 rounded-es-none rounded-ee-none'
-              >
+              <TabsTrigger value='flows' className='h-10 rounded-es-none rounded-ee-none'>
                 Flows
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='recorder' className='flex flex-col flex-1'>
+            <TabsContent value='main' className='flex flex-col flex-1'>
               Chat... this will be the main screen
             </TabsContent>
-            <TabsContent value='runner' className='flex flex-col flex-1'>
-              <FlowRunner />
+            <TabsContent value='flows' className='flex flex-col flex-1'>
               <FlowRecorder />
+              <FlowRunner />
             </TabsContent>
           </Tabs>
 
