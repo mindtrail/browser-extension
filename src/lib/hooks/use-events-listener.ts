@@ -39,7 +39,6 @@ export function useEventListeners(props: EventListenersProps) {
   useEffect(() => {
     if (!isRecording) return
 
-    console.log(isRecording, isPaused)
     const uiStateEvents: Event[] = [
       { type: MOUSEOVER, handler: handleMouseOver },
       { type: KEYDOWN, handler: (e) => handleKeyDown(e, resetRecorderState) },

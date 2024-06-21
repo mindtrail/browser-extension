@@ -25,7 +25,7 @@ const initDeepgram = async (setTranscript) => {
     })
 
     connection.on(LiveTranscriptionEvents.Transcript, (data) => {
-      console.log(data.channel.alternatives[0].transcript)
+      console.log(111, data.channel.alternatives[0].transcript)
       setTranscript((prev) => prev + ' ' + data.channel.alternatives[0].transcript)
     })
 
@@ -42,22 +42,26 @@ const initDeepgram = async (setTranscript) => {
 }
 
 const handleDataAvailable = async (event: BlobEvent) => {
+  if (!deepgramConnection || deepgramConnection?.getReadyState() !== 1) {
+    console.error('Connection is not open.')
+    return
+  }
   // @TODO: Process each chunk, i.e. stream to backend
   const { data } = event
   const arrayBuffer = await data.arrayBuffer()
   deepgramConnection.send(arrayBuffer)
 }
 
-const handleStop = () => {
+const handleStop = (event) => {
   console.log('Recording stopped')
   // Delay the stream close to make sure all data available events are processed
   setTimeout(() => {
     deepgramConnection?.finish()
     deepgramConnection = null
-  }, 1000)
+  }, 200)
 }
 
-export const useAudioRecorder = (isRecording) => {
+export const useAudioRecorder = (isRecording = false, isPaused = false) => {
   const [error, setError] = useState<string | null>(null)
   const [transcript, setTranscript] = useState<string>('')
 
@@ -80,6 +84,24 @@ export const useAudioRecorder = (isRecording) => {
     }
   }, [])
 
+  const pauseRecording = useCallback(() => {
+    if (!mediaRecorder) return
+
+    mediaRecorder.pause()
+  }, [])
+
+  const resumeRecording = useCallback(async () => {
+    if (!mediaRecorder) return
+
+    console.log(deepgramConnection?.getReadyState())
+
+    if (deepgramConnection?.getReadyState() === 1) {
+      return mediaRecorder.resume()
+    }
+
+    startRecording()
+  }, [])
+
   const stopRecording = useCallback(() => {
     if (!mediaRecorder) return
 
@@ -89,14 +111,20 @@ export const useAudioRecorder = (isRecording) => {
   }, [])
 
   useEffect(() => {
-    if (isRecording) {
-      startRecording()
-    } else {
-      stopRecording()
+    if (!isRecording) {
+      return stopRecording()
     }
 
-    return () => stopRecording()
-  }, [isRecording, startRecording, stopRecording])
+    if (!mediaRecorder) {
+      startRecording()
+    } else {
+      if (isPaused) {
+        pauseRecording()
+      } else {
+        resumeRecording()
+      }
+    }
+  }, [isRecording, isPaused, startRecording, stopRecording, pauseRecording])
 
   return { transcript, error }
 }

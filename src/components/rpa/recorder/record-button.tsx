@@ -41,7 +41,7 @@ export function RecordButton(props: RecordButtonProps) {
     </div>
   ) : (
     <Button
-      className='flex gap-4 items-center'
+      className='flex gap-4 items-center w-full'
       variant='outline'
       onClick={onToggleRecording}
     >

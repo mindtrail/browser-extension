@@ -19,10 +19,11 @@ function FlowRecorder() {
     toggleRecording,
     togglePause,
   } = useRecorderState()
-  const { transcript } = useAudioRecorder(isRecording)
 
-  console.log(111, isRecording)
+  const { transcript } = useAudioRecorder(isRecording, isPaused)
   useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
+
+  if (!isRecording) return null
 
   return (
     <div
