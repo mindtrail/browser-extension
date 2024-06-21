@@ -1,21 +1,18 @@
-import { LoaderCircleIcon } from 'lucide-react'
-
-import { Button } from '~/components/ui/button'
 import { Typography } from '~/components/typography'
 import { useEventListeners } from '~/lib/hooks/use-events-listener'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 import { useAudioRecorder } from '~/lib/hooks/use-audio-recorder'
 
+import { RecordButton } from './record-button'
 import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-recording-button'
-import { RecordButton } from './record-button'
 
-export function FlowRecorder() {
+function FlowRecorder() {
   const {
+    eventsList,
     isRecording,
     isPaused,
     isSaving,
-    eventsList,
     resetRecorderState,
     updateRecordedEvents,
     deleteEvent,
@@ -24,6 +21,7 @@ export function FlowRecorder() {
   } = useRecorderState()
   const { transcript } = useAudioRecorder(isRecording)
 
+  console.log(111, isRecording)
   useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
 
   return (
@@ -60,3 +58,5 @@ export function FlowRecorder() {
     </div>
   )
 }
+
+export { RecordButton, FlowRecorder }

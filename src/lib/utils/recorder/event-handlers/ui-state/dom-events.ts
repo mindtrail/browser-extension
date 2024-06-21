@@ -12,6 +12,7 @@ export const handleMouseOver = (event: MouseEvent) => {
 }
 
 export const handleKeyDown = (event: KeyboardEvent, resetRecorderState: () => void) => {
+  console.log(event)
   if (event.key === 'Escape') {
     const target = event?.target as HTMLElement
     if (target.nodeName === 'INPUT' || target.nodeName === 'TEXTAREA') {

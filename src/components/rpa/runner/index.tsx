@@ -22,7 +22,7 @@ export function FlowRunner() {
 
   return (
     <>
-      <div ref={runnerContainerRef} className='flex flex-col gap-4 px-4 py-1 overauto'>
+      <div ref={runnerContainerRef} className='flex flex-col gap-4 py-1 overauto'>
         {/* <form
           className='flex items-center'
           onSubmit={(e) => {
