@@ -28,7 +28,7 @@ export function FlowRecorder() {
 
   return (
     <div
-      className={`${isRecording ? 'h-[calc(100%-52px)]' : 'h-auto'}
+      className={`${isRecording ? 'h-full' : 'h-auto'}
         flex flex-col justify-end gap-2 py-2 px-4`}
     >
       {isRecording && (
@@ -47,6 +47,7 @@ export function FlowRecorder() {
             : 'Recording Workflow...'}
         </Typography>
       )}
+      
       <RecordButton
         onToggleRecording={toggleRecording}
         onPause={togglePause}

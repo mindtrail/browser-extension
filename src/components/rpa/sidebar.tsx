@@ -27,8 +27,8 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
       `}
     >
       {isSidebarOpen ? (
-        <div className='flex flex-col'>
-          <Tabs defaultValue='flows'>
+        <>
+          <Tabs defaultValue='flows' className='h-full'>
             <TabsList className='flex justify-start'>
               <TabsTrigger value='main' className='h-10 rounded-es-none rounded-ee-none'>
                 <ProcessIcon className='w-6 h-6 text-primary/70' />
@@ -39,12 +39,14 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='main' className='flex flex-col flex-1'>
+            <TabsContent value='main' className='flex flex-col'>
               Chat... this will be the main screen
             </TabsContent>
-            <TabsContent value='flows' className='flex flex-col flex-1'>
-              <FlowRecorder />
-              <FlowRunner />
+            <TabsContent value='flows' asChild>
+              <div className='flex flex-col h-[calc(100%-56px)]'>
+                <FlowRecorder />
+                <FlowRunner />
+              </div>
             </TabsContent>
           </Tabs>
 
@@ -55,7 +57,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
           >
             <XIcon className='w-4 h-4' />
           </Button>
-        </div>
+        </>
       ) : (
         <Button onClick={toggleSidebar} variant='ghost' size='icon'>
           <ProcessIcon className='w-8 h-8 text-primary/70' />
