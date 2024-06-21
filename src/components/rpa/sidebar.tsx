@@ -44,8 +44,8 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
             </TabsContent>
             <TabsContent value='flows' asChild>
               <div className='flex flex-col h-[calc(100%-56px)]'>
-                <FlowRecorder />
                 <FlowRunner />
+                <FlowRecorder />
               </div>
             </TabsContent>
           </Tabs>

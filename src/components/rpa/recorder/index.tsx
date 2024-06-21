@@ -29,7 +29,9 @@ export function FlowRecorder() {
   return (
     <div
       className={`${isRecording ? 'h-full' : 'h-auto'}
-        flex flex-col justify-end gap-2 py-2 px-4`}
+        flex flex-col justify-end gap-2 py-2 px-4
+        w-full absolute bottom-0 border bg-slate-50 z-10
+      `}
     >
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
@@ -47,7 +49,7 @@ export function FlowRecorder() {
             : 'Recording Workflow...'}
         </Typography>
       )}
-      
+
       <RecordButton
         onToggleRecording={toggleRecording}
         onPause={togglePause}
