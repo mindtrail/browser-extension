@@ -77,7 +77,7 @@ export const useAudioRecorder = (isRecording = false, isPaused = false) => {
 
       newRecorder.ondataavailable = handleDataAvailable
       newRecorder.onstop = handleStop
-      newRecorder.start(1000)
+      newRecorder.start(600)
 
       mediaRecorder = newRecorder
       setError(null)
@@ -111,6 +111,10 @@ export const useAudioRecorder = (isRecording = false, isPaused = false) => {
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach((track) => track.stop())
     mediaRecorder = null
+
+    setTimeout(() => {
+      setTranscript('')
+    }, 600)
   }, [])
 
   useEffect(() => {
