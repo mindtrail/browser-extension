@@ -36,7 +36,7 @@ const UIOverlay = () => {
     <TooltipProvider>
       <ClippingOverlay />
       <RightSidebar settings={settings} setSettings={setSettings} />
-      <SidebarRPA />
+      <SidebarRPA settings={settings} setSettings={setSettings} />
     </TooltipProvider>
   )
 }

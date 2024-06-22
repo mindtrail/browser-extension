@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { XIcon } from 'lucide-react'
 
@@ -6,23 +7,30 @@ import { ProcessIcon } from '~/components/icons/process'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 import { ACTIVE_TAB } from '~/lib/constants'
-import { useSettingsStorage } from '~lib/hooks/use-storage'
 
 import { FlowRunner } from './runner'
 import { FlowRecorder, RecordButton } from './recorder'
 
-export const SidebarRPA = () => {
-  const [settings, setSettings] = useSettingsStorage()
+interface SidebarRPAProps {
+  settings: SettingsStored
+  setSettings: Dispatch<SetStateAction<SettingsStored>>
+}
+
+export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isSidebarOpen, activeTab } = settings
 
   const { isRecording, isPaused, isSaving, toggleRecording, togglePause } =
     useRecorderState()
 
-  const toggleSidebar = () =>
-    setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen }))
+  const toggleSidebar = useCallback(
+    () => setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen })),
+    [isSidebarOpen, setSettings],
+  )
 
-  const changeTab = (tab: string) =>
-    setSettings((settings) => ({ ...settings, activeTab: tab }))
+  const changeTab = useCallback(
+    (tab: string) => setSettings((settings) => ({ ...settings, activeTab: tab })),
+    [setSettings],
+  )
 
   return (
     <div
@@ -33,7 +41,7 @@ export const SidebarRPA = () => {
     >
       {isSidebarOpen ? (
         <>
-          <Tabs defaultValue={activeTab} className='h-full'>
+          <Tabs defaultValue={ACTIVE_TAB.MAIN} value={activeTab} className='h-full'>
             <TabsList className='flex justify-start px-4 gap-2'>
               <TabsTrigger
                 value={ACTIVE_TAB.MAIN}
