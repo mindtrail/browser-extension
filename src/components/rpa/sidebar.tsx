@@ -34,9 +34,10 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
 
   return (
     <div
-      className={`fixed right-2 bottom-4 flex flex-col h-auto w-auto
+      className={`fixed right-2 bottom-4 flex flex-col items-center
         font-sans text-foreground bg-white border rounded-lg drop-shadow-xl
-        ${isSidebarOpen ? '!h-[70vh] !w-80' : ''}
+        transition-all duration-100
+        ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-10 w-10'}
       `}
     >
       {isSidebarOpen ? (
@@ -44,7 +45,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
           <Tabs
             defaultValue={ACTIVE_TAB.MAIN}
             value={activeTab}
-            className='flex flex-col flex-1'
+            className='flex flex-col flex-1 opacity-0 animate-fadeIn'
           >
             <TabsContent
               value={ACTIVE_TAB.MAIN}
@@ -100,8 +101,13 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
           </Button>
         </>
       ) : (
-        <Button onClick={toggleSidebar} variant='ghost' size='icon'>
-          <ProcessIcon className='w-8 h-8 text-primary/70' />
+        <Button
+          onClick={toggleSidebar}
+          variant='ghost'
+          size='icon'
+          className='opacity-0 animate-fadeIn'
+        >
+          <ProcessIcon className='w-8 h-8 tex text-primary/70' />
         </Button>
       )}
     </div>
