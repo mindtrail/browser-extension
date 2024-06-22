@@ -40,15 +40,14 @@ export function useEventListeners(props: EventListenersProps) {
   useEffect(() => {
     if (!isRecording) return
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      handleEscapeKey(e, resetRecorderState)
+      handleAltPress(e)
+    }
+
     const uiStateEvents: Event[] = [
       { type: MOUSEOVER, handler: handleMouseOver },
-      {
-        type: KEYDOWN,
-        handler: (e) => {
-          handleEscapeKey(e, resetRecorderState)
-          handleAltPress(e)
-        },
-      },
+      { type: KEYDOWN, handler: handleKeyDown },
       { type: KEYUP, handler: handleAltRelease },
     ]
     addEventListeners(uiStateEvents)

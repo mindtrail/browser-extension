@@ -14,6 +14,7 @@ export function handleMouseOver(event: MouseEvent) {
 export function handleEscapeKey(event: KeyboardEvent, callback: () => void) {
   if (event.key === 'Escape') {
     const target = event?.target as HTMLElement
+
     if (target.nodeName === 'INPUT' || target.nodeName === 'TEXTAREA') {
       return
     }

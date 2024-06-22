@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { XIcon } from 'lucide-react'
 
@@ -7,6 +7,7 @@ import { ProcessIcon } from '~/components/icons/process'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 import { ACTIVE_TAB } from '~/lib/constants'
+import { handleEscapeKey } from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
 import { FlowRunner } from './runner'
 import { FlowRecorder, RecordButton } from './recorder'
@@ -31,6 +32,18 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
     (tab: string) => setSettings((settings) => ({ ...settings, activeTab: tab })),
     [setSettings],
   )
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => handleEscapeKey(e, toggleSidebar)
+
+    if (!isRecording) {
+      document.addEventListener('keydown', handleKeyDown)
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [toggleSidebar, isRecording])
 
   return (
     <div
