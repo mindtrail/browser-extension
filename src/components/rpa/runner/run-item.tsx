@@ -92,7 +92,7 @@ export function RunItem(props: RunItemProps) {
           <Typography
             variant='small'
             className={`w-full line-clamp-2 h-auto justify-start text-left
-            px-4 py-4 cursor-default bg-slate-50 rounded
+            px-4 py-4 cursor-default border rounded
             ${flowsRunning?.includes(flowId) ? 'text-primary' : 'text-foreground/70'}
           `}
           >

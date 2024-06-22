@@ -91,10 +91,16 @@ export const STORAGE_AREA = {
 
 export const CLIPPING_BTN_OFFSET = 16
 
+export const ACTIVE_TAB = {
+  MAIN: 'main',
+  FLOWS: 'flows',
+}
 export const DEFAULT_SETTINGS = {
   autoSave: true,
   saveDelay: AUTO_SAVE_DELAY,
   excludeList: DEFAULT_EXCLUDE_LIST,
+  isSidebarOpen: false,
+  activeTab: ACTIVE_TAB.MAIN,
 }
 
 export const URL_REGEX =

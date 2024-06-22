@@ -54,30 +54,6 @@ export function FlowRunner() {
             eventsList={eventsList}
           />
         ))}
-        {flows?.map((flow, index) => (
-          <RunItem
-            key={index}
-            flow={flow}
-            flowsRunning={flowsRunning}
-            runFlow={runFlow}
-            removeFlow={deleteFlow}
-            runnerContainerRef={runnerContainerRef}
-            updateFlowName={updateFlow}
-            eventsList={eventsList}
-          />
-        ))}
-        {flows?.map((flow, index) => (
-          <RunItem
-            key={index}
-            flow={flow}
-            flowsRunning={flowsRunning}
-            runFlow={runFlow}
-            removeFlow={deleteFlow}
-            runnerContainerRef={runnerContainerRef}
-            updateFlowName={updateFlow}
-            eventsList={eventsList}
-          />
-        ))}
       </div>
     </div>
   )

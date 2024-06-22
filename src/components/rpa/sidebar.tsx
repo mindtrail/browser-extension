@@ -5,22 +5,24 @@ import { Button } from '~/components/ui/button'
 import { ProcessIcon } from '~/components/icons/process'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
+import { ACTIVE_TAB } from '~/lib/constants'
+import { useSettingsStorage } from '~lib/hooks/use-storage'
 
 import { FlowRunner } from './runner'
 import { FlowRecorder, RecordButton } from './recorder'
 
-interface SidebarRPAProps {
-  settings: SettingsStored
-  setSettings: Dispatch<SetStateAction<SettingsStored>>
-}
+export const SidebarRPA = () => {
+  const [settings, setSettings] = useSettingsStorage()
+  const { isSidebarOpen, activeTab } = settings
 
-export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
-  const { isSidebarOpen } = settings
   const { isRecording, isPaused, isSaving, toggleRecording, togglePause } =
     useRecorderState()
 
   const toggleSidebar = () =>
     setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen }))
+
+  const changeTab = (tab: string) =>
+    setSettings((settings) => ({ ...settings, activeTab: tab }))
 
   return (
     <div
@@ -31,21 +33,29 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
     >
       {isSidebarOpen ? (
         <>
-          <Tabs defaultValue='flows' className='h-full'>
-            <TabsList className='flex justify-start'>
-              <TabsTrigger value='main' className='h-10 rounded-es-none rounded-ee-none'>
+          <Tabs defaultValue={activeTab} className='h-full'>
+            <TabsList className='flex justify-start px-4 gap-2'>
+              <TabsTrigger
+                value={ACTIVE_TAB.MAIN}
+                className='h-10 rounded-es-none rounded-ee-none'
+                onClick={() => changeTab(ACTIVE_TAB.MAIN)}
+              >
                 <ProcessIcon className='w-6 h-6 text-primary/70' />
               </TabsTrigger>
 
-              <TabsTrigger value='flows' className='h-10 rounded-es-none rounded-ee-none'>
+              <TabsTrigger
+                value={ACTIVE_TAB.FLOWS}
+                className='h-10 rounded-es-none rounded-ee-none'
+                onClick={() => changeTab(ACTIVE_TAB.FLOWS)}
+              >
                 Flows
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='main' className='flex flex-col'>
+            <TabsContent value={ACTIVE_TAB.MAIN} className='flex flex-col'>
               Chat... this will be the main screen
             </TabsContent>
-            <TabsContent value='flows' asChild>
+            <TabsContent value={ACTIVE_TAB.FLOWS} asChild>
               <div className='h-[calc(100%-56px)] flex flex-col justify-between gap-2 pb-2'>
                 <FlowRunner />
 
