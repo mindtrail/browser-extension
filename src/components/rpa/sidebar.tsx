@@ -75,7 +75,6 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
                 <div className='w-full'>
                   <RecordButton
                     onToggleRecording={toggleRecording}
-                    onPause={togglePause}
                     isRecording={isRecording}
                     isPaused={isPaused}
                     isSaving={isSaving}

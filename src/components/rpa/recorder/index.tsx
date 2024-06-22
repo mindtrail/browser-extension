@@ -5,7 +5,7 @@ import { useAudioRecorder } from '~/lib/hooks/use-audio-recorder'
 
 import { RecordButton } from './record-button'
 import { EventsList } from '../events-list'
-import { CancelRecordingButton } from './cancel-recording-button'
+import { CancelRecordingButton } from './cancel-button'
 
 function FlowRecorder() {
   const {
@@ -41,17 +41,12 @@ function FlowRecorder() {
 
       {isRecording && !eventsList?.length && (
         <Typography className='w-full text-center mb-6'>
-          {isPaused
-            ? 'Paused Recording'
-            : !!transcript
-            ? transcript
-            : 'Recording Workflow...'}
+          {isPaused ? 'Paused Recording' : !!transcript && transcript}
         </Typography>
       )}
 
       <RecordButton
         onToggleRecording={toggleRecording}
-        onPause={togglePause}
         isRecording={isRecording}
         isPaused={isPaused}
         isSaving={isSaving}
