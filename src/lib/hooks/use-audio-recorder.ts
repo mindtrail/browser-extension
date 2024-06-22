@@ -43,7 +43,6 @@ const initDeepgram = async (setTranscript) => {
 
 const handleDataAvailable = async (event: BlobEvent) => {
   if (!deepgramConnection || deepgramConnection?.getReadyState() !== 1) {
-    console.error('Connection is not open.')
     return
   }
   // @TODO: Process each chunk, i.e. stream to backend
@@ -52,10 +51,14 @@ const handleDataAvailable = async (event: BlobEvent) => {
   deepgramConnection.send(arrayBuffer)
 }
 
-const handleStop = (event) => {
+const handleStop = () => {
   console.log('Recording stopped')
   // Delay the stream close to make sure all data available events are processed
   setTimeout(() => {
+    if (!deepgramConnection || deepgramConnection?.getReadyState() !== 1) {
+      return
+    }
+
     deepgramConnection?.finish()
     deepgramConnection = null
   }, 200)

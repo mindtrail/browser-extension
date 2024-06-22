@@ -5,8 +5,9 @@ import { handleClickEvent } from '~lib/utils/recorder/event-handlers/click-event
 import { handleInputEvent } from '~lib/utils/recorder/event-handlers/input-event'
 import {
   handleMouseOver,
-  handleKeyDown,
-  handleKeyUp,
+  handleEscapeKey,
+  handleAltPress,
+  handleAltRelease,
 } from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
 const { CLICK, INPUT, MOUSEOVER, KEYDOWN, KEYUP } = DOM_EVENT
@@ -41,8 +42,14 @@ export function useEventListeners(props: EventListenersProps) {
 
     const uiStateEvents: Event[] = [
       { type: MOUSEOVER, handler: handleMouseOver },
-      { type: KEYDOWN, handler: (e) => handleKeyDown(e, resetRecorderState) },
-      { type: KEYUP, handler: handleKeyUp },
+      {
+        type: KEYDOWN,
+        handler: (e) => {
+          handleEscapeKey(e, resetRecorderState)
+          handleAltPress(e)
+        },
+      },
+      { type: KEYUP, handler: handleAltRelease },
     ]
     addEventListeners(uiStateEvents)
 

@@ -34,10 +34,9 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
 
   return (
     <div
-      className={`fixed right-2 bottom-4 flex flex-col items-center
+      className={`fixed right-2 bottom-4 flex flex-col transition-all duration-100
         font-sans text-foreground bg-white border rounded-lg drop-shadow-xl
-        transition-all duration-100
-        ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-10 w-10'}
+        ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-11 w-11 items-center justify-center'}
       `}
     >
       {isSidebarOpen ? (
@@ -72,7 +71,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               </div>
             </TabsContent>
 
-            <TabsList className='flex justify-start px-4 gap-2'>
+            <TabsList className='flex justify-start px-4 gap-2 relative items-center'>
               <TabsTrigger
                 value={ACTIVE_TAB.MAIN}
                 className='h-10 rounded-ss-none rounded-se-none'
@@ -88,17 +87,18 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               >
                 Flows
               </TabsTrigger>
+
+              <Button
+                onClick={toggleSidebar}
+                variant='ghost'
+                className='absolute right-0 text-foreground/50'
+              >
+                <XIcon className='w-4 h-4' />
+              </Button>
             </TabsList>
           </Tabs>
-          <FlowRecorder />
 
-          <Button
-            onClick={toggleSidebar}
-            variant='ghost'
-            className='absolute right-0 bottom-0.5 text-foreground/50'
-          >
-            <XIcon className='w-4 h-4' />
-          </Button>
+          <FlowRecorder />
         </>
       ) : (
         <Button
