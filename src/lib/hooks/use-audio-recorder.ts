@@ -133,5 +133,5 @@ export const useAudioRecorder = (isRecording = false, isPaused = false) => {
     }
   }, [isRecording, isPaused, startRecording, stopRecording, pauseRecording])
 
-  return { transcript, error }
+  return { transcript, setTranscript, error }
 }

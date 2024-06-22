@@ -8,6 +8,7 @@ import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-button'
 import { PauseRecordingButton } from './pause-button'
 import { RestartRecordingButton } from './restart-button'
+import { useCallback } from 'react'
 
 function FlowRecorder() {
   const {
@@ -16,15 +17,21 @@ function FlowRecorder() {
     isPaused,
     isSaving,
     resetRecorderState,
-    restartRecording,
+    deleteAllEvents,
     updateRecordedEvents,
     deleteEvent,
     toggleRecording,
     togglePause,
   } = useRecorderState()
 
-  const { transcript } = useAudioRecorder(isRecording, isPaused)
+  const { transcript, setTranscript } = useAudioRecorder(isRecording, isPaused)
   useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
+
+  const restartRecording = useCallback(() => {
+    deleteAllEvents()
+    togglePause()
+    setTranscript('')
+  }, [])
 
   if (!isRecording) return null
 

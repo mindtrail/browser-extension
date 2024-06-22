@@ -96,3 +96,10 @@ export const togglePause = (setRecorderState) => {
     isPaused: !prevState.isPaused,
   }))
 }
+
+export const deleteAllEvents = (setRecorderState) => {
+  setRecorderState((prevState) => ({
+    ...prevState,
+    eventsList: [],
+  }))
+}

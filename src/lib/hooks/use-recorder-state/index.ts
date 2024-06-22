@@ -8,6 +8,7 @@ import {
   deleteEvent,
   togglePause,
   toggleRecording,
+  deleteAllEvents,
 } from './recorder-state-events'
 
 const RECORDER_CONFIG = {
@@ -26,11 +27,6 @@ export const useRecorderState = () => {
     [],
   )
 
-  const restartRecording = useCallback(
-    () => setRecorderState({ ...recorderState, eventsList: [] }),
-    [],
-  )
-
   const baseState = { ...recorderState, resetRecorderState, setRecorderState }
 
   const eventHandlers = useMemo(
@@ -39,6 +35,7 @@ export const useRecorderState = () => {
       deleteEvent: (args) => deleteEvent(args, setRecorderState),
       toggleRecording: () => toggleRecording(baseState),
       togglePause: () => togglePause(setRecorderState),
+      deleteAllEvents: () => deleteAllEvents(setRecorderState),
     }),
     [recorderState, setRecorderState, resetRecorderState],
   )
@@ -46,6 +43,5 @@ export const useRecorderState = () => {
   return {
     ...baseState,
     ...eventHandlers,
-    restartRecording,
   }
 }
