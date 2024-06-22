@@ -94,11 +94,7 @@ export const useAudioRecorder = (isRecording = false, isPaused = false) => {
   }, [])
 
   const resumeRecording = useCallback(async () => {
-    if (!mediaRecorder) return
-
-    console.log(deepgramConnection?.getReadyState())
-
-    if (deepgramConnection?.getReadyState() === 1) {
+    if (mediaRecorder && deepgramConnection?.getReadyState() === 1) {
       return mediaRecorder.resume()
     }
 
@@ -122,16 +118,19 @@ export const useAudioRecorder = (isRecording = false, isPaused = false) => {
       return stopRecording()
     }
 
-    if (!mediaRecorder) {
-      startRecording()
+    if (isPaused) {
+      pauseRecording()
     } else {
-      if (isPaused) {
-        pauseRecording()
-      } else {
-        resumeRecording()
-      }
+      resumeRecording()
     }
-  }, [isRecording, isPaused, startRecording, stopRecording, pauseRecording])
+  }, [
+    isRecording,
+    isPaused,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    resumeRecording,
+  ])
 
   return { transcript, setTranscript, error }
 }

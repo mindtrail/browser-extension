@@ -27,11 +27,10 @@ function FlowRecorder() {
   const { transcript, setTranscript } = useAudioRecorder(isRecording, isPaused)
   useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
 
-  const restartRecording = useCallback(() => {
+  const restartRecording = () => {
     deleteAllEvents()
-    togglePause()
     setTranscript('')
-  }, [])
+  }
 
   if (!isRecording) return null
 
