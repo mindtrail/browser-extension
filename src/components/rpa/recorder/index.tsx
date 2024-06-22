@@ -6,6 +6,8 @@ import { useAudioRecorder } from '~/lib/hooks/use-audio-recorder'
 import { RecordButton } from './record-button'
 import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-button'
+import { PauseRecordingButton } from './pause-button'
+import { RestartRecordingButton } from './restart-button'
 
 function FlowRecorder() {
   const {
@@ -14,6 +16,7 @@ function FlowRecorder() {
     isPaused,
     isSaving,
     resetRecorderState,
+    restartRecording,
     updateRecordedEvents,
     deleteEvent,
     toggleRecording,
@@ -34,14 +37,18 @@ function FlowRecorder() {
     >
       {isRecording && (
         <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
-          <CancelRecordingButton onClick={resetRecorderState} />
+          <div className='flex justify-between gap-4'>
+            <PauseRecordingButton onPause={togglePause} isPaused={isPaused} />
+            <RestartRecordingButton onRestart={restartRecording} />
+            <CancelRecordingButton onCancel={resetRecorderState} />
+          </div>
           <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
         </div>
       )}
 
       {isRecording && !eventsList?.length && (
         <Typography className='w-full text-center mb-6'>
-          {isPaused ? 'Paused Recording' : !!transcript && transcript}
+          {isPaused ? 'Recording paused' : !!transcript && transcript}
         </Typography>
       )}
 

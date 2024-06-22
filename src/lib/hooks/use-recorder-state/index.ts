@@ -26,7 +26,13 @@ export const useRecorderState = () => {
     [],
   )
 
+  const restartRecording = useCallback(
+    () => setRecorderState({ ...recorderState, eventsList: [] }),
+    [],
+  )
+
   const baseState = { ...recorderState, resetRecorderState, setRecorderState }
+
   const eventHandlers = useMemo(
     () => ({
       updateRecordedEvents: (args) => updateRecordedEvents(args, setRecorderState),
@@ -40,5 +46,6 @@ export const useRecorderState = () => {
   return {
     ...baseState,
     ...eventHandlers,
+    restartRecording,
   }
 }
