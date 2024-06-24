@@ -1,70 +1,72 @@
-import { LoaderCircleIcon } from 'lucide-react'
+import { Typography } from '~/components/typography'
+import { useEventListeners } from '~/lib/hooks/use-events-listener'
+import { useRecorderState } from '~/lib/hooks/use-recorder-state'
+import { useAudioRecorder } from '~/lib/hooks/use-audio-recorder'
 
-import { Button } from '~/components/ui/button'
-import { Typography } from '~components/typography'
-import { useEventListeners } from '~lib/hooks/use-events-listener'
-import { useRecorderState } from '~lib/hooks/use-recorder-state'
-import { useAudioRecorder } from '~lib/hooks/use-audio-recorder'
-
-import { EventsList } from '../events-list'
-import { CancelRecordingButton } from './cancel-recording-button'
 import { RecordButton } from './record-button'
+import { EventsList } from '../events-list'
+import { CancelRecordingButton } from './cancel-button'
+import { PauseRecordingButton } from './pause-button'
+import { RestartRecordingButton } from './restart-button'
 
-export function FlowRecorder() {
+function FlowRecorder() {
   const {
+    eventsList,
     isRecording,
     isPaused,
     isSaving,
-    eventsList,
     resetRecorderState,
+    deleteAllEvents,
     updateRecordedEvents,
     deleteEvent,
     toggleRecording,
     togglePause,
   } = useRecorderState()
 
+  const { transcript, setTranscript } = useAudioRecorder(isRecording, isPaused)
   useEventListeners({ isRecording, isPaused, updateRecordedEvents, resetRecorderState })
-  const { transcript } = useAudioRecorder(isRecording)
+
+  const restartRecording = () => {
+    deleteAllEvents()
+    setTranscript('')
+  }
+
+  if (!isRecording) return null
+
   return (
     <div
-      className={`${isRecording ? 'h-[calc(100%-52px)]' : 'h-auto'}
-        flex flex-col justify-end gap-2 px-4 py-2
-        w-full absolute bottom-0 border bg-slate-50`}
+      className={`flex flex-col justify-end gap-4 py-2 px-4
+        w-full absolute bottom-0 bg-slate-50 z-10
+      `}
     >
-      {isRecording && (
-        <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
-          <CancelRecordingButton onClick={resetRecorderState} />
-          <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
-        </div>
-      )}
+      <div className='flex flex-col py-2 gap-4'>
+        {!!transcript.length && (
+          <Typography className='w-full'>
+            {isPaused ? 'Recording paused' : transcript}
+          </Typography>
+        )}
 
-      {isRecording && !eventsList?.length && (
-        <Typography className='w-full text-center mb-6'>
-          {isPaused
-            ? 'Paused Recording'
-            : !!transcript
-            ? transcript
-            : 'Recording Workflow...'}
-        </Typography>
-      )}
+        {!!eventsList?.length && (
+          <div className='flex flex-col flex-1 justify-between h-full overflow-auto'>
+            <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
+          </div>
+        )}
+      </div>
 
-      {isSaving ? (
-        <Button
-          className='flex w-full gap-4 items-center !opacity-75'
-          variant='outline'
-          disabled
-        >
-          <LoaderCircleIcon className='w-5 h-5 animate-spin' />
-          <Typography>Saving Workflow...</Typography>
-        </Button>
-      ) : (
-        <RecordButton
-          onToggleRecording={toggleRecording}
-          onPause={togglePause}
-          isRecording={isRecording}
-          isPaused={isPaused}
-        />
-      )}
+      <RecordButton
+        onToggleRecording={toggleRecording}
+        isRecording={isRecording}
+        isPaused={isPaused}
+        isSaving={isSaving}
+      />
+
+      <div className='flex justify-between gap-4'>
+        <PauseRecordingButton onPause={togglePause} isPaused={isPaused} />
+        <RestartRecordingButton onRestart={restartRecording} />
+        <CancelRecordingButton onCancel={resetRecorderState} />
+      </div>
     </div>
   )
 }
+
+export { RecordButton, FlowRecorder }

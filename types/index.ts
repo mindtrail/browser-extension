@@ -13,6 +13,7 @@ declare global {
     excludeList: string[]
     overlayPosition?: OverlayPosition
     isSidebarOpen?: boolean
+    activeTab?: string
   }
 
   interface ClippingRange {

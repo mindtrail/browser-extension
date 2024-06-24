@@ -2,7 +2,7 @@ import { addOutlineStyles, removeOutlineStyles } from '~/lib/utils/recorder/dom-
 
 let hoveredEl = null
 
-export const handleMouseOver = (event: MouseEvent) => {
+export function handleMouseOver(event: MouseEvent) {
   removeOutlineStyles(hoveredEl)
   hoveredEl = event.target
 
@@ -11,23 +11,25 @@ export const handleMouseOver = (event: MouseEvent) => {
   }
 }
 
-export const handleKeyDown = (event: KeyboardEvent, resetRecorderState: () => void) => {
+export function handleEscapeKey(event: KeyboardEvent, callback: () => void) {
   if (event.key === 'Escape') {
     const target = event?.target as HTMLElement
+
     if (target.nodeName === 'INPUT' || target.nodeName === 'TEXTAREA') {
       return
     }
-
-    resetRecorderState()
+    callback()
   }
+}
 
+export function handleAltPress(event: KeyboardEvent) {
   if (event.key === 'Alt') {
     // Instant highlighting - mouseover will not trigger if already on the element
     hoveredEl?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, altKey: true }))
   }
 }
 
-export const handleKeyUp = (event: KeyboardEvent) => {
+export function handleAltRelease(event: KeyboardEvent) {
   if (event.key === 'Alt') {
     removeOutlineStyles(hoveredEl)
   }

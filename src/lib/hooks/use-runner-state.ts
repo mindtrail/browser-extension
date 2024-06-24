@@ -117,6 +117,8 @@ export const useRunnerState = () => {
   }, [setRunnerState])
 
   useEffect(() => {
+    if (!runnerState.flows) return
+
     const resumeTask = async () => {
       const { data } = await getTasks()
       const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
@@ -125,7 +127,9 @@ export const useRunnerState = () => {
         await runFlow(resumableTask.state.flowId, resumableTask)
       }
     }
-    if (runnerState.flows.length > 0) resumeTask()
+    if (runnerState.flows.length > 0) {
+      resumeTask()
+    }
   }, [runnerState.flows])
 
   const runFlow = useCallback(

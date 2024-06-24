@@ -1,47 +1,39 @@
-import { CirclePauseIcon, SaveIcon } from 'lucide-react'
+import { LoaderCircleIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
-import { RecordIcon } from '~/components/icons/record'
+import { StartRecordingIcon, StopRecordingIcon } from '~/components/icons/record'
 
 interface RecordButtonProps {
-  onToggleRecording: () => void
-  onPause: () => void
   isRecording: boolean
   isPaused: boolean
+  isSaving: boolean
+  onToggleRecording: () => void
 }
 export function RecordButton(props: RecordButtonProps) {
-  const { onPause, onToggleRecording, isRecording, isPaused } = props
+  const { isRecording, isPaused, isSaving, onToggleRecording } = props
 
-  return isRecording ? (
-    <div className='flex w-full gap-2 items-center'>
-      <Button
-        className='flex w-full gap-2 items-center'
-        variant='outline'
-        onClick={onPause}
-      >
-        {isPaused ? (
-          <RecordIcon className='w-5 h-5' />
-        ) : (
-          <CirclePauseIcon className='w-5 h-5' />
-        )}
-        {isPaused ? 'Resume' : '  Pause'}
-      </Button>
-      <Button
-        className='flex w-full gap-2 items-center'
-        variant='default'
-        onClick={onToggleRecording}
-      >
-        <SaveIcon className='w-5 h-5 ' />
-        Save
-      </Button>
-    </div>
-  ) : (
+  const Icon = isSaving
+    ? LoaderCircleIcon
+    : isRecording
+    ? StopRecordingIcon
+    : StartRecordingIcon
+
+  return (
     <Button
       className='flex w-full gap-4 items-center'
-      variant='outline'
+      variant={isRecording && !isPaused ? 'default' : 'outline'}
       onClick={onToggleRecording}
     >
-      <RecordIcon className='w-5 h-5' />
-      Record New Workflow
+      <Icon
+        className={`w-5 h-5 text-red-600
+          ${
+            isSaving
+              ? 'animate-spin !text-primary-foreground'
+              : isRecording && !isPaused
+              ? 'animate-pulse'
+              : ''
+          }`}
+      />
+      {isSaving ? 'Saving...' : isRecording ? 'Save Recording' : 'Record New Workflow'}
     </Button>
   )
 }

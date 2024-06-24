@@ -25,7 +25,7 @@ const initDeepgram = async (setTranscript) => {
     })
 
     connection.on(LiveTranscriptionEvents.Transcript, (data) => {
-      console.log(data.channel.alternatives[0].transcript)
+      console.log(111, data.channel.alternatives[0].transcript)
       setTranscript((prev) => prev + ' ' + data.channel.alternatives[0].transcript)
     })
 
@@ -42,6 +42,9 @@ const initDeepgram = async (setTranscript) => {
 }
 
 const handleDataAvailable = async (event: BlobEvent) => {
+  if (!deepgramConnection || deepgramConnection?.getReadyState() !== 1) {
+    return
+  }
   // @TODO: Process each chunk, i.e. stream to backend
   const { data } = event
   const arrayBuffer = await data.arrayBuffer()
@@ -52,12 +55,16 @@ const handleStop = () => {
   console.log('Recording stopped')
   // Delay the stream close to make sure all data available events are processed
   setTimeout(() => {
+    if (!deepgramConnection || deepgramConnection?.getReadyState() !== 1) {
+      return
+    }
+
     deepgramConnection?.finish()
     deepgramConnection = null
-  }, 1000)
+  }, 200)
 }
 
-export const useAudioRecorder = (isRecording) => {
+export const useAudioRecorder = (isRecording = false, isPaused = false) => {
   const [error, setError] = useState<string | null>(null)
   const [transcript, setTranscript] = useState<string>('')
 
@@ -70,7 +77,7 @@ export const useAudioRecorder = (isRecording) => {
 
       newRecorder.ondataavailable = handleDataAvailable
       newRecorder.onstop = handleStop
-      newRecorder.start(1000)
+      newRecorder.start(600)
 
       mediaRecorder = newRecorder
       setError(null)
@@ -80,23 +87,50 @@ export const useAudioRecorder = (isRecording) => {
     }
   }, [])
 
+  const pauseRecording = useCallback(() => {
+    if (!mediaRecorder) return
+
+    mediaRecorder.pause()
+  }, [])
+
+  const resumeRecording = useCallback(async () => {
+    if (mediaRecorder && deepgramConnection?.getReadyState() === 1) {
+      return mediaRecorder.resume()
+    }
+
+    startRecording()
+  }, [])
+
   const stopRecording = useCallback(() => {
     if (!mediaRecorder) return
 
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach((track) => track.stop())
     mediaRecorder = null
+
+    setTimeout(() => {
+      setTranscript('')
+    }, 600)
   }, [])
 
   useEffect(() => {
-    if (isRecording) {
-      startRecording()
-    } else {
-      stopRecording()
+    if (!isRecording) {
+      return stopRecording()
     }
 
-    return () => stopRecording()
-  }, [isRecording, startRecording, stopRecording])
+    if (isPaused) {
+      pauseRecording()
+    } else {
+      resumeRecording()
+    }
+  }, [
+    isRecording,
+    isPaused,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    resumeRecording,
+  ])
 
-  return { transcript, error }
+  return { transcript, setTranscript, error }
 }

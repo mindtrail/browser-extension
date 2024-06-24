@@ -5,8 +5,9 @@ import { handleClickEvent } from '~lib/utils/recorder/event-handlers/click-event
 import { handleInputEvent } from '~lib/utils/recorder/event-handlers/input-event'
 import {
   handleMouseOver,
-  handleKeyDown,
-  handleKeyUp,
+  handleEscapeKey,
+  handleAltPress,
+  handleAltRelease,
 } from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
 const { CLICK, INPUT, MOUSEOVER, KEYDOWN, KEYUP } = DOM_EVENT
@@ -37,21 +38,31 @@ export function useEventListeners(props: EventListenersProps) {
   const { isRecording, isPaused, updateRecordedEvents, resetRecorderState } = props
 
   useEffect(() => {
-    if (!(isRecording && !isPaused)) return
+    if (!isRecording) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      handleEscapeKey(e, resetRecorderState)
+      handleAltPress(e)
+    }
+
+    const uiStateEvents: Event[] = [
+      { type: MOUSEOVER, handler: handleMouseOver },
+      { type: KEYDOWN, handler: handleKeyDown },
+      { type: KEYUP, handler: handleAltRelease },
+    ]
+    addEventListeners(uiStateEvents)
+
+    if (isPaused)
+      return () => {
+        removeEventListeners(uiStateEvents)
+      }
 
     const recordingEvents: Event[] = [
       { type: CLICK, handler: (e) => handleClickEvent(e, updateRecordedEvents) },
       { type: INPUT, handler: (e) => handleInputEvent(e, updateRecordedEvents) },
     ]
 
-    const uiStateEvents: Event[] = [
-      { type: MOUSEOVER, handler: handleMouseOver },
-      { type: KEYDOWN, handler: (e) => handleKeyDown(e, resetRecorderState) },
-      { type: KEYUP, handler: handleKeyUp },
-    ]
-
     addEventListeners(recordingEvents)
-    addEventListeners(uiStateEvents)
 
     return () => {
       removeEventListeners(recordingEvents)

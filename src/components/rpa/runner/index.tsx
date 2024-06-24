@@ -21,12 +21,8 @@ export function FlowRunner() {
   const runnerContainerRef = useRef(null)
 
   return (
-    <>
-      <div
-        ref={runnerContainerRef}
-        className=' flex flex-col gap-4 px-4 py-4 overflow-auto'
-      >
-        <form
+    <div ref={runnerContainerRef} className='flex flex-col gap-4 overflow-auto'>
+      {/* <form
           className='flex items-center'
           onSubmit={(e) => {
             e.preventDefault()
@@ -44,22 +40,21 @@ export function FlowRunner() {
           />
 
           <SearchIcon className='w-4 h-4 absolute right-8 text-foreground/50' />
-        </form>
-        <div className='flex flex-col gap-2'>
-          {flows?.map((flow, index) => (
-            <RunItem
-              key={index}
-              flow={flow}
-              flowsRunning={flowsRunning}
-              runFlow={runFlow}
-              removeFlow={deleteFlow}
-              runnerContainerRef={runnerContainerRef}
-              updateFlowName={updateFlow}
-              eventsList={eventsList}
-            />
-          ))}
-        </div>
+        </form> */}
+      <div className='flex flex-col gap-2'>
+        {flows?.map((flow, index) => (
+          <RunItem
+            key={index}
+            flow={flow}
+            flowsRunning={flowsRunning}
+            runFlow={runFlow}
+            removeFlow={deleteFlow}
+            runnerContainerRef={runnerContainerRef}
+            updateFlowName={updateFlow}
+            eventsList={eventsList}
+          />
+        ))}
       </div>
-    </>
+    </div>
   )
 }

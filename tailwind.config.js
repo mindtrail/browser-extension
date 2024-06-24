@@ -144,6 +144,21 @@ module.exports = {
             transform: 'translateX(-50%)',
           },
         },
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+        pulse: {
+          '0%': {
+            opacity: 1,
+          },
+          '50%': {
+            opacity: 0.75,
+          },
+          '100%': {
+            opacity: 1,
+          },
+        },
       },
       animation: {
         'slide-from-left': 'slide-from-left 0.3s cubic-bezier(0.82, 0.085, 0.395, 0.895)',
@@ -151,6 +166,8 @@ module.exports = {
           'slide-to-left 0.25s cubic-bezier(0.82, 0.085, 0.395, 0.895) forwards',
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        fadeIn: 'fadeIn 0.1s forwards 0.1s',
+        pulse: 'pulse 1.5s infinite',
       },
     },
     boxShadow: {
