@@ -3,13 +3,14 @@ import { Button } from '~/components/ui/button'
 import { StartRecordingIcon, StopRecordingIcon } from '~/components/icons/record'
 
 interface RecordButtonProps {
-  onToggleRecording: () => void
   isRecording: boolean
   isPaused: boolean
   isSaving: boolean
+  onToggleRecording: () => void
 }
 export function RecordButton(props: RecordButtonProps) {
-  const { onToggleRecording, isRecording, isPaused, isSaving } = props
+  const { isRecording, isPaused, isSaving, onToggleRecording } = props
+
   const Icon = isSaving
     ? LoaderCircleIcon
     : isRecording
@@ -24,9 +25,15 @@ export function RecordButton(props: RecordButtonProps) {
     >
       <Icon
         className={`w-5 h-5 text-red-600
-          ${isRecording && !isPaused ? 'animate-pulse' : ''}`}
+          ${
+            isSaving
+              ? 'animate-spin !text-primary-foreground'
+              : isRecording && !isPaused
+              ? 'animate-pulse'
+              : ''
+          }`}
       />
-      {isRecording ? 'Save Recording' : 'Record New Workflow'}
+      {isSaving ? 'Saving...' : isRecording ? 'Save Recording' : 'Record New Workflow'}
     </Button>
   )
 }

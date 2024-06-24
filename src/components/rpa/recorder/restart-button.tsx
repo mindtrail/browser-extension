@@ -19,7 +19,7 @@ export function RestartRecordingButton(props: RestartButtonProps) {
           <RotateCcwIcon className='w-5 h-5' />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Restart</TooltipContent>
+      <TooltipContent>Restart Recording</TooltipContent>
     </Tooltip>
   )
 }

@@ -22,7 +22,7 @@ export function PauseRecordingButton(props: PauseButtonProps) {
           <Icon className='w-5 h-5' />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{isPaused ? 'Resume' : 'Pause'}</TooltipContent>
+      <TooltipContent>{isPaused ? 'Resume Recording' : 'Pause Recording'}</TooltipContent>
     </Tooltip>
   )
 }

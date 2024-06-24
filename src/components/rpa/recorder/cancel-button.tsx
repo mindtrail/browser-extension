@@ -20,7 +20,7 @@ export function CancelRecordingButton(props: RecordButtonProps) {
           <TrashIcon className='w-5 h-5 text-foreground/70' />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Cancel (Esc)</TooltipContent>
+      <TooltipContent>Cancel Recording (Esc)</TooltipContent>
     </Tooltip>
   )
 }
