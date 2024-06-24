@@ -34,7 +34,8 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   )
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => handleEscapeKey(e, toggleSidebar)
+    const handleKeyDown = (e: KeyboardEvent) =>
+      isSidebarOpen && handleEscapeKey(e, toggleSidebar)
 
     if (!isRecording) {
       document.addEventListener('keydown', handleKeyDown)
@@ -43,7 +44,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [toggleSidebar, isRecording])
+  }, [toggleSidebar, isRecording, isSidebarOpen])
 
   return (
     <div
