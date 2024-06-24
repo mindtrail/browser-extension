@@ -10,8 +10,6 @@ import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { useSavedWebsitesStorage } from '~lib/hooks/use-storage'
 import { MESSAGE_AREAS } from '~/lib/constants'
 
-import { useSettingsStorage } from '~lib/hooks/use-storage'
-
 import {
   DEFAULT_EXTENSION_SETTINGS,
   MESSAGES,
