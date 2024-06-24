@@ -49,8 +49,14 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   return (
     <div
       className={`fixed right-2 bottom-4 flex flex-col transition-all duration-100
-        font-sans text-foreground bg-white border rounded-lg drop-shadow-xl
-        ${isSidebarOpen ? 'h-[70vh] w-80' : 'h-11 w-11 items-center justify-center'}
+        font-sans text-foreground bg-white rounded-lg drop-shadow-xl
+        ${
+          !isSidebarOpen
+            ? 'h-11 w-11 items-center justify-center'
+            : isRecording
+            ? 'h-auto w-80'
+            : 'h-[70vh] w-80'
+        }
       `}
     >
       {isSidebarOpen ? (
@@ -58,7 +64,9 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
           <Tabs
             defaultValue={ACTIVE_TAB.MAIN}
             value={activeTab}
-            className='flex flex-col flex-1 opacity-0 animate-fadeIn'
+            className={`flex flex-col flex-1 opacity-0 animate-fadeIn ${
+              isRecording ? 'hidden' : ''
+            }`}
           >
             <TabsContent
               value={ACTIVE_TAB.MAIN}
@@ -84,10 +92,10 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               </div>
             </TabsContent>
 
-            <TabsList className='flex justify-start px-4 gap-2 relative items-center'>
+            <TabsList className='flex h-11 justify-start px-4 gap-2 relative items-center'>
               <TabsTrigger
                 value={ACTIVE_TAB.MAIN}
-                className='h-10 rounded-ss-none rounded-se-none'
+                className='h-11 rounded-ss-none rounded-se-none'
                 onClick={() => changeTab(ACTIVE_TAB.MAIN)}
               >
                 <ProcessIcon className='w-6 h-6 text-primary/70' />
@@ -95,7 +103,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
 
               <TabsTrigger
                 value={ACTIVE_TAB.FLOWS}
-                className='h-10 rounded-ss-none rounded-se-none'
+                className='h-11 rounded-ss-none rounded-se-none'
                 onClick={() => changeTab(ACTIVE_TAB.FLOWS)}
               >
                 Flows

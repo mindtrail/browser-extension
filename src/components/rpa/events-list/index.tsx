@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   MousePointerClickIcon,
   GlobeIcon,
@@ -6,6 +7,8 @@ import {
 } from 'lucide-react'
 
 import { ACTION_TYPE } from '~lib/constants'
+import { Switch } from '~components/ui/switch'
+import { Label } from '~components/ui/label'
 import { Event } from './event'
 
 const EVENT_ICONS = {
@@ -25,12 +28,14 @@ interface EventProps {
 
 export function EventsList(props: EventProps) {
   const { eventsList = [], deleteEvent, debugMode = false, readOnly = false } = props
+  const [showAllEvents, setShowAllEvents] = useState(false)
 
   if (!eventsList?.length) return
 
   const eventsToDisplay = []
 
-  eventsList.forEach((event = {}) => {
+  // Only show the last 2 events
+  eventsList.slice(showAllEvents ? 0 : -2).forEach((event = {}) => {
     const { value } = event
 
     eventsToDisplay.push({
@@ -43,6 +48,19 @@ export function EventsList(props: EventProps) {
 
   return (
     <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
+      {eventsList?.length > 2 && (
+        <div className='flex items-center justify-between mb-4'>
+          <span>...</span>
+          <div className='flex gap-4'>
+            <Label htmlFor='show-all-events'>Show All</Label>
+            <Switch
+              id='show-all-events'
+              checked={showAllEvents}
+              onCheckedChange={setShowAllEvents}
+            />
+          </div>
+        </div>
+      )}
       {eventsToDisplay.map((event, index) => (
         <Event
           key={index}

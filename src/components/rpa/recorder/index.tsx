@@ -8,7 +8,6 @@ import { EventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-button'
 import { PauseRecordingButton } from './pause-button'
 import { RestartRecordingButton } from './restart-button'
-import { useCallback } from 'react'
 
 function FlowRecorder() {
   const {
@@ -36,27 +35,23 @@ function FlowRecorder() {
 
   return (
     <div
-      className={`${isRecording ? 'h-full' : 'h-auto'}
-        flex flex-col justify-end gap-2 py-2 px-4
-        w-full absolute bottom-0 border bg-slate-50 z-10
+      className={`flex flex-col justify-end gap-4 py-2 px-4
+        w-full absolute bottom-0 bg-slate-50 z-10
       `}
     >
-      {isRecording && (
-        <div className='flex flex-col flex-1 justify-between pt-2 h-full overflow-auto'>
-          <div className='flex justify-between gap-4'>
-            <PauseRecordingButton onPause={togglePause} isPaused={isPaused} />
-            <RestartRecordingButton onRestart={restartRecording} />
-            <CancelRecordingButton onCancel={resetRecorderState} />
-          </div>
-          <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
-        </div>
-      )}
+      <div className='flex flex-col py-2 gap-4'>
+        {!!transcript.length && (
+          <Typography className='w-full'>
+            {isPaused ? 'Recording paused' : transcript}
+          </Typography>
+        )}
 
-      {isRecording && !eventsList?.length && (
-        <Typography className='w-full text-center mb-6'>
-          {isPaused ? 'Recording paused' : !!transcript && transcript}
-        </Typography>
-      )}
+        {!!eventsList?.length && (
+          <div className='flex flex-col flex-1 justify-between h-full overflow-auto'>
+            <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
+          </div>
+        )}
+      </div>
 
       <RecordButton
         onToggleRecording={toggleRecording}
@@ -64,6 +59,12 @@ function FlowRecorder() {
         isPaused={isPaused}
         isSaving={isSaving}
       />
+
+      <div className='flex justify-between gap-4'>
+        <PauseRecordingButton onPause={togglePause} isPaused={isPaused} />
+        <RestartRecordingButton onRestart={restartRecording} />
+        <CancelRecordingButton onCancel={resetRecorderState} />
+      </div>
     </div>
   )
 }
