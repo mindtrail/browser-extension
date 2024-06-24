@@ -104,9 +104,10 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               <Button
                 onClick={toggleSidebar}
                 variant='ghost'
-                className='absolute right-0 text-foreground/50'
+                size='icon'
+                className='absolute right-1 text-foreground/50'
               >
-                <XIcon className='w-4 h-4' />
+                <XIcon className='w-5 h-5' />
               </Button>
             </TabsList>
           </Tabs>
