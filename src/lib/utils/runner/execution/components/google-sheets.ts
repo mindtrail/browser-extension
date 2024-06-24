@@ -14,16 +14,19 @@ export async function googleSheetsComponent({
     const taskRes = await getTask(task.id)
     task = taskRes.data
 
-    const response = await fetch('http://localhost:8000/google-sheets/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${process.env.PLASMO_PUBLIC_API_URL}/google-sheets/save`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sheetId: event.sheetId,
+          values: task.state.variables[event.values],
+        }),
       },
-      body: JSON.stringify({
-        sheetId: event.sheetId,
-        values: task.state.variables[event.values],
-      }),
-    })
+    )
     const result = await response.json()
     event.sheetId = result.sheetId
     event.baseURI = result.url
