@@ -1,8 +1,7 @@
 import { extractParams } from '~lib/llm/openai'
-import { search } from '~lib/llm/openai'
 import { buildParamsSchema } from './build-params-schema'
 import { runEvents } from './run-events'
-import { extractTableEntities } from './extract-entities'
+import { extractTable } from './extract-table'
 
 export async function processQuery({
   task,
@@ -15,10 +14,7 @@ export async function processQuery({
   const schema = buildParamsSchema(events)
   console.log('schema', schema)
 
-  const entities = await extractTableEntities({
-    columns: Object.keys(schema),
-    entitySelectorPattern: events[0].selector,
-  })
+  const entities = await extractTable(events[0].selector)
   console.log('entities', entities)
 
   // const filteredEntities = await search({ query, entities })

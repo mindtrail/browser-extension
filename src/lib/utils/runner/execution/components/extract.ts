@@ -1,16 +1,28 @@
-import { buildParamsSchema } from '../build-params-schema'
-import { extractTableEntities } from '../extract-entities'
+import { extractTable } from '../extract-table'
 import { updateTask, getTask } from '~/lib/supabase'
+import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
+import { waitForElement } from '~/lib/utils/runner/wait-for-element'
 
-export async function extractComponent({ task, events, columns }) {
-  const schema = buildParamsSchema(events)
+export async function extractComponent({
+  flowId,
+  task,
+  event,
+  onEventStart,
+  onEventEnd,
+}) {
+  await onEventStart(flowId, event)
+  if (event.baseURI) {
+    const urlMatch = await waitForUrl(event.baseURI)
+    if (!urlMatch) {
+      window.location.href = event.baseURI
+    }
+  }
 
-  const entities = columns
-    ? await extractTableEntities({
-        columns: columns || Object.keys(schema),
-        entitySelectorPattern: events[0].selector || '',
-      })
-    : null
+  const element: any = await waitForElement(event.selector)
+  if (!element) return
+
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+  const entities = await extractTable(event.selector)
 
   const taskRes = await getTask(task.id)
   task = taskRes.data
@@ -24,4 +36,5 @@ export async function extractComponent({ task, events, columns }) {
       },
     },
   })
+  await onEventEnd(flowId, event)
 }
