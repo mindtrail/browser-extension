@@ -3,10 +3,10 @@ import { SearchIcon } from 'lucide-react'
 
 import { Input } from '~/components/ui/input'
 
-import { RunItem } from './run-item'
+import { FlowItem } from './flow-item'
 import { useRunnerState } from '~lib/hooks/use-runner-state'
 
-export function FlowRunner() {
+export function FlowList() {
   const {
     query,
     flows,
@@ -43,7 +43,7 @@ export function FlowRunner() {
         </form> */}
       <div className='flex flex-col gap-2'>
         {flows?.map((flow, index) => (
-          <RunItem
+          <FlowItem
             key={index}
             flow={flow}
             flowsRunning={flowsRunning}

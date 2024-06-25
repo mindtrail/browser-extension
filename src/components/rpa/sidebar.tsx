@@ -9,7 +9,7 @@ import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 import { ACTIVE_TAB } from '~/lib/constants'
 import { handleEscapeKey } from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
-import { FlowRunner } from './runner'
+import { FlowList } from './flows'
 import { FlowRecorder, RecordButton } from './recorder'
 
 interface SidebarRPAProps {
@@ -19,9 +19,7 @@ interface SidebarRPAProps {
 
 export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isSidebarOpen, activeTab } = settings
-
-  const { isRecording, isPaused, isSaving, toggleRecording, togglePause } =
-    useRecorderState()
+  const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
 
   const toggleSidebar = useCallback(
     () => setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen })),
@@ -79,7 +77,7 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               className='flex flex-col data-[state=active]:flex-1 mt-0'
             >
               <div className='flex flex-col flex-1 justify-between gap-2 p-4'>
-                <FlowRunner />
+                <FlowList />
 
                 <div className='w-full'>
                   <RecordButton

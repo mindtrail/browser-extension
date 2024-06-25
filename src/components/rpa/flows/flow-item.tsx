@@ -19,7 +19,7 @@ import {
 
 import { EventsList } from '../events-list'
 
-interface RunItemProps {
+interface FlowItemProps {
   flow: any
   flowsRunning: string[]
   runnerContainerRef: React.RefObject<HTMLDivElement>
@@ -29,7 +29,7 @@ interface RunItemProps {
   eventsList: any[]
 }
 
-export function RunItem(props: RunItemProps) {
+export function FlowItem(props: FlowItemProps) {
   const {
     flow,
     flowsRunning,
@@ -59,15 +59,17 @@ export function RunItem(props: RunItemProps) {
       ) {
         setIsRenaming(false)
         setFlowName(initialName)
+        event.stopPropagation()
+        event.preventDefault()
       }
     }
 
-    window.addEventListener('keydown', handleClickOutsideOrEscape)
+    window.addEventListener('keydown', handleClickOutsideOrEscape, true)
     window.addEventListener('click', handleClickOutsideOrEscape)
     shadowRoot.addEventListener('click', handleClickOutsideOrEscape)
 
     return () => {
-      window.removeEventListener('keydown', handleClickOutsideOrEscape)
+      window.removeEventListener('keydown', handleClickOutsideOrEscape, true)
       window.removeEventListener('click', handleClickOutsideOrEscape)
       shadowRoot.removeEventListener('click', handleClickOutsideOrEscape)
     }
