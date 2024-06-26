@@ -4,6 +4,8 @@ import { getHref } from '~lib/utils/recorder/find-href'
 import { ACTION_TYPE } from '~/lib/constants'
 import { debounceEvent } from './debounce-event'
 import { createBaseEvent } from './base-event'
+import { getElementDescription } from '~lib/utils/recorder/get-element-description'
+import { getHtmlContext } from '~lib/utils/recorder/get-html-context'
 
 const { CLICK, EXTRACT } = ACTION_TYPE
 
@@ -22,11 +24,15 @@ export function handleClickEvent(event: MouseEvent, callback) {
 
   const href = getHref(target)
   const actionType = altKey ? EXTRACT : CLICK
+  const event_description = getElementDescription(selector)
+  const html_context = getHtmlContext(target)
 
   let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: actionType })
   eventDetails = {
     ...eventDetails,
     ...(href !== null && { href }),
+    ...(event_description && { event_description }),
+    ...(html_context && { html_context }),
   }
 
   debounceEvent(eventKey, eventDetails, callback)

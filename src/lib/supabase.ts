@@ -6,6 +6,8 @@ const supabaseKey = process.env.PLASMO_PUBLIC_SUPABASE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+// Flows
+
 export function onFlowsChange(onChange, channelName = SUPABASE_CHANNELS.FLOWS) {
   const channel = supabase
     .channel(channelName)
@@ -31,6 +33,8 @@ export async function deleteFlow(id) {
 export async function updateFlow(id, flow) {
   return supabase.from('flows').update(flow).match({ id })
 }
+
+// Tasks
 
 export function onTasksChange(
   onChange: (payload: any) => void,
@@ -63,4 +67,27 @@ export async function deleteTask(id: string) {
 
 export async function updateTask(id: string, task: any) {
   return supabase.from('tasks').update(task).match({ id })
+}
+
+// Action Groups
+
+export async function getActionGroupsByKeys(keys: string[]) {
+  const res = await supabase.from('action_groups').select('key,actions').in('key', keys)
+  return res.data || []
+}
+
+export async function getActionGroup(id: string) {
+  return supabase.from('action_groups').select('*').match({ id }).single()
+}
+
+export async function createActionGroup(actionGroup: any) {
+  return supabase.from('action_groups').insert([actionGroup]).select().single()
+}
+
+export async function deleteActionGroup(id: string) {
+  return supabase.from('action_groups').delete().match({ id })
+}
+
+export async function updateActionGroup(id: string, actionGroup: any) {
+  return supabase.from('action_groups').update(actionGroup).match({ id })
 }
