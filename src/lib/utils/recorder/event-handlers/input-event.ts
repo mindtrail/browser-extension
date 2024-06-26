@@ -15,8 +15,8 @@ export function handleInputEvent(event, callback) {
     return
   }
 
-  const event_description = getElementDescription(selector)
-  const html_context = getHtmlContext(target)
+  const { element, text: event_description } = getElementDescription(selector)
+  const html_context = getHtmlContext(element)
 
   let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: INPUT })
   eventDetails = {

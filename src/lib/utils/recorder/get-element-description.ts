@@ -2,7 +2,7 @@
 // This function will return the closest text content for the given element. Most of the times that will be the "label" of the element
 export function getElementDescription(selector) {
   const element = document.querySelector(selector)
-  if (!element) return null
+  if (!element) return { element: null, text: '' }
 
   // Helper function to check if a node has text content
   function hasTextContent(node) {
@@ -11,7 +11,7 @@ export function getElementDescription(selector) {
 
   // Check if the element itself has text content
   if (hasTextContent(element)) {
-    return element.textContent.trim()
+    return { element, text: element.textContent.trim() }
   }
 
   // Define the traversal strategy
@@ -23,7 +23,7 @@ export function getElementDescription(selector) {
     let sibling = currentNode.previousSibling
     while (sibling) {
       if (sibling.nodeType === Node.ELEMENT_NODE && hasTextContent(sibling)) {
-        return sibling.textContent.trim()
+        return { element: sibling, text: sibling.textContent.trim() }
       }
       sibling = sibling.previousSibling
     }
@@ -31,7 +31,7 @@ export function getElementDescription(selector) {
     sibling = currentNode.nextSibling
     while (sibling) {
       if (sibling.nodeType === Node.ELEMENT_NODE && hasTextContent(sibling)) {
-        return sibling.textContent.trim()
+        return { element: sibling, text: sibling.textContent.trim() }
       }
       sibling = sibling.nextSibling
     }
@@ -43,7 +43,7 @@ export function getElementDescription(selector) {
       parentNode.nodeType === Node.ELEMENT_NODE &&
       hasTextContent(parentNode)
     ) {
-      return parentNode.textContent.trim()
+      return { element: parentNode, text: parentNode.textContent.trim() }
     }
 
     // Add parent to the queue to continue the search
@@ -52,5 +52,5 @@ export function getElementDescription(selector) {
     }
   }
 
-  return null
+  return { element: null, text: '' }
 }

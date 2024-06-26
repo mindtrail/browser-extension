@@ -10,5 +10,7 @@ export function getHtmlContext(element) {
   // $('*').removeAttr('style')
   // const html_context = $('body').html() || ''
 
-  return element.parentElement.parentElement.parentElement.outerHTML
+  const html_context = element.parentElement.outerHTML
+  console.log(html_context)
+  return html_context
 }

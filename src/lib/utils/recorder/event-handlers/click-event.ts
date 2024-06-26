@@ -24,8 +24,8 @@ export function handleClickEvent(event: MouseEvent, callback) {
 
   const href = getHref(target)
   const actionType = altKey ? EXTRACT : CLICK
-  const event_description = getElementDescription(selector)
-  const html_context = getHtmlContext(target)
+  const { element, text: event_description } = getElementDescription(selector)
+  const html_context = getHtmlContext(element)
 
   let { eventKey, eventDetails } = createBaseEvent({ event, selector, type: actionType })
   eventDetails = {
