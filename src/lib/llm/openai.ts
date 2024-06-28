@@ -11,6 +11,7 @@ import {
   extractListEntitiesPrompt,
   mergeEventsPrompt,
   generateActionsPrompt,
+  updateFormDataPrompt,
 } from './prompts'
 
 const openai = new OpenAI({
@@ -169,4 +170,18 @@ export async function generateActions(html) {
   })
   const result = completion.choices[0].message.content
   return JSON.parse(result).actions
+}
+
+export async function updateFormData({ form, variables }) {
+  const completion = await openai.chat.completions.create({
+    messages: updateFormDataPrompt({
+      form,
+      variables,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
+  return JSON.parse(result)
 }

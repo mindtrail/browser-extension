@@ -91,3 +91,78 @@ export async function deleteActionGroup(id: string) {
 export async function updateActionGroup(id: string, actionGroup: any) {
   return supabase.from('action_groups').update(actionGroup).match({ id })
 }
+
+// Assistants
+
+export async function getAssistants() {
+  return supabase.from('assistants').select('*').order('created_at', { ascending: true })
+}
+
+export async function getLastAssistant() {
+  const res = await supabase
+    .from('assistants')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .single()
+  return res.data
+}
+
+export async function getAssistant(id: string) {
+  return supabase.from('assistants').select('*').match({ id }).single()
+}
+
+export async function createAssistant(assistant: any) {
+  return supabase.from('assistants').insert([assistant]).select().single()
+}
+
+export async function deleteAssistant(id: string) {
+  return supabase.from('assistants').delete().match({ id })
+}
+
+export async function updateAssistant(id: string, assistant: any) {
+  return supabase.from('assistants').update(assistant).match({ id })
+}
+
+// Threads
+
+export function onThreadsChange(
+  onChange: (payload: any) => void,
+  channelName = SUPABASE_CHANNELS.THREADS,
+) {
+  const channel = supabase
+    .channel(channelName)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'threads' }, onChange)
+    .subscribe()
+  return () => {
+    channel.unsubscribe()
+  }
+}
+
+export async function getThreads() {
+  return supabase.from('threads').select('*').order('created_at', { ascending: true })
+}
+
+export async function getLastThread() {
+  const res = await supabase
+    .from('threads')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .single()
+  return res.data
+}
+
+export async function getThread(id: string) {
+  return supabase.from('threads').select('*').match({ id }).single()
+}
+
+export async function createThread(thread: any) {
+  return supabase.from('threads').insert([thread]).select().single()
+}
+
+export async function deleteThread(id: string) {
+  return supabase.from('threads').delete().match({ id })
+}
+
+export async function updateThread(id: string, thread: any) {
+  return supabase.from('threads').update(thread).match({ id })
+}

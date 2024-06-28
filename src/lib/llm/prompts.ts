@@ -210,3 +210,27 @@ export const generateActionsPrompt = (html) => [
     ],
   },
 ]
+
+export const updateFormDataPrompt = ({ form, variables }) => [
+  {
+    role: 'system',
+    content: `You are a tool that updates the values of a form object based on the given JSON database of available information extracted from various sources.`,
+  },
+  {
+    role: 'user',
+    content: `
+      1. The following JSON represents a database of available information extracted from various sources. Some might be useful other might not. 
+      The role of it is to be used as a source of truth for when we need to auto-fill some fields or params.  
+      ${JSON.stringify(variables)}
+    `,
+  },
+  {
+    role: 'user',
+    content: `
+      2. Next this other JSON structure represents a form object. The value needs to be updated, where it makes sense, with relevant information extracted from the database above.
+      Allow a bit of flexibility if information is not exact but could be relevant or infered (ex: if form data requires work phone but you only have a personal phone then use that) but if you can't find relevant information for a form fields then remove that fields from the form object !
+      Old values should not be used !
+      ${JSON.stringify(form)}
+    `,
+  },
+]

@@ -12,6 +12,7 @@ import {
   createTask,
   getTask,
   updateTask,
+  getLastThread,
 } from '~/lib/supabase'
 import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
 import { runFlows } from '~lib/utils/runner/execution/run-flows'
@@ -22,10 +23,11 @@ const RUNNER_CONFIG = {
 }
 
 async function onTaskStart(flowId) {
+  const thread = await getLastThread()
   const newTaskRes = await createTask({
     state: {
       status: 'started',
-      variables: {},
+      variables: thread.data,
       flowId,
     },
     logs: [],

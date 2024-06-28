@@ -5,7 +5,7 @@ async function triggerInputEvent(event) {
   try {
     if (event.baseURI) {
       const urlMatch = await waitForUrl(event.baseURI)
-      if (!urlMatch) window.location.href = event.baseURI
+      // if (!urlMatch) window.location.href = event.baseURI
     }
 
     const element: any = await waitForElement(event.selector)
@@ -31,7 +31,7 @@ async function triggerInputEvent(event) {
 
 export async function inputComponent({ flowId, event, data, onEventStart, onEventEnd }) {
   await onEventStart(flowId, event)
-  event.value = data[event.name] || event.value
+  event.value = data[event.name] || data[event.event_name] || event.value
   await triggerInputEvent(event)
   await onEventEnd(flowId, event)
 }
