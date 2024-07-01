@@ -6,6 +6,7 @@ import { Button } from '~/components/ui/button'
 import { ProcessIcon } from '~/components/icons/process'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
+import { useAssistant } from '~/lib/hooks/use-assistant'
 import { ACTIVE_TAB } from '~/lib/constants'
 import { handleEscapeKey } from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
@@ -19,7 +20,10 @@ interface SidebarRPAProps {
 
 export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isSidebarOpen, activeTab } = settings
-  const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
+
+  const { isRecording, isPaused, isSaving, toggleRecording, togglePause } =
+    useRecorderState()
+  const { uploadFile, parseFile, assistantStatus, assistantResponse } = useAssistant()
 
   const toggleSidebar = useCallback(
     () => setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen })),
@@ -70,7 +74,26 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
               value={ACTIVE_TAB.MAIN}
               className='flex flex-col data-[state=active]:flex-1 mt-0'
             >
-              <div className='p-4'>Chat... this will be the main screen</div>
+              <div className='p-4'>
+                <Button variant='ghost'>
+                  <input
+                    type='file'
+                    name='file'
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      await uploadFile(file)
+                      await parseFile()
+                    }}
+                  />
+                </Button>
+                {assistantStatus === 'file_upload_pending' && 'Uploading file...'}
+                {assistantStatus === 'file_parsing_pending' && 'Parsing file...'}
+                {assistantResponse && (
+                  <pre className='text-xs overflow-auto max-h-[60vh]'>
+                    {JSON.stringify(assistantResponse, null, 2)}
+                  </pre>
+                )}
+              </div>
             </TabsContent>
             <TabsContent
               value={ACTIVE_TAB.FLOWS}

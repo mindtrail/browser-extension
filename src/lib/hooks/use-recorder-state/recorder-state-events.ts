@@ -1,12 +1,28 @@
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
-import { generateMetadata } from '~/lib/llm/openai'
+import { generateMetadata, mergeEvents, generateActions } from '~/lib/llm/openai'
+import { getActionGroupsByKeys, createActionGroup } from '~/lib/supabase'
 
-export const updateRecordedEvents = (event, setRecorderState) => {
+// TODO: experiment with persisting actions for `url` or for `url+selector`
+function buildActionGroupKey(event) {
+  return `[${event.baseURI}][${event.selector}]`
+}
+
+export const updateRecordedEvents = async (event, setRecorderState) => {
   // @TODO: reimplement this
   // const prevEvents = prevState?.eventsList
   // lastKey = generateKey(event.eventKey, lastKey, prevEvents)
   // use array for each key instead of single event (potentially useful for repetitive events)
+
+  // Create possible actions for the given actionGroup key
+  const actionGroups = await getActionGroupsByKeys([buildActionGroupKey(event)])
+  if (!actionGroups.length) {
+    const actions = await generateActions(event.html_context)
+    await createActionGroup({
+      key: buildActionGroupKey(event),
+      actions,
+    })
+  }
 
   setRecorderState((prevState) => {
     const eventAlreadyInList = prevState?.eventsList.find(
@@ -62,16 +78,31 @@ export const toggleRecording = async (props) => {
     isSaving: true,
   }))
 
-  const eventsRecorded = Array.from(eventsList.values()).flat()
-  const flow = await generateMetadata(eventsRecorded)
+  const eventsRecorded = Array.from(eventsList.values())
+    .flat()
+    .map((event: any) => {
+      delete event.eventKey // clean unnecessary property
+      return event
+    })
 
-  flow.events = eventsRecorded.map((event: Event, index) => {
+  // Generate flow (name,description) + events (name,description)
+  const flow = await generateMetadata(eventsRecorded)
+  flow.events = eventsRecorded.map((event: any, index) => {
     return {
       ...event,
       event_name: flow.events[index]?.event_name,
       event_description: flow.events[index]?.event_description,
     }
   })
+
+  // Get possible actions for each unique actionGroup key
+  const eventsKeys: string[] = Array.from(
+    new Set(flow.events.map((event: any) => buildActionGroupKey(event))),
+  )
+  const actionGroups = await getActionGroupsByKeys(eventsKeys)
+
+  // Update events via possible actions
+  flow.events = await mergeEvents({ events: flow.events, actionGroups })
 
   setRecorderState((prevState) => ({
     ...prevState,
