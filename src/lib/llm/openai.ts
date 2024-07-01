@@ -9,6 +9,9 @@ import {
   extractPropertiesPrompt,
   splitNQLPrompt,
   extractListEntitiesPrompt,
+  mergeEventsPrompt,
+  generateActionsPrompt,
+  updateFormDataPrompt,
 } from './prompts'
 
 const openai = new OpenAI({
@@ -138,5 +141,47 @@ export async function generateMetadata(query) {
   })
   const result = completion.choices[0].message.content
   console.log('generateMetadata', typeof result, result)
+  return JSON.parse(result)
+}
+
+export async function mergeEvents({ events, actionGroups }) {
+  const completion = await openai.chat.completions.create({
+    messages: mergeEventsPrompt({
+      events,
+      actionGroups,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
+  // TODO: improve prompt response format and get rid of RPA_flow key
+  return JSON.parse(result)['RPA_flow']
+}
+
+export async function generateActions(html) {
+  const completion = await openai.chat.completions.create({
+    messages: generateActionsPrompt(
+      html,
+    ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
+  return JSON.parse(result).actions
+}
+
+export async function updateFormData({ form, variables }) {
+  const completion = await openai.chat.completions.create({
+    messages: updateFormDataPrompt({
+      form,
+      variables,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
   return JSON.parse(result)
 }

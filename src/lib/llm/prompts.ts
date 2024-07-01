@@ -115,16 +115,122 @@ export const generateMetadataPrompt = (query) => [
   {
     role: 'system',
     content: `Role: You are a tool that outputs as JSON the name and description of a flow used in a RPA tool.
-        Tasks:
-          1. You will generate name and description:
-              1.1 for the flow in general
-              1.2 for each event
-          2. Pay close atention to the baseURI and corelate it with the rest of the event properties to generate a meaningful name and description.
-        Output Requirements:
-          1. Only respond with JSON format and absolutely no explanation.
-          2. Pay attention to baseURI when it comes to the infering the type of action: create vs update. Details from baseURI could lead to what action is being performed. Example: item/<id> means UPDATE of item with id <id> not CREATE !
-          3. If selector is part of a navigation section OR if the baseURI is changing as an effect of the event then use words as "NAV to <variable>" as the name.
+        Tasks: You will generate name and description for the flow in general and for each event.
+        Output Requirements: Only respond with JSON format and absolutely no explanation.
         Output: Response should always be a JSON object in this format: {name: string, description: string, events: [{event_name: string, event_description: string}]}`,
   },
-  { role: 'user', content: JSON.stringify(query) },
+  {
+    role: 'user',
+    content: JSON.stringify(query),
+  },
+]
+
+export const mergeEventsPrompt = ({ events, actionGroups }) => [
+  {
+    role: 'system',
+    content: `Role: You are a tool that updates selectors from withing a given JSON array of events.
+        Tasks: You will update selectors (only update selectors!) from the given "RPA_flow" using a list of "Possible Actions" that contains more accurate selector paterns.
+        Output: Response should always be a just a JSON array !`,
+  },
+  {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: `
+        "RPA_flow": ${JSON.stringify(events)}
+        `,
+      },
+      {
+        type: 'text',
+        text: `
+        "Possible Actions": ${JSON.stringify(actionGroups)}
+        `,
+      },
+    ],
+  },
+]
+
+export const generateActionsPrompt = (html) => [
+  {
+    role: 'assistant',
+    content: [
+      {
+        type: 'text',
+        text: `
+          [
+            {
+              "type": "input",
+              "description": "Input text into a field on a webpage",
+              "properties": {
+                "label": {
+                  "required": true,
+                  "type": "string",
+                  "description": "The label of the input field"
+                },
+                "selector": {
+                  "required": true,
+                  "type": "string",
+                  "description": "The CSS selector for the input field"
+                }
+              }
+            },
+            {
+              "type": "click",
+              "description": "Click a button or link on a webpage",
+              "properties": {
+                "label": {
+                  "required": true,
+                  "type": "string",
+                  "description": "The label of the button or link"
+                },
+                "selector": {
+                  "required": true,
+                  "type": "string",
+                  "description": "The CSS selector for the button or link"
+                }
+              }
+            }
+          ]
+        `,
+      },
+      {
+        type: 'text',
+        text: `Use the above action types to extract all the possible actions from the given HTML. Use JSON format.`,
+      },
+    ],
+  },
+  {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: html,
+      },
+    ],
+  },
+]
+
+export const updateFormDataPrompt = ({ form, variables }) => [
+  {
+    role: 'system',
+    content: `You are a tool that updates the values of a form object based on the given JSON database of available information extracted from various sources.`,
+  },
+  {
+    role: 'user',
+    content: `
+      1. The following JSON represents a database of available information extracted from various sources. Some might be useful other might not. 
+      The role of it is to be used as a source of truth for when we need to auto-fill some fields or params.  
+      ${JSON.stringify(variables)}
+    `,
+  },
+  {
+    role: 'user',
+    content: `
+      2. Next this other JSON structure represents a form object. The value needs to be updated, where it makes sense, with relevant information extracted from the database above.
+      Allow a bit of flexibility if information is not exact but could be relevant or infered (ex: if form data requires work phone but you only have a personal phone then use that) but if you can't find relevant information for a form fields then remove that fields from the form object !
+      Old values should not be used !
+      ${JSON.stringify(form)}
+    `,
+  },
 ]
