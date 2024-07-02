@@ -1,11 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { EllipsisVerticalIcon, CirclePlayIcon, SaveIcon } from 'lucide-react'
 
-import {
-  EllipsisVerticalIcon,
-  CirclePlayIcon,
-  CheckCheckIcon,
-  SaveIcon,
-} from 'lucide-react'
 import { Button } from '~components/ui/button'
 import { Typography } from '~components/typography'
 import { Input } from '~/components/ui/input'
@@ -17,30 +12,18 @@ import {
   DropdownMenuPortal,
 } from '~/components/ui/dropdown-menu'
 
-import { EventsList } from '../events-list'
-
 interface FlowItemProps {
   flow: any
-  flowsRunning: string[]
   runnerContainerRef: React.RefObject<HTMLDivElement>
   runFlow: (flowId: string, task?: any) => Promise<void>
   removeFlow: (flowId: string) => void
   updateFlowName: (flowId: string, flow: any) => any
-  eventsList: any[]
 }
 
 export function FlowListItem(props: FlowItemProps) {
-  const {
-    flow,
-    flowsRunning,
-    runnerContainerRef,
-    eventsList,
-    runFlow,
-    removeFlow,
-    updateFlowName,
-  } = props
+  const { flow, runnerContainerRef, runFlow, removeFlow, updateFlowName } = props
 
-  const { id: flowId, name: initialName, events } = flow
+  const { id: flowId, name: initialName } = flow
   const [isRenaming, setIsRenaming] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [flowName, setFlowName] = useState(initialName)
@@ -94,9 +77,7 @@ export function FlowListItem(props: FlowItemProps) {
           <Typography
             variant='small'
             className={`w-full line-clamp-2 h-auto justify-start text-left
-            px-4 py-4 cursor-default border rounded
-            ${flowsRunning?.includes(flowId) ? 'text-primary' : 'text-foreground/70'}
-          `}
+            px-4 py-4 cursor-default border rounded`}
           >
             {flowName}
           </Typography>
@@ -167,31 +148,6 @@ export function FlowListItem(props: FlowItemProps) {
           </div>
         )}
       </div>
-      {flowsRunning?.includes(flowId) && (
-        <>
-          <EventsList eventsList={eventsList} readOnly={true} />
-
-          {eventsList?.length === events?.length && (
-            <Typography
-              variant='small-semi'
-              className='flex items-center gap-2 px-6 text-primary'
-            >
-              <CheckCheckIcon className='w-5 h-5' />
-              Run complete
-            </Typography>
-          )}
-        </>
-      )}
     </div>
   )
 }
-
-// const mock_event = {
-//   id: Date.now(),
-//   delay: 0,
-//   name: '',
-//   selector: 'label > button',
-//   textContent: 'BUTTON',
-//   type: 'click',
-//   value: undefined,
-// }

@@ -10,8 +10,8 @@ import { useAssistant } from '~/lib/hooks/use-assistant'
 import { ACTIVE_TAB } from '~/lib/constants'
 import { handleEscapeKey } from '~lib/utils/recorder/event-handlers/ui-state/dom-events'
 
-import { FlowList } from './flows'
-import { FlowRecorder, RecordButton } from './recorder'
+import { FlowsTab } from './flows'
+import { FlowRecorder } from './recorder'
 
 interface SidebarRPAProps {
   settings: SettingsStored
@@ -21,7 +21,7 @@ interface SidebarRPAProps {
 export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isSidebarOpen, activeTab } = settings
 
-  const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
+  const { isRecording } = useRecorderState()
   const { uploadFile, parseFile, assistantStatus, assistantResponse } = useAssistant()
 
   const toggleSidebar = useCallback(
@@ -96,20 +96,9 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
             </TabsContent>
             <TabsContent
               value={ACTIVE_TAB.FLOWS}
-              className='flex flex-col data-[state=active]:flex-1 mt-0'
+              className='flex flex-col data-[state=active]:flex-1 mt-0 p-4'
             >
-              <div className='flex flex-col flex-1 justify-between gap-2 p-4'>
-                <FlowList />
-
-                <div className='w-full'>
-                  <RecordButton
-                    onToggleRecording={toggleRecording}
-                    isRecording={isRecording}
-                    isPaused={isPaused}
-                    isSaving={isSaving}
-                  />
-                </div>
-              </div>
+              <FlowsTab />
             </TabsContent>
 
             <TabsList className='flex h-11 justify-start px-4 gap-2 relative items-center'>
