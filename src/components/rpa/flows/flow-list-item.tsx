@@ -29,7 +29,7 @@ interface FlowItemProps {
   eventsList: any[]
 }
 
-export function FlowItem(props: FlowItemProps) {
+export function FlowListItem(props: FlowItemProps) {
   const {
     flow,
     flowsRunning,

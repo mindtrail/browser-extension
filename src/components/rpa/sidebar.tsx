@@ -21,8 +21,7 @@ interface SidebarRPAProps {
 export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isSidebarOpen, activeTab } = settings
 
-  const { isRecording, isPaused, isSaving, toggleRecording, togglePause } =
-    useRecorderState()
+  const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
   const { uploadFile, parseFile, assistantStatus, assistantResponse } = useAssistant()
 
   const toggleSidebar = useCallback(
