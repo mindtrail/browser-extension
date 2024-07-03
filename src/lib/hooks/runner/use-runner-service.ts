@@ -32,10 +32,10 @@ export const useRunnerService = () => {
     return () => unsubscribe()
   }, [setRunnerState])
 
-  const startFlowsRun = useCallback(async (flowsToRun: any[]) => {
+  const startFlowsRun = useCallback(async (flowsRunning: any[]) => {
     setRunnerState((prev) => ({
       ...prev,
-      flowsRunning: flowsToRun,
+      flowsRunning,
     }))
   }, [])
 

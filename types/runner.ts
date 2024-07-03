@@ -35,4 +35,10 @@ declare global {
     event: any
     runEvents?: (props: RunnerEventProps) => Promise<void>
   }
+
+  interface FlowsRetrieval {
+    flowId: string
+    flows: any[]
+    query: string
+  }
 }
