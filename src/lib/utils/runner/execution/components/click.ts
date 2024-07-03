@@ -32,8 +32,6 @@ async function triggerClickEvent(event, callback) {
 export async function clickComponent(props: RunnerComponentProps) {
   const { flowId, event, onEventStart, onEventEnd, task } = props
 
-  console.log(2222, props)
-
   await onEventStart({ flowId, event, taskId: task.id })
   await triggerClickEvent(event, () => onEventEnd({ event, taskId: task.id }))
 }

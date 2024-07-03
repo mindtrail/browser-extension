@@ -22,6 +22,83 @@ const RUNNER_CONFIG = {
   instance: new Storage({ area: 'local' }),
 }
 
+export const useRunnerState = () => {
+  const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
+  const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
+
+  const { flows, query } = runnerState
+
+  useEffect(() => {
+    const fetchFlows = async () => {
+      const { data } = await getFlows()
+
+      setRunnerState((prev) => ({ ...prev, flows: data }))
+    }
+    fetchFlows()
+    const unsubscribe = onFlowsChange(fetchFlows)
+    return () => unsubscribe()
+  }, [setRunnerState])
+
+  useEffect(() => {
+    if (!flows) return
+
+    const resumeTask = async () => {
+      const { data } = await getTasks()
+      const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
+
+      if (resumableTask) {
+        await runFlow(resumableTask.state.flowId, resumableTask)
+      }
+    }
+    if (flows.length > 0) {
+      resumeTask()
+    }
+  }, [flows])
+
+  console.log(111, runnerState)
+
+  const runFlow = useCallback(
+    async (flowId: string, task) => {
+      const flowsToRun = await getFlowsToRun({ flows, flowId, query })
+
+      setRunnerState((prev) => ({
+        ...prev,
+        flowsRunning: flowsToRun.map((flow) => flow?.flowId),
+      }))
+
+      task = task || (await onTaskStart(flowId))
+      await runFlows({
+        flowId,
+        task,
+        flows,
+        flowsToRun,
+        query,
+        onEventStart,
+        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
+      })
+
+      setTimeout(async () => {
+        setRunnerState((prev) => ({
+          ...DEFAULT_RUNNER_STATE,
+          flows: prev.flows,
+        }))
+
+        await onTaskEnd(task.id)
+      }, 2000)
+    },
+    [runnerState.flows, runnerState.query, setRunnerState],
+  )
+
+  return {
+    ...runnerState,
+    setRunnerState,
+    resetRunnerState,
+    runFlow,
+    updateFlow,
+    deleteFlow,
+  }
+}
+
 async function onTaskStart(flowId: string) {
   const thread = await getLastThread()
   const newTaskRes = await createTask({
@@ -35,7 +112,7 @@ async function onTaskStart(flowId: string) {
   return newTaskRes.data
 }
 
-async function onTaskEnd(flowId: string, taskId: string) {
+async function onTaskEnd(taskId: string) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
 
@@ -111,80 +188,4 @@ async function onEventEnd({ event, taskId, setRunnerState }: OnEventEndProps) {
       eventsList: [...prev.eventsList, event],
     }
   })
-}
-
-export const useRunnerState = () => {
-  const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
-
-  const { flows, query } = runnerState
-
-  useEffect(() => {
-    const fetchFlows = async () => {
-      const { data } = await getFlows()
-
-      setRunnerState((prev) => ({ ...prev, flows: data }))
-    }
-    fetchFlows()
-    const unsubscribe = onFlowsChange(fetchFlows)
-    return () => unsubscribe()
-  }, [setRunnerState])
-
-  useEffect(() => {
-    if (!flows) return
-
-    const resumeTask = async () => {
-      const { data } = await getTasks()
-      const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
-
-      if (resumableTask) {
-        await runFlow(resumableTask.state.flowId, resumableTask)
-      }
-    }
-    if (flows.length > 0) {
-      resumeTask()
-    }
-  }, [flows])
-
-  const runFlow = useCallback(
-    async (flowId: string, task) => {
-      const flowsToRun = await getFlowsToRun({ flows, flowId, query })
-
-      setRunnerState((prev) => ({
-        ...prev,
-        flowsRunning: flowsToRun.map((flow) => flow?.flowId),
-        // @TODO: This was lost somewhere along the way... I don't have the running events anymore
-        eventsList: [],
-      }))
-
-      task = task || (await onTaskStart(flowId))
-      await runFlows({
-        flowId,
-        task,
-        flows,
-        flowsToRun,
-        query,
-        onEventStart,
-        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
-      })
-
-      setTimeout(async () => {
-        setRunnerState((prev) => ({
-          ...DEFAULT_RUNNER_STATE,
-          flows: prev.flows,
-        }))
-        await onTaskEnd(flowId, task.id)
-      }, 2000)
-    },
-    [runnerState.flows, runnerState.query, setRunnerState],
-  )
-
-  return {
-    ...runnerState,
-    setRunnerState,
-    resetRunnerState,
-    runFlow,
-    updateFlow,
-    deleteFlow,
-  }
 }

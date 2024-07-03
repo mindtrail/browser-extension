@@ -28,7 +28,7 @@ interface EventProps {
 
 export function EventsList(props: EventProps) {
   const { eventsList = [], deleteEvent, debugMode = false, readOnly = false } = props
-  const [showAllEvents, setShowAllEvents] = useState(false)
+  const [showAllEvents, setShowAllEvents] = useState(readOnly)
 
   if (!eventsList?.length) return
 
@@ -50,7 +50,7 @@ export function EventsList(props: EventProps) {
 
   return (
     <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
-      {eventsList?.length > 2 && (
+      {!readOnly && eventsList?.length > 2 && (
         <div className='flex items-center justify-between mb-4'>
           <span>...</span>
           <div className='flex gap-4'>
