@@ -1,72 +1,32 @@
 import { useCallback, useEffect } from 'react'
-import { Storage } from '@plasmohq/storage'
-import { useStorage } from '@plasmohq/storage/hook'
 
-import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
-import {
-  getFlows,
-  onFlowsChange,
-  getTasks,
-  deleteFlow,
-  updateFlow,
-  createTask,
-  getTask,
-  updateTask,
-  getLastThread,
-} from '~/lib/supabase'
+import { getTasks } from '~/lib/supabase'
 import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
 import { runFlows } from '~lib/utils/runner/execution/run-flows'
+import { onTaskStart, onTaskEnd } from '~lib/utils/runner/execution/task-utils'
 
-const RUNNER_CONFIG = {
-  key: STORAGE_AREA.RUNNER,
-  instance: new Storage({ area: 'local' }),
-}
+import { useRunnerService } from './use-runner-service'
+import { useEventManager } from './use-event-manager'
 
 export const useRunnerState = () => {
-  const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
+  const {
+    runnerState,
+    setRunnerState,
+    resetRunnerState,
+    startFlowsRun,
+    updateFlow,
+    deleteFlow,
+  } = useRunnerService()
 
   const { flows, query } = runnerState
+  const { onEventStart, onEventEnd } = useEventManager()
 
-  useEffect(() => {
-    const fetchFlows = async () => {
-      const { data } = await getFlows()
-
-      setRunnerState((prev) => ({ ...prev, flows: data }))
-    }
-
-    fetchFlows()
-    const unsubscribe = onFlowsChange(fetchFlows)
-    return () => unsubscribe()
-  }, [setRunnerState])
-
-  useEffect(() => {
-    if (!flows) return
-
-    const resumeTask = async () => {
-      const { data } = await getTasks()
-      const resumableTask = data.filter((task) => task.state.status !== 'ended')[0]
-
-      if (resumableTask) {
-        await runFlow(resumableTask.state.flowId, resumableTask)
-      }
-    }
-    if (flows.length > 0) {
-      resumeTask()
-    }
-  }, [flows])
-
-  console.log(111, runnerState)
-
+  // Combine the functionalities here
   const runFlow = useCallback(
-    async (flowId: string, task) => {
-      const flowsToRun = await getFlowsToRun({ flows, flowId, query })
+    async (flowId: string, task: any) => {
+      const flowsToRun = await getFlowsToRun({ flowId, flows, query })
 
-      setRunnerState((prev) => ({
-        ...prev,
-        flowsRunning: flowsToRun.map((flow) => flow?.flowId),
-      }))
-
+      await startFlowsRun(flowsToRun)
       task = task || (await onTaskStart(flowId))
       await runFlows({
         flowId,
@@ -74,21 +34,34 @@ export const useRunnerState = () => {
         flows,
         flowsToRun,
         query,
-        onEventStart,
+        onEventStart: onEventStart,
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
 
-      setTimeout(async () => {
-        setRunnerState((prev) => ({
-          ...DEFAULT_RUNNER_STATE,
-          flows: prev.flows,
-        }))
-
-        await onTaskEnd(task.id)
+      setTimeout(() => {
+        resetRunnerState()
+        onTaskEnd(task.id)
       }, 2000)
     },
-    [runnerState.flows, runnerState.query, setRunnerState],
+    [flows, query],
   )
+
+  useEffect(() => {
+    if (!flows?.length) return
+
+    const resumeTask = async () => {
+      const { data = [] } = await getTasks()
+      const resumableTask = data.filter((task) => task?.state?.status !== 'ended')[0]
+
+      if (resumableTask) {
+        runFlow(resumableTask?.state?.flowId, resumableTask)
+      }
+    }
+
+    if (flows.length > 0) {
+      resumeTask()
+    }
+  }, [flows])
 
   return {
     ...runnerState,
@@ -98,95 +71,4 @@ export const useRunnerState = () => {
     updateFlow,
     deleteFlow,
   }
-}
-
-async function onTaskStart(flowId: string) {
-  const thread = await getLastThread()
-  const newTaskRes = await createTask({
-    state: {
-      status: 'started',
-      variables: thread.data,
-      flowId,
-    },
-    logs: [],
-  })
-  return newTaskRes.data
-}
-
-async function onTaskEnd(taskId: string) {
-  const taskRes = await getTask(taskId)
-  const task: any = taskRes.data
-
-  // Update task state to 'ended' if all events are ended
-  const logs = task.logs || []
-  const lastLog = logs[logs.length - 1]
-  if (lastLog && lastLog.status === 'ended') {
-    return updateTask(task.id, {
-      ...task,
-      state: {
-        ...task.state,
-        status: 'ended',
-      },
-    })
-  }
-
-  return task
-}
-
-async function onEventStart({ flowId, event, taskId }: OnEventStartProps) {
-  const taskRes = await getTask(taskId)
-  const task: any = taskRes.data
-
-  // Check if the eventId already exists in the logs
-  const eventExists = task.logs.some((log) => log.eventId === event.id)
-
-  // Only add the log if the eventId does not exist
-  if (!eventExists) {
-    await updateTask(task.id, {
-      ...task,
-      state: {
-        ...task.state,
-        status: 'running',
-      },
-      logs: [
-        ...task.logs,
-        {
-          flowId,
-          eventId: event.id,
-          status: 'running',
-        },
-      ],
-    })
-  }
-}
-
-async function onEventEnd({ event, taskId, setRunnerState }: OnEventEndProps) {
-  const taskRes = await getTask(taskId)
-  const task: any = taskRes.data
-  await updateTask(task.id, {
-    ...task,
-    state: {
-      ...task.state,
-      status: 'running',
-    },
-    logs: task.logs.map((log) => {
-      if (log.eventId === event.id) {
-        return {
-          ...log,
-          status: 'ended',
-        }
-      }
-      return log
-    }),
-  })
-
-  setRunnerState((prev) => {
-    const eventAlreadyRan = prev.eventsCompleted.some((e) => e.id === event.id)
-    if (eventAlreadyRan) return prev
-
-    return {
-      ...prev,
-      eventsCompleted: [...prev.eventsCompleted, event],
-    }
-  })
 }
