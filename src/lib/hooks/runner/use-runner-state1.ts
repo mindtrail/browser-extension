@@ -25,13 +25,14 @@ export const useRunnerState = () => {
   const runFlow = async (flowId: string, task: any) => {
     const flowsToRun = await getFlowsToRun(flowId, runnerState.flows, runnerState.query)
     await startFlowsRun(flowsToRun)
-
     task = task || (await onTaskStart(flowId))
 
     await executeFlow(flowsToRun[0], handleEventStart, handleEventEnd)
-    // Additional logic for after flow execution
 
-
+    setTimeout(() => {
+      resetRunnerState()
+      onTaskEnd(task.id)
+    }, 2000)
   }
 
   return {
@@ -55,4 +56,24 @@ async function onTaskStart(flowId: string) {
     logs: [],
   })
   return newTaskRes.data
+}
+
+async function onTaskEnd(taskId: string) {
+  const taskRes = await getTask(taskId)
+  const task: any = taskRes.data
+
+  // Update task state to 'ended' if all events are ended
+  const logs = task.logs || []
+  const lastLog = logs[logs.length - 1]
+  if (lastLog && lastLog.status === 'ended') {
+    return updateTask(task.id, {
+      ...task,
+      state: {
+        ...task.state,
+        status: 'ended',
+      },
+    })
+  }
+
+  return task
 }

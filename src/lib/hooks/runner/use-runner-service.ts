@@ -16,7 +16,10 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
+  const resetRunnerState = useCallback(
+    () => setRunnerState((prev) => ({ ...DEFAULT_RUNNER_STATE, flows: prev.flows })),
+    [],
+  )
 
   useEffect(() => {
     const fetchFlows = async () => {
