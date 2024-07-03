@@ -1,6 +1,6 @@
 import { createTask, getTask, updateTask, getLastThread } from '~/lib/supabase'
 
-export async function onTaskStart(flowId: string) {
+export async function createNewTask(flowId: string) {
   const thread = await getLastThread()
   const newTaskRes = await createTask({
     state: {
@@ -13,13 +13,14 @@ export async function onTaskStart(flowId: string) {
   return newTaskRes.data
 }
 
-export async function onTaskEnd(taskId: string) {
+export async function endTask(taskId: string) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
 
   // Update task state to 'ended' if all events are ended
   const logs = task.logs || []
   const lastLog = logs[logs.length - 1]
+
   if (lastLog && lastLog.status === 'ended') {
     return updateTask(task.id, {
       ...task,

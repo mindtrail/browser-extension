@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react'
 
 import { getTasks } from '~/lib/supabase'
-import { executeFlow } from '~lib/utils/runner/execution/execute-flow'
-import { onTaskStart, onTaskEnd } from '~lib/utils/runner/execution/task-utils'
+import { executeTask } from '~lib/utils/runner/execution/execute-task'
+import { createNewTask, endTask } from '~lib/utils/runner/execution/task-utils'
 
 import { useRunnerService } from './use-runner-service'
 import { useEventManager } from './use-event-manager'
@@ -57,19 +57,18 @@ export const useRunnerState = () => {
     const flowToRun = flowQueue[0]
 
     await startFlowsRun(flowToRun)
-    let task = await onTaskStart(flowToRun.flowId)
+    let task = await createNewTask(flowToRun.flowId)
 
     try {
-      await executeFlow({
+      await executeTask({
         flowToRun,
         task,
-        flows: runnerState.flows,
-        query: runnerState.query,
+        query,
         onEventStart,
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
     } finally {
-      await onTaskEnd(task.id)
+      await endTask(task.id)
       removeFromQueue(flowToRun?.flowId)
 
       setTimeout(() => {

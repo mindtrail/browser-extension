@@ -5,16 +5,16 @@ export const useEventManager = () => {
   const onEventStart = useCallback(handleEventStart, [])
 
   const onEventEnd = useCallback(async (props: OnEventEndProps) => {
-    const { event, setRunnerState } = props
     await handleEventEnd(props)
+    const { event: newEvent, setRunnerState } = props
 
     setRunnerState((prev) => {
-      const eventAlreadyRan = prev.eventsCompleted.some((e) => e.id === event.id)
-      if (eventAlreadyRan) return prev
+      const eventAlreadyMarked = prev.eventsCompleted.some((e) => e.id === newEvent.id)
+      if (eventAlreadyMarked) return prev
 
       return {
         ...prev,
-        eventsCompleted: [...prev.eventsCompleted, event],
+        eventsCompleted: [...prev.eventsCompleted, newEvent],
       }
     })
   }, [])

@@ -20,9 +20,8 @@ declare global {
     onEventEnd: (props: OnEventEndProps) => Promise<void>
   }
 
-  interface ExecuteFlowsProp extends BaseRunnerProps {
-    flows: any[]
-    flowToRun: { flowId: string; eventIds: string[] }
+  interface ExecuteTaskProp extends BaseRunnerProps {
+    flowToRun: { flowId: string; eventIds: string[] } & any
     query: string
   }
 
