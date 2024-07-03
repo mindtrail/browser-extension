@@ -13,10 +13,10 @@ import { EventsList } from '../events-list'
 interface RunningFlowProps {
   flowsRunning: string[]
   flows: any[]
-  eventsList: any[]
+  eventsCompleted: any[]
 }
 
-export function RunningFlow({ flowsRunning, flows, eventsList }: RunningFlowProps) {
+export function RunningFlow({ flowsRunning, flows, eventsCompleted }: RunningFlowProps) {
   if (!flowsRunning.length) {
     return null
   }
@@ -48,9 +48,9 @@ export function RunningFlow({ flowsRunning, flows, eventsList }: RunningFlowProp
       <Typography variant='small-semi'>{flow.description}</Typography>
 
       <div className='flex flex-col flex-1 gap-4'>
-        <EventsList eventsList={eventsList} readOnly={true} />
+        <EventsList eventsList={eventsCompleted} readOnly={true} />
 
-        {eventsList?.length === currentFlowEvents?.length && (
+        {eventsCompleted?.length === currentFlowEvents?.length && (
           <Typography
             variant='small-semi'
             className='flex items-center gap-2 px-6 text-primary'

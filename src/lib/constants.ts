@@ -132,7 +132,7 @@ export const DEFAULT_RUNNER_STATE = {
   query: '',
   flows: [],
   flowsRunning: [],
-  eventsList: [],
+  eventsCompleted: [],
 }
 
 export const SUPABASE_CHANNELS = {

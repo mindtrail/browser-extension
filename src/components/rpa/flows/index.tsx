@@ -1,7 +1,8 @@
 import React, { useRef } from 'react'
 
 import { FlowListItem } from './flow-list-item'
-import { useRunnerState } from '~lib/hooks/use-runner-state'
+// import { useRunnerState } from '~lib/hooks/runner/use-runner-state'
+import { useRunnerState } from '~lib/hooks/runner/use-runner-state1'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 
 import { RecordButton } from '~/components/rpa/recorder'
@@ -9,14 +10,18 @@ import { RunningFlow } from './running-flow'
 
 export function FlowsTab() {
   const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
-  const { flows, flowsRunning, eventsList, runFlow, updateFlow, deleteFlow } =
+  const { flows, flowsRunning, eventsCompleted, runFlow, updateFlow, deleteFlow } =
     useRunnerState()
 
   const runnerContainerRef = useRef(null)
 
   if (flowsRunning?.length) {
     return (
-      <RunningFlow flowsRunning={flowsRunning} flows={flows} eventsList={eventsList} />
+      <RunningFlow
+        flowsRunning={flowsRunning}
+        flows={flows}
+        eventsCompleted={eventsCompleted}
+      />
     )
   }
 

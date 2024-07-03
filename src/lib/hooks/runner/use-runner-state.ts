@@ -34,6 +34,7 @@ export const useRunnerState = () => {
 
       setRunnerState((prev) => ({ ...prev, flows: data }))
     }
+
     fetchFlows()
     const unsubscribe = onFlowsChange(fetchFlows)
     return () => unsubscribe()
@@ -180,12 +181,12 @@ async function onEventEnd({ event, taskId, setRunnerState }: OnEventEndProps) {
   })
 
   setRunnerState((prev) => {
-    const eventExists = prev.eventsList.some((e) => e.id === event.id)
-    if (eventExists) return prev
+    const eventAlreadyRan = prev.eventsCompleted.some((e) => e.id === event.id)
+    if (eventAlreadyRan) return prev
 
     return {
       ...prev,
-      eventsList: [...prev.eventsList, event],
+      eventsCompleted: [...prev.eventsCompleted, event],
     }
   })
 }
