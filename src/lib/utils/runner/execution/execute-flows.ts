@@ -2,7 +2,7 @@ import { getFlowEvents } from '~lib/utils/runner/get-flow-events'
 import { runEvents } from './run-events'
 import { buildFormData } from '~lib/utils/runner/build-form-data'
 
-export async function runFlows(props: RunnerFlowsProps) {
+export async function executeFlows(props: RunnerFlowsProps) {
   const { task, flows, flowsToRun, query, onEventStart, onEventEnd } = props
 
   for (const { flowId, eventIds } of flowsToRun) {

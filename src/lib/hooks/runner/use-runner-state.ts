@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react'
 
 import { getTasks } from '~/lib/supabase'
 import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
-import { runFlows } from '~lib/utils/runner/execution/run-flows'
+import { executeFlows } from '~lib/utils/runner/execution/execute-flows'
 import { onTaskStart, onTaskEnd } from '~lib/utils/runner/execution/task-utils'
 
 import { useRunnerService } from './use-runner-service'
@@ -28,7 +28,7 @@ export const useRunnerState = () => {
 
       await startFlowsRun(flowsToRun)
       task = task || (await onTaskStart(flowId))
-      await runFlows({
+      await executeFlows({
         flowId,
         task,
         flows,
