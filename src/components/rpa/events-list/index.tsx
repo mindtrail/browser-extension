@@ -35,7 +35,9 @@ export function EventsList(props: EventProps) {
   const eventsToDisplay = []
 
   // Only show the last 2 events
-  eventsList.slice(showAllEvents ? 0 : -2).forEach((event = {}) => {
+  eventsList.slice(showAllEvents ? 0 : -2).forEach((event) => {
+    if (!event?.value) return
+
     const { value } = event
 
     eventsToDisplay.push({

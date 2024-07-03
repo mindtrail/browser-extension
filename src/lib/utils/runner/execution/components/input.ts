@@ -29,9 +29,11 @@ async function triggerInputEvent(event) {
   }
 }
 
-export async function inputComponent({ flowId, event, data, onEventStart, onEventEnd }) {
-  await onEventStart(flowId, event)
+export async function inputComponent(props: RunnerComponentProps) {
+  const { flowId, task, event, data, onEventStart, onEventEnd } = props
   event.value = data[event.name] || data[event.event_name] || event.value
+
+  await onEventStart({ flowId, event, taskId: task.id })
   await triggerInputEvent(event)
-  await onEventEnd(flowId, event)
+  await onEventEnd({ flowId, event, taskId: task.id })
 }

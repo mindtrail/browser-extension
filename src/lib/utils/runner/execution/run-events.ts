@@ -14,14 +14,9 @@ const components = {
   'google-sheets': googleSheetsComponent,
 }
 
-export async function runEvents({
-  flowId,
-  task,
-  events,
-  data = {},
-  onEventStart,
-  onEventEnd,
-}) {
+export async function runEvents(props: RunnerEventProps) {
+  const { flowId, task, events, data, onEventStart, onEventEnd } = props
+
   const clonedTask = structuredClone(task)
   const clonedEvents = structuredClone(events)
 

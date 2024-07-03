@@ -29,7 +29,11 @@ async function triggerClickEvent(event, callback) {
   }
 }
 
-export async function clickComponent({ flowId, event, onEventStart, onEventEnd }) {
+export async function clickComponent(props) {
+  const { flowId, task, event, onEventStart, onEventEnd } = props
+
+  console.log(2222, props)
+
   await onEventStart(flowId, event)
   await triggerClickEvent(event, async () => {
     await onEventEnd(flowId, event)

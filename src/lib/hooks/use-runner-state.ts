@@ -15,14 +15,14 @@ import {
   getLastThread,
 } from '~/lib/supabase'
 import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
-import { runFlowEvents } from '~lib/utils/runner/execution/run-flows'
+import { runFlows } from '~lib/utils/runner/execution/run-flows'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
   instance: new Storage({ area: 'local' }),
 }
 
-async function onTaskStart(flowId) {
+async function onTaskStart(flowId: string) {
   const thread = await getLastThread()
   const newTaskRes = await createTask({
     state: {
@@ -35,7 +35,7 @@ async function onTaskStart(flowId) {
   return newTaskRes.data
 }
 
-async function onTaskEnd(flowId, taskId) {
+async function onTaskEnd(flowId: string, taskId: string) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
 
@@ -55,7 +55,12 @@ async function onTaskEnd(flowId, taskId) {
   return task
 }
 
-async function onEventStart(flowId, event, taskId) {
+type EventStart = {
+  flowId: string
+  event: any
+  taskId: string
+}
+async function onEventStart({ flowId, event, taskId }: EventStart) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
 
@@ -82,7 +87,7 @@ async function onEventStart(flowId, event, taskId) {
   }
 }
 
-async function onEventEnd(flowId, event, taskId) {
+async function onEventEnd(flowId: string, event: any, taskId: string) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
   await updateTask(task.id, {
@@ -107,12 +112,11 @@ export const useRunnerState = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
 
-  console.log(4444, runnerState)
+  const { flows, query } = runnerState
 
   useEffect(() => {
     const fetchFlows = async () => {
       const { data } = await getFlows()
-      console.log(111, data)
 
       setRunnerState((prev) => ({ ...prev, flows: data }))
     }
@@ -122,7 +126,7 @@ export const useRunnerState = () => {
   }, [setRunnerState])
 
   useEffect(() => {
-    if (!runnerState.flows) return
+    if (!flows) return
 
     const resumeTask = async () => {
       const { data } = await getTasks()
@@ -132,35 +136,30 @@ export const useRunnerState = () => {
         await runFlow(resumableTask.state.flowId, resumableTask)
       }
     }
-    if (runnerState.flows.length > 0) {
+    if (flows.length > 0) {
       resumeTask()
     }
-  }, [runnerState.flows])
+  }, [flows])
 
   const runFlow = useCallback(
     async (flowId, task) => {
-      const flowsToRun = await getFlowsToRun({
-        flows: runnerState.flows,
-        flowId,
-        query: runnerState.query,
-      })
+      const flowsToRun = await getFlowsToRun({ flows, flowId, query })
+
       setRunnerState((prev) => ({
         ...prev,
         flowsRunning: flowsToRun.map((flow) => flow?.flowId),
-        eventsList: flowsToRun.map((flow) => flow?.events).flat(),
+        // @TODO: This was lost somewhere along the way... I don't have the running events anymore
+        eventsList: [],
       }))
 
-      console.log(111, flowsToRun)
-
       task = task || (await onTaskStart(flowId))
-      await runFlowEvents({
+      await runFlows({
         task,
-        flows: runnerState.flows,
+        flows,
         flowsToRun,
-        query: runnerState.query,
-        onEventStart: async (flowId, event) => {
-          await onEventStart(flowId, event, task.id)
-        },
+        query,
+        // @TODO: Move handlers outside
+        onEventStart,
         onEventEnd: async (flowId, event) => {
           await onEventEnd(flowId, event, task.id)
           setRunnerState((prev) => {
