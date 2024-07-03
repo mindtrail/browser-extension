@@ -55,12 +55,7 @@ async function onTaskEnd(flowId: string, taskId: string) {
   return task
 }
 
-type EventStart = {
-  flowId: string
-  event: any
-  taskId: string
-}
-async function onEventStart({ flowId, event, taskId }: EventStart) {
+async function onEventStart({ flowId, event, taskId }: OnEventStartProps) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
 
@@ -87,7 +82,7 @@ async function onEventStart({ flowId, event, taskId }: EventStart) {
   }
 }
 
-async function onEventEnd(flowId: string, event: any, taskId: string) {
+async function onEventEnd({ event, taskId, setRunnerState }: OnEventEndProps) {
   const taskRes = await getTask(taskId)
   const task: any = taskRes.data
   await updateTask(task.id, {
@@ -105,6 +100,16 @@ async function onEventEnd(flowId: string, event: any, taskId: string) {
       }
       return log
     }),
+  })
+
+  setRunnerState((prev) => {
+    const eventExists = prev.eventsList.some((e) => e.id === event.id)
+    if (eventExists) return prev
+
+    return {
+      ...prev,
+      eventsList: [...prev.eventsList, event],
+    }
   })
 }
 
@@ -142,7 +147,7 @@ export const useRunnerState = () => {
   }, [flows])
 
   const runFlow = useCallback(
-    async (flowId, task) => {
+    async (flowId: string, task) => {
       const flowsToRun = await getFlowsToRun({ flows, flowId, query })
 
       setRunnerState((prev) => ({
@@ -154,23 +159,13 @@ export const useRunnerState = () => {
 
       task = task || (await onTaskStart(flowId))
       await runFlows({
+        flowId,
         task,
         flows,
         flowsToRun,
         query,
-        // @TODO: Move handlers outside
         onEventStart,
-        onEventEnd: async (flowId, event) => {
-          await onEventEnd(flowId, event, task.id)
-          setRunnerState((prev) => {
-            const eventExists = prev.eventsList.some((e) => e.id === event.id)
-            if (eventExists) return prev
-            return {
-              ...prev,
-              eventsList: [...prev.eventsList, event],
-            }
-          })
-        },
+        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
 
       setTimeout(async () => {
@@ -181,7 +176,7 @@ export const useRunnerState = () => {
         await onTaskEnd(flowId, task.id)
       }, 2000)
     },
-    [runnerState.flows, runnerState.query],
+    [runnerState.flows, runnerState.query, setRunnerState],
   )
 
   return {

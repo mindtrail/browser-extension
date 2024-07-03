@@ -1,11 +1,23 @@
 export default {}
 
 declare global {
+  type OnEventStartProps = {
+    flowId: string
+    event: any
+    taskId: string
+  }
+
+  type OnEventEndProps = {
+    event: any
+    taskId: string
+    setRunnerState?: Function
+  }
+
   interface BaseRunnerProps {
     task: any
     flowId: string
-    onEventStart: (props: { flowId: string; event: any; taskId: string }) => Promise<void>
-    onEventEnd: (props: { flowId: string; event: any; taskId: string }) => Promise<void>
+    onEventStart: (props: OnEventStartProps) => Promise<void>
+    onEventEnd: (props: OnEventEndProps) => Promise<void>
   }
 
   interface RunnerFlowsProps extends BaseRunnerProps {

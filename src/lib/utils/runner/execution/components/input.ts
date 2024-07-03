@@ -35,5 +35,5 @@ export async function inputComponent(props: RunnerComponentProps) {
 
   await onEventStart({ flowId, event, taskId: task.id })
   await triggerInputEvent(event)
-  await onEventEnd({ flowId, event, taskId: task.id })
+  await onEventEnd({ event, taskId: task.id })
 }

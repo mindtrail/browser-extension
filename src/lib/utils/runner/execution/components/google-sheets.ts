@@ -1,18 +1,13 @@
 import { getTask } from '~/lib/supabase'
 import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
 
-export async function googleSheetsComponent({
-  flowId,
-  event,
-  data,
-  onEventStart,
-  onEventEnd,
-  task,
-}) {
-  await onEventStart(flowId, event)
+export async function googleSheetsComponent(props: RunnerComponentProps) {
+  const { flowId, event, onEventStart, onEventEnd, task } = props
+  await onEventStart({ flowId, event, taskId: task.id })
+
   try {
-    const taskRes = await getTask(task.id)
-    task = taskRes.data
+    const latestTask = await getTask(task.id)
+    const updatedTask = latestTask.data || task
 
     const response = await fetch(
       `${process.env.PLASMO_PUBLIC_API_URL}/google-sheets/save`,
@@ -23,7 +18,7 @@ export async function googleSheetsComponent({
         },
         body: JSON.stringify({
           sheetId: event.sheetId,
-          values: task.state.variables[event.values],
+          values: updatedTask.state.variables[event.values],
         }),
       },
     )
@@ -36,7 +31,7 @@ export async function googleSheetsComponent({
       window.location.href = event.baseURI
     }
 
-    await onEventEnd(flowId, event)
+    await onEventEnd({ event, taskId: task.id })
   } catch (error) {
     console.error('Error syncing to Google Sheet:', error)
     throw error
