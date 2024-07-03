@@ -15,16 +15,17 @@ const components = {
 }
 
 export async function runEvents({
-  task,
   flowId,
+  task,
   events,
   data = {},
   onEventStart,
   onEventEnd,
 }) {
-  task = structuredClone(task)
-  events = structuredClone(events)
-  for (const event of events) {
+  const clonedTask = structuredClone(task)
+  const clonedEvents = structuredClone(events)
+
+  for (const event of clonedEvents) {
     // skip event if already found in task.logs and status = 'ended'
     if (task.logs.find((log) => log.eventId === event.id && log.status === 'ended')) {
       continue
@@ -33,14 +34,14 @@ export async function runEvents({
     if (!component) break
 
     await component({
-      task,
       flowId,
+      task: clonedTask,
+      events: clonedEvents,
       event,
       data,
       onEventStart,
       onEventEnd,
       runEvents,
-      events,
     })
   }
 }

@@ -22,8 +22,6 @@ export function RunningFlow({ flowsRunning, flows, eventsList }: RunningFlowProp
   }
 
   const flow = flows.find((flow) => flow.id === flowsRunning[0])
-  console.log(flow, eventsList)
-
   const currentFlowEvents = flow.events
 
   return (
@@ -36,11 +34,11 @@ export function RunningFlow({ flowsRunning, flows, eventsList }: RunningFlowProp
           </Typography>
         </div>
         <div className='flex justify-between gap-4'>
-          <Button variant='outline' className='flex items-center gap-2'>
+          <Button variant='ghost' className='flex items-center gap-2'>
             <CircleStopIcon className='w-5 h-5' />
             Stop
           </Button>
-          <Button variant='outline' className='flex items-center gap-2'>
+          <Button variant='ghost' className='flex items-center gap-2'>
             <CirclePauseIcon className='w-5 h-5' />
             Pause
           </Button>

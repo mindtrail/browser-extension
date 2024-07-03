@@ -15,7 +15,7 @@ import {
   getLastThread,
 } from '~/lib/supabase'
 import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
-import { runFlows } from '~lib/utils/runner/execution/run-flows'
+import { runFlowEvents } from '~lib/utils/runner/execution/run-flows'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
@@ -105,12 +105,15 @@ async function onEventEnd(flowId, event, taskId) {
 
 export const useRunnerState = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
+
+  console.log(4444, runnerState)
 
   useEffect(() => {
     const fetchFlows = async () => {
       const { data } = await getFlows()
+      console.log(111, data)
+
       setRunnerState((prev) => ({ ...prev, flows: data }))
     }
     fetchFlows()
@@ -144,10 +147,13 @@ export const useRunnerState = () => {
       setRunnerState((prev) => ({
         ...prev,
         flowsRunning: flowsToRun.map((flow) => flow?.flowId),
+        eventsList: flowsToRun.map((flow) => flow?.events).flat(),
       }))
 
+      console.log(111, flowsToRun)
+
       task = task || (await onTaskStart(flowId))
-      await runFlows({
+      await runFlowEvents({
         task,
         flows: runnerState.flows,
         flowsToRun,
