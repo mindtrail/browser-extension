@@ -11,18 +11,22 @@ import { Button } from '~components/ui/button'
 import { EventsList } from '../events-list'
 
 interface RunningFlowProps {
-  flowsRunning: string[]
+  flowsRunning: any[]
   flows: any[]
   eventsCompleted: any[]
 }
 
 export function RunningFlow({ flowsRunning, flows, eventsCompleted }: RunningFlowProps) {
-  if (!flowsRunning.length) {
+  if (!flows?.length || !flowsRunning?.length) {
     return null
   }
 
-  const flow = flows.find((flow) => flow.id === flowsRunning[0])
-  const currentFlowEvents = flow.events
+  const firstFlowId = flowsRunning[0]?.flowId
+  // @TODO: update this as it takes only the 1st flow
+  const flow = flows.find((flow) => flow.id === firstFlowId)
+  if (!flow) return null
+
+  const currentFlowEvents = flow?.events
 
   return (
     <div className='flex flex-col flex-1 gap-6'>

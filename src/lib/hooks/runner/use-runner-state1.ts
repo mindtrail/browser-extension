@@ -19,7 +19,7 @@ export const useRunnerState = () => {
   } = useRunnerService()
 
   const { flows, query } = runnerState
-  const { handleEventStart, handleEventEnd } = useEventManager()
+  const { onEventStart, onEventEnd } = useEventManager()
 
   // Combine the functionalities here
   const runFlow = useCallback(
@@ -34,8 +34,8 @@ export const useRunnerState = () => {
         flows,
         flowsToRun,
         query,
-        onEventStart: handleEventStart,
-        onEventEnd: (props) => handleEventEnd({ ...props, setRunnerState }),
+        onEventStart: onEventStart,
+        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
 
       setTimeout(() => {

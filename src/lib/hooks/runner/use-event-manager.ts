@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
-import { onEventStart, onEventEnd } from '~/lib/utils/runner/execution/task-utils'
+import { handleEventStart, handleEventEnd } from '~/lib/utils/runner/execution/task-utils'
 
 export const useEventManager = () => {
-  const handleEventStart = useCallback(onEventStart, [])
+  const onEventStart = useCallback(handleEventStart, [])
 
-  const handleEventEnd = useCallback(async (props: OnEventEndProps) => {
+  const onEventEnd = useCallback(async (props: OnEventEndProps) => {
     const { event, setRunnerState } = props
     await handleEventEnd(props)
 
@@ -19,5 +19,5 @@ export const useEventManager = () => {
     })
   }, [])
 
-  return { handleEventStart, handleEventEnd }
+  return { onEventStart, onEventEnd }
 }

@@ -33,7 +33,7 @@ export async function onTaskEnd(taskId: string) {
   return task
 }
 
-export async function onEventStart({ flowId, event, taskId }: OnEventStartProps) {
+export async function handleEventStart({ flowId, event, taskId }: OnEventStartProps) {
   const taskRes = await getTask(taskId)
   const task = taskRes.data
 
@@ -48,7 +48,7 @@ export async function onEventStart({ flowId, event, taskId }: OnEventStartProps)
   }
 }
 
-export async function onEventEnd({ event, taskId }: OnEventEndProps) {
+export async function handleEventEnd({ event, taskId }: OnEventEndProps) {
   const taskRes = await getTask(taskId)
   const task = taskRes.data
 
