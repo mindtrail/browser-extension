@@ -1,8 +1,7 @@
 import { useCallback, useEffect } from 'react'
 
 import { getTasks } from '~/lib/supabase'
-import { getFlowsToRun } from '~lib/utils/runner/retrieval/get-flows-to-run'
-import { executeFlows } from '~lib/utils/runner/execution/execute-flows'
+import { executeFlow } from '~lib/utils/runner/execution/execute-flow'
 import { onTaskStart, onTaskEnd } from '~lib/utils/runner/execution/task-utils'
 
 import { useRunnerService } from './use-runner-service'
@@ -10,51 +9,87 @@ import { useEventManager } from './use-event-manager'
 
 export const useRunnerState = () => {
   const {
+    flows,
     runnerState,
     setRunnerState,
     resetRunnerState,
     startFlowsRun,
     updateFlow,
     deleteFlow,
+    flowQueue,
+    isProcessing,
+    addToQueue,
+    removeFromQueue,
+    startProcessing,
+    stopProcessing,
   } = useRunnerService()
 
-  const { flows, query } = runnerState
+  const { query } = runnerState
   const { onEventStart, onEventEnd } = useEventManager()
 
-  // Combine the functionalities here
   const runFlow = useCallback(
-    async (flowId: string, task: any) => {
-      const flowsToRun = await getFlowsToRun({ flowId, flows, query })
+    async (flowToRun: any) => {
+      if (!flowToRun) return
 
-      await startFlowsRun(flowsToRun)
-      task = task || (await onTaskStart(flowId))
-      await executeFlows({
-        flowId,
-        task,
-        flows,
-        flowsToRun,
+      const queuedFlow = {
+        ...flowToRun,
+        flowId: flowToRun.id,
+        eventIds: flowToRun.events.map((event: any) => event.id),
         query,
-        onEventStart: onEventStart,
+      }
+
+      addToQueue(queuedFlow)
+
+      if (!isProcessing) {
+        processQueue()
+      }
+    },
+    [runnerState.flows, runnerState.query, isProcessing, addToQueue],
+  )
+
+  const processQueue = async () => {
+    if (flowQueue.length === 0) {
+      stopProcessing()
+      return
+    }
+
+    startProcessing()
+    const flowToRun = flowQueue[0]
+
+    await startFlowsRun(flowToRun)
+    let task = await onTaskStart(flowToRun.flowId)
+
+    try {
+      await executeFlow({
+        flowToRun,
+        task,
+        flows: runnerState.flows,
+        query: runnerState.query,
+        onEventStart,
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
+    } finally {
+      await onTaskEnd(task.id)
+      removeFromQueue(flowToRun?.flowId)
 
       setTimeout(() => {
         resetRunnerState()
-        onTaskEnd(task.id)
+        processQueue()
       }, 2000)
-    },
-    [flows, query],
-  )
+    }
+  }
 
   useEffect(() => {
     if (!flows?.length) return
 
     const resumeTask = async () => {
       const { data = [] } = await getTasks()
-      const resumableTask = data.filter((task) => task?.state?.status !== 'ended')[0]
+      const resumableTasks = data.filter((task) => task?.state?.status !== 'ended')
 
-      if (resumableTask) {
-        runFlow(resumableTask?.state?.flowId, resumableTask)
+      if (resumableTasks.length > 0) {
+        const resumableTask = resumableTasks[0]
+        console.log(33333, 'resumableTask', resumableTask)
+        // runFlow(resumableTask?.state?.flowId)
       }
     }
 
@@ -65,6 +100,7 @@ export const useRunnerState = () => {
 
   return {
     ...runnerState,
+    flows,
     setRunnerState,
     resetRunnerState,
     runFlow,

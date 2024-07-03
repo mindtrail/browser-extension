@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
@@ -16,27 +16,29 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
+
+  const [flows, setFlows] = useState([])
+  const [flowQueue, setFlowQueue] = useState([])
+  const [isProcessing, setIsProcessing] = useState(false)
+
   const resetRunnerState = useCallback(
-    () => setRunnerState((prev) => ({ ...DEFAULT_RUNNER_STATE, flows: prev.flows })),
+    () => setRunnerState({ ...DEFAULT_RUNNER_STATE }),
     [],
   )
 
   useEffect(() => {
     const fetchFlows = async () => {
       const { data = [] } = await getFlows()
-      setRunnerState((prev) => ({ ...prev, flows: data }))
+      setFlows(data)
     }
 
     fetchFlows()
     const unsubscribe = onFlowsChange(fetchFlows)
     return () => unsubscribe()
-  }, [setRunnerState])
+  }, [])
 
-  const startFlowsRun = useCallback(async (flowsRunning: any[]) => {
-    setRunnerState((prev) => ({
-      ...prev,
-      flowsRunning,
-    }))
+  const startFlowsRun = useCallback(async (flowToRun: any[]) => {
+    setRunnerState({ ...DEFAULT_RUNNER_STATE, flowRunning: flowToRun })
   }, [])
 
   const updateFlow = useCallback(async (flowId: string, payload: any) => {
@@ -58,12 +60,40 @@ export const useRunnerService = () => {
     }))
   }, [])
 
+  const addToQueue = useCallback((newFlows: any[]) => {
+    setFlowQueue((prevQueue) => {
+      const newItems = newFlows.filter(
+        (flow) => !prevQueue.some((queuedFlow) => queuedFlow.id === flow.id),
+      )
+      return [...prevQueue, ...newItems]
+    })
+  }, [])
+
+  const removeFromQueue = useCallback((flowId: string) => {
+    setFlowQueue((prevQueue) => prevQueue.filter((flow) => flow.id !== flowId))
+  }, [])
+
+  const startProcessing = useCallback(() => {
+    setIsProcessing(true)
+  }, [])
+
+  const stopProcessing = useCallback(() => {
+    setIsProcessing(false)
+  }, [])
+
   return {
+    flows,
     runnerState,
     setRunnerState,
     resetRunnerState,
     startFlowsRun,
     updateFlow,
     deleteFlow,
+    flowQueue,
+    isProcessing,
+    addToQueue,
+    removeFromQueue,
+    startProcessing,
+    stopProcessing,
   }
 }

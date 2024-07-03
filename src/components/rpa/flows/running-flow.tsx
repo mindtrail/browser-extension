@@ -11,22 +11,17 @@ import { Button } from '~components/ui/button'
 import { EventsList } from '../events-list'
 
 interface RunningFlowProps {
-  flowsRunning: any[]
+  flowRunning: any
   flows: any[]
   eventsCompleted: any[]
 }
 
-export function RunningFlow({ flowsRunning, flows, eventsCompleted }: RunningFlowProps) {
-  if (!flows?.length || !flowsRunning?.length) {
+export function RunningFlow({ flowRunning, flows, eventsCompleted }: RunningFlowProps) {
+  if (!flows?.length || !flowRunning) {
     return null
   }
 
-  const firstFlowId = flowsRunning[0]?.flowId
-  // @TODO: update this as it takes only the 1st flow
-  const flow = flows.find((flow) => flow.id === firstFlowId)
-  if (!flow) return null
-
-  const currentFlowEvents = flow?.events
+  const { events: currentFlowEvents, name, description } = flowRunning
 
   return (
     <div className='flex flex-col flex-1 gap-6'>
@@ -34,7 +29,7 @@ export function RunningFlow({ flowsRunning, flows, eventsCompleted }: RunningFlo
         <div className='flex items-center gap-2'>
           <CirclePlayIcon className='w-5 h-5 text-primary' />
           <Typography variant='h4' className='text-primary'>
-            {flow.name}
+            {name}
           </Typography>
         </div>
         <div className='flex justify-between gap-4'>
@@ -49,7 +44,7 @@ export function RunningFlow({ flowsRunning, flows, eventsCompleted }: RunningFlo
         </div>
       </div>
 
-      <Typography variant='small-semi'>{flow.description}</Typography>
+      <Typography variant='small-semi'>{description}</Typography>
 
       <div className='flex flex-col flex-1 gap-4'>
         <EventsList eventsList={eventsCompleted} readOnly={true} />

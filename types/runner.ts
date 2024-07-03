@@ -15,14 +15,14 @@ declare global {
 
   interface BaseRunnerProps {
     task: any
-    flowId: string
+    flowId?: string
     onEventStart: (props: OnEventStartProps) => Promise<void>
     onEventEnd: (props: OnEventEndProps) => Promise<void>
   }
 
-  interface RunnerFlowsProps extends BaseRunnerProps {
+  interface ExecuteFlowsProp extends BaseRunnerProps {
     flows: any[]
-    flowsToRun: { flowId: string; eventIds: string[] }[]
+    flowToRun: { flowId: string; eventIds: string[] }
     query: string
   }
 

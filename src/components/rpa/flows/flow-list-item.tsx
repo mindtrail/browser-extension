@@ -15,7 +15,7 @@ import {
 interface FlowItemProps {
   flow: any
   runnerContainerRef: React.RefObject<HTMLDivElement>
-  runFlow: (flowId: string, task?: any) => Promise<void>
+  runFlow: (flow: any, task?: any) => Promise<void>
   removeFlow: (flowId: string) => void
   updateFlowName: (flowId: string, flow: any) => any
 }
@@ -111,7 +111,7 @@ export function FlowListItem(props: FlowItemProps) {
               variant='default'
               size='sm'
               className='flex gap-2'
-              onClick={() => runFlow(flowId)}
+              onClick={() => runFlow(flow)}
             >
               <CirclePlayIcon className='w-4 h-4' />
               Run
