@@ -12,14 +12,18 @@ import { EventsList } from '../events-list'
 
 interface RunningFlowProps {
   runningTask: any
-  flows: any[]
   eventsCompleted: any[]
 }
 
-export function RunningFlow({ runningTask, flows, eventsCompleted }: RunningFlowProps) {
-  if (!flows?.length || !runningTask) {
+export function RunningFlow({ runningTask, eventsCompleted }: RunningFlowProps) {
+  if (!runningTask) {
     return null
   }
+
+  console.log(runningTask)
+  console.log(eventsCompleted)
+
+  const eventsList = runningTask?.flow?.events
 
   const {
     events: runningTaskEvents,
@@ -50,9 +54,9 @@ export function RunningFlow({ runningTask, flows, eventsCompleted }: RunningFlow
       <Typography variant='small-semi'>{description}</Typography>
 
       <div className='flex flex-col flex-1 gap-4'>
-        <EventsList eventsList={eventsCompleted} readOnly={true} />
+        <EventsList eventsList={eventsList} readOnly={true} />
 
-        {eventsCompleted?.length === runningTaskEvents?.length && (
+        {eventsCompleted?.length === eventsList?.length && (
           <Typography
             variant='small-semi'
             className='flex items-center gap-2 px-6 text-primary'

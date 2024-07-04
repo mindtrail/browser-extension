@@ -40,16 +40,14 @@ export const useRunnerService = () => {
   }, [])
 
   const onEventEnd = useCallback(async (props: OnEventEndProps) => {
-    await handleEventEnd(props)
-    const { event: newEvent } = props
+    const eventLogs = await handleEventEnd(props)
 
     setRunnerState((prev) => {
-      const eventAlreadyMarked = prev?.eventsCompleted?.some((e) => e.id === newEvent.id)
-      if (eventAlreadyMarked) return prev
-
+      // const eventAlreadyMarked = prev?.eventsCompleted?.some((e) => e.id === newEvent.id)
+      // if (eventAlreadyMarked) return prev
       return {
         ...prev,
-        eventsCompleted: [...(prev?.eventsCompleted || []), newEvent],
+        eventsCompleted: [...eventLogs],
       }
     })
   }, [])
@@ -93,7 +91,6 @@ export const useRunnerService = () => {
       }
 
       try {
-        console.log(222, 'executeTask')
         const { events, if: flowId } = flow
         const data = await buildFormData({ variables: task.state.variables, events })
 
@@ -111,14 +108,11 @@ export const useRunnerService = () => {
         return
       }
 
-      const { logs = [] } = task
-      const lastLog = logs[logs.length - 1]
-
-      console.log(logs)
-      if (lastLog && lastLog.status === 'ended') {
+      // @TODO: make a check ...
+      setTimeout(async () => {
         await endTask(task)
         removeFromQueue(taskId)
-      }
+      }, 2000)
     }
 
     executeFlowTasks()

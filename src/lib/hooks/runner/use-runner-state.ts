@@ -18,7 +18,6 @@ export const useRunnerState = () => {
       const task = await createNewTask(flowToRun.id)
       if (!task) return
 
-      console.log(2222, flowToRun)
       const queueItem = {
         id: task.id,
         task,

@@ -57,11 +57,16 @@ export async function handleEventEnd({ event, taskId }: OnEventEndProps) {
   const taskRes = await getTask(taskId)
   const task = taskRes.data
 
-  await updateTask(task.id, {
+  const updatedLogs = task.logs.map((log) =>
+    log.eventId === event.id ? { ...log, status: 'ended' } : log,
+  )
+
+  const updateRes = await updateTask(task.id, {
     ...task,
-    state: { ...task.state, status: 'running' },
-    logs: task.logs.map((log) =>
-      log.eventId === event.id ? { ...log, status: 'ended' } : log,
-    ),
+    logs: updatedLogs,
   })
+
+  if (!updateRes.error) {
+    return updatedLogs
+  }
 }

@@ -14,13 +14,7 @@ export function FlowsTab() {
     useRunnerState()
 
   if (runningTask) {
-    return (
-      <RunningFlow
-        runningTask={runningTask}
-        flows={flows}
-        eventsCompleted={eventsCompleted}
-      />
-    )
+    return <RunningFlow runningTask={runningTask} eventsCompleted={eventsCompleted} />
   }
 
   return (
