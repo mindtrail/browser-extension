@@ -57,7 +57,8 @@ export async function getTasksToRun() {
   return supabase
     .from('tasks')
     .select('*')
-    .not('state', 'in', ['ended', 'failed'])
+    .neq('state->>status', 'ended')
+    .neq('state->>status', 'failed')
     .order('created_at', { ascending: true })
 }
 

@@ -1,13 +1,17 @@
 import { createTask, getTask, updateTask, getLastThread } from '~/lib/supabase'
 
 export async function createNewTask(flowId: string) {
+  if (!flowId) {
+    throw new Error('Flow ID is required')
+  }
+
   const thread = await getLastThread()
   const newTaskRes = await createTask({
     state: {
       status: 'started',
-      variables: thread.data,
       flowId,
       retries: 0,
+      variables: thread.data,
     },
     logs: [],
   })

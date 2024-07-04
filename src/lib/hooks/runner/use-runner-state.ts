@@ -16,7 +16,7 @@ export const useRunnerState = () => {
     async (flowToRun: any) => {
       if (!flowToRun) return
 
-      const task = await createNewTask(flowToRun.flowId)
+      const task = await createNewTask(flowToRun.id)
 
       const queuedItem = {
         ...flowToRun,
@@ -35,9 +35,12 @@ export const useRunnerState = () => {
     if (!flows?.length) return
 
     const updateQueueWithResumableTasks = async () => {
-      const { data: tasksToRun = [] } = await getTasksToRun()
+      const res = await getTasksToRun()
 
-      console.log(666, tasksToRun)
+      const { data: tasksToRun = [] } = res
+      if (!tasksToRun) return
+
+      console.log(flows, tasksToRun)
       const flowsToResume = []
       for (const task of tasksToRun) {
         const flowToRun = flows.find((flow) => flow.id === task?.state?.flowId)
@@ -56,6 +59,8 @@ export const useRunnerState = () => {
 
         flowsToResume.push(queuedItem)
       }
+
+      console.log(111, flowsToResume)
       addToQueue(flowsToResume)
     }
 

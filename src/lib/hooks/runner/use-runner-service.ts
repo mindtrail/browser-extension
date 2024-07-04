@@ -32,6 +32,8 @@ export const useRunnerService = () => {
 
   const addToQueue = useCallback(
     (newFlows: any[]) => {
+      if (!newFlows?.length) return
+
       setFlowsQueue((prevQueue) => {
         const newItems = newFlows?.filter(
           (flow) => !prevQueue.some((queuedFlow) => queuedFlow.id === flow.id),
@@ -72,6 +74,7 @@ export const useRunnerService = () => {
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
     } catch (error) {
+      console.log(2222, error)
       await markTaskRetry(task)
     } finally {
       const { logs = [], state } = task
