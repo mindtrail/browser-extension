@@ -130,7 +130,6 @@ export const ACTION_TYPE = {
 
 export const DEFAULT_RUNNER_STATE = {
   query: '',
-  flows: [],
   flowRunning: null,
   eventsCompleted: [],
 }

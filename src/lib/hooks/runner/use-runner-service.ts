@@ -18,7 +18,7 @@ export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
 
   const [flows, setFlows] = useState([])
-  const [flowQueue, setFlowQueue] = useState([])
+  const [flowsQueue, setFlowQueue] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
 
   const resetRunnerState = useCallback(
@@ -44,23 +44,17 @@ export const useRunnerService = () => {
   const updateFlow = useCallback(async (flowId: string, payload: any) => {
     await updateFlowDBCall(flowId, payload)
 
-    setRunnerState((prev) => ({
-      ...prev,
-      flows: prev.flows.map((flow) =>
-        flow.id === flowId ? { ...flow, ...payload } : flow,
-      ),
-    }))
+    setFlows((prev) =>
+      prev.map((flow) => (flow.id === flowId ? { ...flow, ...payload } : flow)),
+    )
   }, [])
 
   const deleteFlow = useCallback(async (flowId: string) => {
     await deleteFlowDBCall(flowId)
-    setRunnerState((prev) => ({
-      ...prev,
-      flows: prev.flows.filter((flow) => flow.id !== flowId),
-    }))
+    setFlows((prev) => [...prev.filter((flow) => flow.id !== flowId)])
   }, [])
 
-  const addToQueue = useCallback((queuedItem: any) => {
+  const addToQueue = useCallback((newFlows: any[]) => {
     setFlowQueue((prevQueue) => {
       const newItems = newFlows?.filter(
         (flow) => !prevQueue.some((queuedFlow) => queuedFlow.id === flow.id),
@@ -89,7 +83,7 @@ export const useRunnerService = () => {
     startFlowsRun,
     updateFlow,
     deleteFlow,
-    flowQueue,
+    flowsQueue,
     isProcessing,
     addToQueue,
     removeFromQueue,

@@ -16,7 +16,7 @@ export const useRunnerState = () => {
     startFlowsRun,
     updateFlow,
     deleteFlow,
-    flowQueue,
+    flowsQueue,
     isProcessing,
     addToQueue,
     removeFromQueue,
@@ -38,23 +38,23 @@ export const useRunnerState = () => {
         query,
       }
 
-      addToQueue(queuedItem)
+      addToQueue([queuedItem])
 
       if (!isProcessing) {
         processQueue()
       }
     },
-    [runnerState.flows, runnerState.query, isProcessing, addToQueue],
+    [flows, query, isProcessing, addToQueue],
   )
 
   const processQueue = async () => {
-    if (flowQueue.length === 0) {
+    if (flowsQueue.length === 0) {
       stopProcessing()
       return
     }
 
     startProcessing()
-    const flowToRun = flowQueue[0]
+    const flowToRun = flowsQueue[0]
 
     await startFlowsRun(flowToRun)
     let task = await createNewTask(flowToRun.flowId)
@@ -81,21 +81,38 @@ export const useRunnerState = () => {
   useEffect(() => {
     if (!flows?.length) return
 
-    const resumeTask = async () => {
+    const updateQueueWithResumableTasks = async () => {
       const { data = [] } = await getTasks()
       const resumableTasks = data.filter((task) => task?.state?.status !== 'ended')
 
-      if (resumableTasks.length > 0) {
-        const resumableTask = resumableTasks[0]
-        // console.log(33333, 'resumableTask', resumableTask)
-        // runFlow(resumableTask?.state?.flowId)
+      const flowsToResume = []
+      for (const task of resumableTasks) {
+        const flowToRun = flows.find((flow) => flow.id === task?.state?.flowId)
+        if (!flowToRun) continue
+
+        const alreadyInQueue = flowsQueue.some((item) => item.flowId === flowToRun.id)
+        if (alreadyInQueue) continue
+
+        const queuedItem = {
+          ...flowToRun,
+          flowId: flowToRun.id,
+          eventIds: flowToRun.events.map((event: any) => event.id),
+          query,
+        }
+
+        flowsToResume.push(queuedItem)
+      }
+      console.log(3333, flowsToResume)
+
+      // addToQueue(flowsToResume)
+
+      if (!isProcessing && flowsQueue.length > 0) {
+        // processQueue()
       }
     }
 
-    if (flows.length > 0) {
-      resumeTask()
-    }
-  }, [flows])
+    updateQueueWithResumableTasks()
+  }, [flows, flowsQueue, query, addToQueue, isProcessing])
 
   return {
     ...runnerState,
