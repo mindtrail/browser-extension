@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
-import { createNewTask, endTask } from '~lib/utils/runner/execution/task-utils'
+import { endTask } from '~lib/utils/runner/execution/task-utils'
 import { executeTask } from '~lib/utils/runner/execution/execute-task'
 import { useEventManager } from './use-event-manager'
 
@@ -18,7 +18,7 @@ export const useRunnerService = () => {
   )
 
   const { onEventStart, onEventEnd } = useEventManager()
-  const [flowsQueue, setFlowQueue] = useState([])
+  const [flowsQueue, setFlowsQueue] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
 
   const resetRunnerState = useCallback(
@@ -30,22 +30,27 @@ export const useRunnerService = () => {
     setRunnerState({ ...DEFAULT_RUNNER_STATE, flowRunning: flowToRun })
   }, [])
 
-  const addToQueue = useCallback((newFlows: any[]) => {
-    setFlowQueue((prevQueue) => {
-      const newItems = newFlows?.filter(
-        (flow) => !prevQueue.some((queuedFlow) => queuedFlow.id === flow.id),
-      )
-      return [...prevQueue, ...newItems]
-    })
-  }, [])
+  const addToQueue = useCallback(
+    (newFlows: any[]) => {
+      setFlowsQueue((prevQueue) => {
+        const newItems = newFlows?.filter(
+          (flow) => !prevQueue.some((queuedFlow) => queuedFlow.id === flow.id),
+        )
+        return [...prevQueue, ...newItems]
+      })
+    },
+    [flowsQueue],
+  )
 
-  const removeFromQueue = useCallback((flowId: string) => {
-    console.log(222, flowId)
-    setFlowQueue((prevQueue) => {
-      console.log(555, prevQueue)
-      return prevQueue.filter((flow) => flow.id !== flowId)
-    })
-  }, [])
+  const removeFromQueue = useCallback(
+    (flowId: string) => {
+      setFlowsQueue((prevQueue) => {
+        console.log(555, flowId, flowsQueue, prevQueue)
+        return prevQueue.filter((flow) => flow.id !== flowId)
+      })
+    },
+    [flowsQueue],
+  )
 
   const processQueue = useCallback(async () => {
     if (flowsQueue.length === 0) {
@@ -53,17 +58,18 @@ export const useRunnerService = () => {
       return
     }
 
+    console.log(111, flowsQueue)
+
     setIsProcessing(true)
-    const flowToRun = flowsQueue[0]
+    const { task, query, ...flowToRun } = flowsQueue[0]
 
     await startFlowsRun(flowToRun)
-    let task = await createNewTask(flowToRun.flowId)
 
     try {
       await executeTask({
-        flowToRun,
         task,
-        query: runnerState.query,
+        query,
+        flowToRun,
         onEventStart,
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })

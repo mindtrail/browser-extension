@@ -1,19 +1,13 @@
 import { useCallback, useEffect } from 'react'
 
 import { getTasks } from '~/lib/supabase'
-
+import { createNewTask } from '~lib/utils/runner/execution/task-utils'
 import { useRunnerService } from './use-runner-service'
 import { useFlowService } from './use-flows-service'
 
 export const useRunnerState = () => {
-  const {
-    runnerState,
-    setRunnerState,
-    resetRunnerState,
-    flowsQueue,
-    isProcessing,
-    addToQueue,
-  } = useRunnerService()
+  const { runnerState, setRunnerState, resetRunnerState, flowsQueue, addToQueue } =
+    useRunnerService()
 
   const { query } = runnerState
   const { flows, updateFlow, deleteFlow } = useFlowService()
@@ -22,11 +16,14 @@ export const useRunnerState = () => {
     async (flowToRun: any) => {
       if (!flowToRun) return
 
+      const task = await createNewTask(flowToRun.flowId)
+
       const queuedItem = {
         ...flowToRun,
         flowId: flowToRun.id,
         eventIds: flowToRun.events.map((event: any) => event.id),
         query,
+        task,
       }
 
       addToQueue([queuedItem])
@@ -54,12 +51,12 @@ export const useRunnerState = () => {
           flowId: flowToRun.id,
           eventIds: flowToRun.events.map((event: any) => event.id),
           query,
+          task,
         }
 
         flowsToResume.push(queuedItem)
       }
-      // addToQueue(flowsToResume)
-      console.log(3333, flowsToResume)
+      addToQueue(flowsToResume)
     }
 
     updateQueueWithResumableTasks()
