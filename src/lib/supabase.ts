@@ -53,6 +53,14 @@ export async function getTasks() {
   return supabase.from('tasks').select('*').order('created_at', { ascending: true })
 }
 
+export async function getTasksToRun() {
+  return supabase
+    .from('tasks')
+    .select('*')
+    .not('state', 'in', ['ended', 'failed'])
+    .order('created_at', { ascending: true })
+}
+
 export async function getTask(id: string) {
   return supabase.from('tasks').select('*').match({ id }).single()
 }

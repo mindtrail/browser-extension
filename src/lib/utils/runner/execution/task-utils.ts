@@ -7,31 +7,31 @@ export async function createNewTask(flowId: string) {
       status: 'started',
       variables: thread.data,
       flowId,
+      retries: 0,
     },
     logs: [],
   })
   return newTaskRes.data
 }
 
-export async function endTask(taskId: string) {
-  const taskRes = await getTask(taskId)
-  const task: any = taskRes.data
+export async function endTask(task: any, status: 'ended' | 'failed' = 'ended') {
+  return updateTask(task.id, {
+    ...task,
+    state: {
+      ...task.state,
+      status,
+    },
+  })
+}
 
-  // Update task state to 'ended' if all events are ended
-  const logs = task.logs || []
-  const lastLog = logs[logs.length - 1]
-
-  if (lastLog && lastLog.status === 'ended') {
-    return updateTask(task.id, {
-      ...task,
-      state: {
-        ...task.state,
-        status: 'ended',
-      },
-    })
-  }
-
-  return task
+export async function markTaskRetry(task: any) {
+  return updateTask(task.id, {
+    ...task,
+    state: {
+      ...task.state,
+      retries: (task?.state?.retries || 0) + 1,
+    },
+  })
 }
 
 export async function handleEventStart({ flowId, event, taskId }: OnEventStartProps) {

@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
-import { endTask } from '~lib/utils/runner/execution/task-utils'
+import { endTask, markTaskRetry } from '~lib/utils/runner/execution/task-utils'
 import { executeTask } from '~lib/utils/runner/execution/execute-task'
 import { useEventManager } from './use-event-manager'
 
@@ -58,8 +58,6 @@ export const useRunnerService = () => {
       return
     }
 
-    console.log(111, flowsQueue)
-
     setIsProcessing(true)
     const { task, query, ...flowToRun } = flowsQueue[0]
 
@@ -73,9 +71,22 @@ export const useRunnerService = () => {
         onEventStart,
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
+    } catch (error) {
+      await markTaskRetry(task)
     } finally {
-      await endTask(task.id)
-      removeFromQueue(flowToRun?.flowId)
+      const { logs = [], state } = task
+      const lastLog = logs[logs.length - 1]
+
+      console.log(3333, task, flowsQueue, logs)
+      if (lastLog && lastLog.status === 'ended') {
+        await endTask(task)
+        removeFromQueue(flowToRun?.flowId)
+      }
+
+      if (state.retries >= 3) {
+        await endTask(task, 'failed')
+        removeFromQueue(flowToRun?.flowId)
+      }
 
       setTimeout(() => {
         resetRunnerState()

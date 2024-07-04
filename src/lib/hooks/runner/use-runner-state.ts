@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 
-import { getTasks } from '~/lib/supabase'
+import { getTasksToRun } from '~/lib/supabase'
 import { createNewTask } from '~lib/utils/runner/execution/task-utils'
 import { useRunnerService } from './use-runner-service'
 import { useFlowService } from './use-flows-service'
@@ -35,11 +35,11 @@ export const useRunnerState = () => {
     if (!flows?.length) return
 
     const updateQueueWithResumableTasks = async () => {
-      const { data = [] } = await getTasks()
-      const resumableTasks = data.filter((task) => task?.state?.status !== 'ended')
+      const { data: tasksToRun = [] } = await getTasksToRun()
 
+      console.log(666, tasksToRun)
       const flowsToResume = []
-      for (const task of resumableTasks) {
+      for (const task of tasksToRun) {
         const flowToRun = flows.find((flow) => flow.id === task?.state?.flowId)
         if (!flowToRun) continue
 
