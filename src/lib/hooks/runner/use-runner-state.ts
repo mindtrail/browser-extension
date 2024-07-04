@@ -23,8 +23,6 @@ export const useRunnerState = () => {
         task,
         flow: flowToRun,
         query,
-        eventIds: flowToRun.events.map((event: any) => event.id),
-        eventsCompleted: [],
       }
 
       addToQueue([queueItem])
@@ -53,8 +51,6 @@ export const useRunnerState = () => {
           task,
           flow: flowToRun,
           query,
-          eventIds: flowToRun.events.map((event: any) => event.id),
-          eventsCompleted: [],
         }
 
         flowsToResume.push(queuedItem)

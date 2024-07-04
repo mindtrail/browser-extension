@@ -53,7 +53,8 @@ declare global {
     flow: Flow
     task: any
     query: string
-    eventsCompleted: string[]
+    eventsCompleted?: string[]
+    retries?: number
   }
 
   type RunnerState = {

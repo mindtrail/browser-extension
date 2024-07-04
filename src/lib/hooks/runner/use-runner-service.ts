@@ -1,10 +1,11 @@
 import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
+
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
 import { endTask } from '~lib/utils/runner/execution/task-utils'
 import { executeTask } from '~lib/utils/runner/execution/execute-task'
-import { useEventManager } from './use-event-manager'
+import { handleEventStart, handleEventEnd } from '~/lib/utils/runner/execution/task-utils'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
@@ -14,7 +15,7 @@ const RUNNER_CONFIG = {
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
   const { runQueue, runningTask } = runnerState
-  const { onEventStart, onEventEnd } = useEventManager()
+
   const [taskRetries, setTaskRetries] = useState(0)
 
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
@@ -39,6 +40,21 @@ export const useRunnerService = () => {
     }))
   }, [])
 
+  const onEventEnd = useCallback(async (props: OnEventEndProps) => {
+    await handleEventEnd(props)
+    const { event: newEvent, setRunnerState } = props
+
+    setRunnerState((prev) => {
+      const eventAlreadyMarked = prev.eventsCompleted.some((e) => e.id === newEvent.id)
+      if (eventAlreadyMarked) return prev
+
+      return {
+        ...prev,
+        eventsCompleted: [...prev.eventsCompleted, newEvent],
+      }
+    })
+  }, [])
+
   // When the queue updates, process the first task
   useEffect(() => {
     if (runQueue?.length === 0) {
@@ -60,6 +76,7 @@ export const useRunnerService = () => {
       const { task, query, flow, id: taskId } = runningTask
       console.log(111, taskRetries)
 
+      console.log(taskRetries)
       if (taskRetries >= 3) {
         console.log(3333, 'failed')
 
@@ -69,14 +86,16 @@ export const useRunnerService = () => {
       }
 
       try {
+        console.log(222, 'executeTask')
         await executeTask({
           task,
           query,
           flow,
-          onEventStart,
-          onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
+          onEventStart: handleEventStart,
+          onEventEnd,
         })
       } catch (error) {
+        console.log(333, 'error', error)
         setTaskRetries(taskRetries + 1)
         return
       }
@@ -84,6 +103,7 @@ export const useRunnerService = () => {
       const { logs = [] } = task
       const lastLog = logs[logs.length - 1]
 
+      console.log(logs)
       if (lastLog && lastLog.status === 'ended') {
         await endTask(task)
         removeFromQueue(taskId)
