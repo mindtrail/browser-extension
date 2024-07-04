@@ -40,7 +40,11 @@ export const useRunnerService = () => {
   }, [])
 
   const removeFromQueue = useCallback((flowId: string) => {
-    setFlowQueue((prevQueue) => prevQueue.filter((flow) => flow.id !== flowId))
+    console.log(222, flowId)
+    setFlowQueue((prevQueue) => {
+      console.log(555, prevQueue)
+      return prevQueue.filter((flow) => flow.id !== flowId)
+    })
   }, [])
 
   const processQueue = useCallback(async () => {
