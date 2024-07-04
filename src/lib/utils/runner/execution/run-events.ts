@@ -28,12 +28,8 @@ export async function runEvents(props: RunnerEventProps) {
     const triggerAction = ACTION_COMPONENTS[event.type]
     if (!triggerAction) break
 
-    if (event.type !== 'loop') {
-      await onEventStart({ flowId, event, taskId: task.id })
-    }
-
-    try {
-      await triggerAction({
+    if (event.type === 'loop') {
+      return await triggerAction({
         flowId,
         task: clonedTask,
         events: clonedEvents,
@@ -43,11 +39,27 @@ export async function runEvents(props: RunnerEventProps) {
         onEventEnd,
         runEvents,
       })
+    }
+
+    await onEventStart({ flowId, event, taskId: task.id })
+
+    if (event.type === 'navigation') {
+      await onEventEnd({ event, taskId: task.id })
+    }
+
+    try {
+      await triggerAction({
+        flowId,
+        task: clonedTask,
+        events: clonedEvents,
+        event,
+        data,
+      })
     } catch (error) {
       console.error(error)
     }
 
-    if (event.type !== 'loop') {
+    if (event.type !== 'navigation') {
       await onEventEnd({ event, taskId: task.id })
     }
   }
