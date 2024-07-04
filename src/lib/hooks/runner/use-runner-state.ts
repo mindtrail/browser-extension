@@ -17,17 +17,17 @@ export const useRunnerState = () => {
 
       const task = await createNewTask(flowToRun.id)
 
-      const queuedItem = {
+      const runItem = {
         ...flowToRun,
-        flowId: flowToRun.id,
-        eventIds: flowToRun.events.map((event: any) => event.id),
+        flow: flowToRun,
         query,
         task,
+        flowId: flowToRun.id,
+        eventIds: flowToRun.events.map((event: any) => event.id),
+        eventsCompleted: [],
       }
 
-      console.log('run', queuedItem)
-
-      addToQueue([queuedItem])
+      addToQueue([runItem])
     },
     [flows, query],
   )
@@ -50,16 +50,16 @@ export const useRunnerState = () => {
 
         const queuedItem = {
           ...flowToRun,
-          flowId: flowToRun.id,
-          eventIds: flowToRun.events.map((event: any) => event.id),
+          flow: flowToRun,
           query,
           task,
+          flowId: flowToRun.id,
+          eventIds: flowToRun.events.map((event: any) => event.id),
+          eventsCompleted: [],
         }
 
         flowsToResume.push(queuedItem)
       }
-
-      console.log(flowsToResume)
 
       if (!flowsToResume.length) {
         resetRunnerState()

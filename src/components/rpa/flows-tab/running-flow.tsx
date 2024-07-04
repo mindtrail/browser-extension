@@ -11,17 +11,17 @@ import { Button } from '~components/ui/button'
 import { EventsList } from '../events-list'
 
 interface RunningFlowProps {
-  flowRunning: any
+  runningFlow: any
   flows: any[]
   eventsCompleted: any[]
 }
 
-export function RunningFlow({ flowRunning, flows, eventsCompleted }: RunningFlowProps) {
-  if (!flows?.length || !flowRunning) {
+export function RunningFlow({ runningFlow, flows, eventsCompleted }: RunningFlowProps) {
+  if (!flows?.length || !runningFlow) {
     return null
   }
 
-  const { events: currentFlowEvents, name, description } = flowRunning
+  const { events: runningFlowEvents, name, description } = runningFlow
 
   return (
     <div className='flex flex-col flex-1 gap-6'>
@@ -49,7 +49,7 @@ export function RunningFlow({ flowRunning, flows, eventsCompleted }: RunningFlow
       <div className='flex flex-col flex-1 gap-4'>
         <EventsList eventsList={eventsCompleted} readOnly={true} />
 
-        {eventsCompleted?.length === currentFlowEvents?.length && (
+        {eventsCompleted?.length === runningFlowEvents?.length && (
           <Typography
             variant='small-semi'
             className='flex items-center gap-2 px-6 text-primary'

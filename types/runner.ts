@@ -21,7 +21,7 @@ declare global {
   }
 
   interface ExecuteTaskProp extends BaseRunnerProps {
-    flowToRun: { flowId: string; eventIds: string[] } & any
+    flow: { flowId: string; eventIds: string[] } & any
     query: string
   }
 

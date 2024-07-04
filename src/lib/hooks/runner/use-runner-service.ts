@@ -13,24 +13,27 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
+  const { runQueue } = runnerState
 
   const { onEventStart, onEventEnd } = useEventManager()
-  const { isRunning, flowsQueue } = runnerState
 
   const resetRunnerState = useCallback(
     () => setRunnerState({ ...DEFAULT_RUNNER_STATE }),
     [],
   )
 
-  const startFlowsRun = useCallback((flowToRun: any[]) => {
-    setRunnerState({ ...DEFAULT_RUNNER_STATE, flowRunning: flowToRun })
-  }, [])
+  const startFlowsRun = useCallback(
+    (runningFlow: any) => {
+      setRunnerState((prev) => ({ ...prev, runningFlow }))
+    },
+    [runQueue],
+  )
 
   const addToQueue = useCallback(
     (newFlows: any[]) => {
-      setRunnerState(({ flowsQueue: existingQueue, ...runnerState }) => ({
+      setRunnerState(({ runQueue: existingQueue, ...runnerState }) => ({
         ...runnerState,
-        flowsQueue: [
+        runQueue: [
           ...existingQueue,
           ...newFlows.filter(
             (flow) => !existingQueue.some((queuedFlow) => queuedFlow.id === flow.id),
@@ -38,52 +41,47 @@ export const useRunnerService = () => {
         ],
       }))
     },
-    [flowsQueue],
+    [runQueue],
   )
 
   const removeFromQueue = useCallback(
     (flowId: string) => {
       setRunnerState((prev) => ({
         ...prev,
-        flowsQueue: prev.flowsQueue.filter((flow) => flow.id !== flowId),
+        runQueue: prev.runQueue.filter((flow) => flow.id !== flowId),
       }))
     },
-    [flowsQueue],
+    [runQueue],
   )
 
   const updateQueueItem = useCallback(
     (flowId: string, newState: any) => {
       setRunnerState((prev) => ({
         ...prev,
-        flowsQueue: prev.flowsQueue.map((flow) => (flow.id === flowId ? newState : flow)),
+        runQueue: prev.runQueue.map((flow) => (flow.id === flowId ? newState : flow)),
       }))
     },
-    [flowsQueue],
+    [runQueue],
   )
 
   const processQueue = useCallback(async () => {
-    if (flowsQueue.length === 0) {
-      setRunnerState((prev) => ({ ...prev, isRunning: false }))
+    if (runQueue?.length === 0) {
+      resetRunnerState()
       return
     }
 
-    if (!isRunning) {
-      setRunnerState((prev) => ({ ...prev, isRunning: true }))
-    }
+    const runningFlow = runQueue[0]
+    startFlowsRun(runningFlow)
 
-    const flowRunning = flowsQueue[0]
-    const { task, query, ...flowToRun } = flowRunning
-
-    startFlowsRun(flowToRun)
-    console.log(1111, task, query, flowToRun)
-
+    const { task, query, ...flow } = runningFlow
     let taskRetries = task?.state?.retries || 0
+    console.log(1111, task, query, flow, taskRetries)
 
     try {
       await executeTask({
         task,
         query,
-        flowToRun,
+        flow,
         onEventStart,
         onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
       })
@@ -92,23 +90,23 @@ export const useRunnerService = () => {
 
       taskRetries += 1
       markTaskRetry(task, taskRetries)
-      updateQueueItem(flowToRun.id, {
-        ...flowRunning,
+      updateQueueItem(flow.id, {
+        ...runningFlow,
         task: { ...task, state: { ...task.state, retries: taskRetries } },
       })
     } finally {
       const { logs = [] } = task
       const lastLog = logs[logs.length - 1]
 
-      console.log(3333, task, flowsQueue, logs)
+      console.log(3333, task, runQueue, logs)
       if (lastLog && lastLog.status === 'ended') {
         await endTask(task)
-        removeFromQueue(flowToRun?.flowId)
+        removeFromQueue(flow?.id)
       }
 
       if (taskRetries >= 3) {
         await endTask(task, 'failed')
-        removeFromQueue(flowToRun?.flowId)
+        removeFromQueue(flow?.id)
       }
 
       setTimeout(() => {
@@ -116,20 +114,19 @@ export const useRunnerService = () => {
         processQueue()
       }, 1000)
     }
-  }, [runnerState])
+  }, [runnerState.runQueue, runnerState.runningFlow])
 
   // when the queue updates, process the queue
   useEffect(() => {
-    if (flowsQueue.length > 0 && !isRunning) {
+    if (runQueue.length > 0) {
       processQueue()
     }
-  }, [flowsQueue, isRunning])
+  }, [runQueue])
 
   return {
     runnerState,
     setRunnerState,
     resetRunnerState,
-    startFlowsRun,
     addToQueue,
     removeFromQueue,
     processQueue,

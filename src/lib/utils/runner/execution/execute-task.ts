@@ -2,8 +2,8 @@ import { runEvents } from './run-events'
 import { buildFormData } from '~lib/utils/runner/build-form-data'
 
 export async function executeTask(props: ExecuteTaskProp) {
-  const { task, flowToRun, query, onEventStart, onEventEnd } = props
-  const { flowId, eventIds, events } = flowToRun || {}
+  const { task, flow, query, onEventStart, onEventEnd } = props
+  const { flowId, eventIds, events } = flow || {}
 
   // @TODO: Clarify the use case where this filtering was needed
   // const events = getFlowEvents(flows, flowId).filter((event) =>

@@ -129,12 +129,17 @@ export const ACTION_TYPE = {
 }
 
 export const DEFAULT_RUNNER_STATE = {
+  flow: null,
   query: '',
-  flowRunning: null,
-  eventsCompleted: [],
   task: null,
-  flowsQueue: [],
-  isRunning: false,
+  eventsCompleted: [],
+  runningFlow: {
+    flow: null,
+    query: '',
+    task: null,
+    eventsCompleted: [],
+  },
+  runQueue: [],
 }
 
 export const SUPABASE_CHANNELS = {
