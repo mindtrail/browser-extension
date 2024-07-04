@@ -22,6 +22,7 @@ export async function runEvents(props: RunnerEventProps) {
 
   for (const event of clonedEvents) {
     // skip event if already found in task.logs and status = 'ended'
+    // @TODO: test this in a flow with x events and refresh mid through running
     if (task.logs.find((log) => log.eventId === event.id && log.status === 'ended')) {
       continue
     }

@@ -16,8 +16,6 @@ export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
   const { runQueue, runningTask } = runnerState
 
-  const [taskRetries, setTaskRetries] = useState(0)
-
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
 
   const addToQueue = useCallback((newFlows: any[]) => {
@@ -55,6 +53,17 @@ export const useRunnerService = () => {
     })
   }, [])
 
+  const incrementTaskRetries = useCallback(
+    () =>
+      setRunnerState((prev) => ({
+        ...prev,
+        runningTask: prev.runningTask
+          ? { ...prev.runningTask, retries: (prev.runningTask.retries || 0) + 1 }
+          : null,
+      })),
+    [],
+  )
+
   // When the queue updates, process the first task
   useEffect(() => {
     if (runQueue?.length === 0) {
@@ -65,7 +74,6 @@ export const useRunnerService = () => {
     if (!runningTask) {
       const runningTask = runQueue[0]
       setRunnerState((prev) => ({ ...prev, runningTask }))
-      setTaskRetries(0)
     }
   }, [runQueue])
 
@@ -73,11 +81,9 @@ export const useRunnerService = () => {
     if (!runningTask) return
 
     const executeFlowTasks = async () => {
-      const { task, query, flow, id: taskId } = runningTask
-      console.log(111, taskRetries)
+      const { task, query, flow, id: taskId, retries = 0 } = runningTask
 
-      console.log(taskRetries)
-      if (taskRetries >= 3) {
+      if (retries >= 3) {
         console.log(3333, 'failed')
 
         await endTask(task, 'failed')
@@ -95,8 +101,7 @@ export const useRunnerService = () => {
           onEventEnd,
         })
       } catch (error) {
-        console.log(333, 'error', error)
-        setTaskRetries(taskRetries + 1)
+        incrementTaskRetries()
         return
       }
 
@@ -111,7 +116,7 @@ export const useRunnerService = () => {
     }
 
     executeFlowTasks()
-  }, [runningTask, taskRetries])
+  }, [runningTask])
 
   return {
     runnerState,

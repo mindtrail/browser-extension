@@ -8,11 +8,11 @@ import { RecordButton } from '~/components/rpa/recorder'
 import { RunningFlow } from './running-flow'
 
 export function FlowsTab() {
+  const runnerContainerRef = useRef(null)
   const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
   const { flows, runningTask, eventsCompleted, runFlow, updateFlow, deleteFlow } =
     useRunnerState()
 
-  const runnerContainerRef = useRef(null)
   if (runningTask) {
     return (
       <RunningFlow

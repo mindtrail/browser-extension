@@ -23,7 +23,11 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isRecording } = useRecorderState()
 
   const toggleSidebar = useCallback(
-    () => setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen })),
+    () =>
+      setSettings((prevSettings) => ({
+        ...prevSettings,
+        isSidebarOpen: !prevSettings.isSidebarOpen,
+      })),
     [],
   )
 
