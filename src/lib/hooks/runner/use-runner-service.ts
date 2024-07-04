@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
@@ -13,7 +13,7 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const { runQueue } = runnerState
+  const { runQueue, runningFlow } = runnerState
 
   const { onEventStart, onEventEnd } = useEventManager()
 
@@ -71,50 +71,59 @@ export const useRunnerService = () => {
     }
 
     const runningFlow = runQueue[0]
+    console.log(1234, runningFlow)
     startFlowsRun(runningFlow)
+  }, [runQueue])
 
-    const { task, query, ...flow } = runningFlow
-    let taskRetries = task?.state?.retries || 0
-    console.log(1111, task, query, flow, taskRetries)
+  useEffect(() => {
+    const executeFlowTasks = async () => {
+      const { task, query, ...flow } = runningFlow
+      if (!task || !flow) return
 
-    try {
-      await executeTask({
-        task,
-        query,
-        flow,
-        onEventStart,
-        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
-      })
-    } catch (error) {
-      console.log(2222, error)
+      let taskRetries = task?.state?.retries || 0
+      console.log(1111, task, query, flow, taskRetries)
 
-      taskRetries += 1
-      markTaskRetry(task, taskRetries)
-      updateQueueItem(flow.id, {
-        ...runningFlow,
-        task: { ...task, state: { ...task.state, retries: taskRetries } },
-      })
-    } finally {
-      const { logs = [] } = task
-      const lastLog = logs[logs.length - 1]
+      try {
+        await executeTask({
+          task,
+          query,
+          flow,
+          onEventStart,
+          onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
+        })
+      } catch (error) {
+        console.log(2222, error)
 
-      console.log(3333, task, runQueue, logs)
-      if (lastLog && lastLog.status === 'ended') {
-        await endTask(task)
-        removeFromQueue(flow?.id)
+        taskRetries += 1
+        markTaskRetry(task, taskRetries)
+        updateQueueItem(flow.id, {
+          ...runningFlow,
+          task: { ...task, state: { ...task.state, retries: taskRetries } },
+        })
+      } finally {
+        const { logs = [] } = task
+        const lastLog = logs[logs.length - 1]
+
+        console.log(3333, task, runQueue, logs)
+        if (lastLog && lastLog.status === 'ended') {
+          await endTask(task)
+          removeFromQueue(flow?.id)
+        }
+
+        if (taskRetries >= 3) {
+          await endTask(task, 'failed')
+          removeFromQueue(flow?.id)
+        }
+
+        setTimeout(() => {
+          resetRunnerState()
+          processQueue()
+        }, 1000)
       }
-
-      if (taskRetries >= 3) {
-        await endTask(task, 'failed')
-        removeFromQueue(flow?.id)
-      }
-
-      setTimeout(() => {
-        resetRunnerState()
-        processQueue()
-      }, 1000)
     }
-  }, [runnerState.runQueue, runnerState.runningFlow])
+
+    executeFlowTasks()
+  }, [runningFlow])
 
   // when the queue updates, process the queue
   useEffect(() => {

@@ -46,11 +46,18 @@ declare global {
     name: string
     description: string
     events: any[]
+    eventIds: string[]
   }
 
-  type QueuedItem = Flow & {
-    flowId: string
-    eventIdList: string[]
+  type QueuedItem =  {
+    flow: Flow
+    task: any
     query: string
+    eventsCompleted: string[]
+  }
+
+  type RunnerState = {
+    runQueue: QueuedItem[]
+    runningFlow: QueuedItem | null
   }
 }

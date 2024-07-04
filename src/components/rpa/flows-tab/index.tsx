@@ -13,8 +13,7 @@ export function FlowsTab() {
     useRunnerState()
 
   const runnerContainerRef = useRef(null)
-
-  if (runningFlow) {
+  if (runningFlow?.flow) {
     return (
       <RunningFlow
         runningFlow={runningFlow}

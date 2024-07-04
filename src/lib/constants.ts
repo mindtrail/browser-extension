@@ -128,7 +128,7 @@ export const ACTION_TYPE = {
   EXTRACT: 'extract',
 }
 
-export const DEFAULT_RUNNER_STATE = {
+export const DEFAULT_RUNNER_STATE: RunnerState & any = {
   flow: null,
   query: '',
   task: null,
