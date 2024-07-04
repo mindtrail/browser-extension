@@ -5,17 +5,15 @@ import { executeTask } from '~lib/utils/runner/execution/execute-task'
 import { createNewTask, endTask } from '~lib/utils/runner/execution/task-utils'
 
 import { useRunnerService } from './use-runner-service'
+import { useFlowService } from './use-flows-service'
 import { useEventManager } from './use-event-manager'
 
 export const useRunnerState = () => {
   const {
-    flows,
     runnerState,
     setRunnerState,
     resetRunnerState,
     startFlowsRun,
-    updateFlow,
-    deleteFlow,
     flowsQueue,
     isProcessing,
     addToQueue,
@@ -25,6 +23,7 @@ export const useRunnerState = () => {
   } = useRunnerService()
 
   const { query } = runnerState
+  const { flows, updateFlow, deleteFlow } = useFlowService()
   const { onEventStart, onEventEnd } = useEventManager()
 
   const runFlow = useCallback(

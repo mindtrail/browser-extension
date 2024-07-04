@@ -2,12 +2,6 @@ import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
-import {
-  getFlows,
-  onFlowsChange,
-  updateFlow as updateFlowDBCall,
-  deleteFlow as deleteFlowDBCall,
-} from '~/lib/supabase'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
@@ -17,7 +11,6 @@ const RUNNER_CONFIG = {
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
 
-  const [flows, setFlows] = useState([])
   const [flowsQueue, setFlowQueue] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -26,32 +19,8 @@ export const useRunnerService = () => {
     [],
   )
 
-  useEffect(() => {
-    const fetchFlows = async () => {
-      const { data = [] } = await getFlows()
-      setFlows(data)
-    }
-
-    fetchFlows()
-    const unsubscribe = onFlowsChange(fetchFlows)
-    return () => unsubscribe()
-  }, [])
-
   const startFlowsRun = useCallback(async (flowToRun: any[]) => {
     setRunnerState({ ...DEFAULT_RUNNER_STATE, flowRunning: flowToRun })
-  }, [])
-
-  const updateFlow = useCallback(async (flowId: string, payload: any) => {
-    await updateFlowDBCall(flowId, payload)
-
-    setFlows((prev) =>
-      prev.map((flow) => (flow.id === flowId ? { ...flow, ...payload } : flow)),
-    )
-  }, [])
-
-  const deleteFlow = useCallback(async (flowId: string) => {
-    await deleteFlowDBCall(flowId)
-    setFlows((prev) => [...prev.filter((flow) => flow.id !== flowId)])
   }, [])
 
   const addToQueue = useCallback((newFlows: any[]) => {
@@ -76,13 +45,10 @@ export const useRunnerService = () => {
   }, [])
 
   return {
-    flows,
     runnerState,
     setRunnerState,
     resetRunnerState,
     startFlowsRun,
-    updateFlow,
-    deleteFlow,
     flowsQueue,
     isProcessing,
     addToQueue,
