@@ -20,13 +20,12 @@ interface SidebarRPAProps {
 
 export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
   const { isSidebarOpen, activeTab } = settings
-
   const { isRecording } = useRecorderState()
   const { uploadFile, parseFile, assistantStatus, assistantResponse } = useAssistant()
 
   const toggleSidebar = useCallback(
     () => setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen })),
-    [isSidebarOpen, setSettings],
+    [setSettings],
   )
 
   const changeTab = useCallback(
@@ -46,6 +45,8 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [toggleSidebar, isRecording, isSidebarOpen])
+
+  console.log(1111)
 
   return (
     <div

@@ -25,7 +25,9 @@ const UIOverlay = () => {
 
   useEffect(() => {
     const hostExcluded = isHostExcluded(excludeList)
-    setOverlayVisible(!hostExcluded)
+    if (hostExcluded) {
+      setOverlayVisible(false)
+    }
   }, [excludeList])
 
   if (!overlayVisible) {

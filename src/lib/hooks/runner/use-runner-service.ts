@@ -60,9 +60,9 @@ export const useRunnerService = () => {
     }))
   }, [])
 
-  const addToQueue = useCallback((newFlows: any[]) => {
+  const addToQueue = useCallback((queuedItem: any) => {
     setFlowQueue((prevQueue) => {
-      const newItems = newFlows.filter(
+      const newItems = newFlows?.filter(
         (flow) => !prevQueue.some((queuedFlow) => queuedFlow.id === flow.id),
       )
       return [...prevQueue, ...newItems]

@@ -31,14 +31,14 @@ export const useRunnerState = () => {
     async (flowToRun: any) => {
       if (!flowToRun) return
 
-      const queuedFlow = {
+      const queuedItem = {
         ...flowToRun,
         flowId: flowToRun.id,
         eventIds: flowToRun.events.map((event: any) => event.id),
         query,
       }
 
-      addToQueue(queuedFlow)
+      addToQueue(queuedItem)
 
       if (!isProcessing) {
         processQueue()
@@ -87,7 +87,7 @@ export const useRunnerState = () => {
 
       if (resumableTasks.length > 0) {
         const resumableTask = resumableTasks[0]
-        console.log(33333, 'resumableTask', resumableTask)
+        // console.log(33333, 'resumableTask', resumableTask)
         // runFlow(resumableTask?.state?.flowId)
       }
     }

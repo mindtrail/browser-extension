@@ -40,7 +40,7 @@ export const useAssistant = () => {
         data: {},
       })
     }
-    console.log('assistant', assistant)
+    // console.log('assistant', assistant)
     setAssistantId(assistant.id)
   }
 
@@ -54,7 +54,7 @@ export const useAssistant = () => {
         data: {},
       })
     }
-    console.log('thread', thread)
+    // console.log('thread', thread)
     setThreadId(thread.id)
   }
 
