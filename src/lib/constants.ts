@@ -133,6 +133,8 @@ export const DEFAULT_RUNNER_STATE = {
   flowRunning: null,
   eventsCompleted: [],
   task: null,
+  flowsQueue: [],
+  isRunning: false,
 }
 
 export const SUPABASE_CHANNELS = {

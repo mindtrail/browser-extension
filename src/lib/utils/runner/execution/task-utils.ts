@@ -28,12 +28,13 @@ export async function endTask(task: any, status: 'ended' | 'failed' = 'ended') {
   })
 }
 
-export async function markTaskRetry(task: any) {
+export async function markTaskRetry(task: any, retries: number = 0) {
+  console.log(retries)
   return updateTask(task.id, {
     ...task,
     state: {
       ...task.state,
-      retries: (task?.state?.retries || 0) + 1,
+      retries,
     },
   })
 }
