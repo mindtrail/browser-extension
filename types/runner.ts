@@ -10,7 +10,6 @@ declare global {
   type OnEventEndProps = {
     event: any
     taskId: string
-    setRunnerState?: Function
   }
 
   interface BaseRunnerProps {

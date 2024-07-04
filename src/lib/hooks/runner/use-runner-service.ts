@@ -42,15 +42,15 @@ export const useRunnerService = () => {
 
   const onEventEnd = useCallback(async (props: OnEventEndProps) => {
     await handleEventEnd(props)
-    const { event: newEvent, setRunnerState } = props
+    const { event: newEvent } = props
 
     setRunnerState((prev) => {
-      const eventAlreadyMarked = prev.eventsCompleted.some((e) => e.id === newEvent.id)
+      const eventAlreadyMarked = prev?.eventsCompleted?.some((e) => e.id === newEvent.id)
       if (eventAlreadyMarked) return prev
 
       return {
         ...prev,
-        eventsCompleted: [...prev.eventsCompleted, newEvent],
+        eventsCompleted: [...(prev?.eventsCompleted || []), newEvent],
       }
     })
   }, [])

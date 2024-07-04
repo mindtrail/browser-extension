@@ -24,12 +24,12 @@ export const SidebarRPA = ({ settings, setSettings }: SidebarRPAProps) => {
 
   const toggleSidebar = useCallback(
     () => setSettings((settings) => ({ ...settings, isSidebarOpen: !isSidebarOpen })),
-    [setSettings],
+    [],
   )
 
   const changeTab = useCallback(
     (tab: string) => setSettings((settings) => ({ ...settings, activeTab: tab })),
-    [setSettings],
+    [],
   )
 
   useEffect(() => {
