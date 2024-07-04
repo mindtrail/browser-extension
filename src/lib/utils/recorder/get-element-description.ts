@@ -1,9 +1,6 @@
 // This is used to generate event_description for the "manual generated events" and this is essential for linking the manual generating events with ai generated actions when "merging" them
 // This function will return the closest text content for the given element. Most of the times that will be the "label" of the element
-export function getElementDescription(selector) {
-  const element = document.querySelector(selector)
-  if (!element) return { element: null, text: '' }
-
+export function getElementDescription(element) {
   // Helper function to check if a node has text content
   function hasTextContent(node) {
     return node.textContent.trim().length > 0
