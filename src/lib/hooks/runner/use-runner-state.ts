@@ -16,18 +16,18 @@ export const useRunnerState = () => {
       if (!flowToRun) return
 
       const task = await createNewTask(flowToRun.id)
+      if (!task) return
 
-      const runItem = {
+      const queueItem = {
         id: task.id,
         task,
         flow: flowToRun,
         query,
-        flowId: flowToRun.id,
         eventIds: flowToRun.events.map((event: any) => event.id),
         eventsCompleted: [],
       }
 
-      addToQueue([runItem])
+      addToQueue([queueItem])
     },
     [flows, query],
   )
@@ -49,11 +49,10 @@ export const useRunnerState = () => {
         if (!flowToRun) continue
 
         const queuedItem = {
-          ...flowToRun,
+          id: task.id,
+          task,
           flow: flowToRun,
           query,
-          task,
-          flowId: flowToRun.id,
           eventIds: flowToRun.events.map((event: any) => event.id),
           eventsCompleted: [],
         }

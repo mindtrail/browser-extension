@@ -19,38 +19,28 @@ export const useRunnerService = () => {
 
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
 
-  const setrunningTask = useCallback(
-    (flow) => setRunnerState((prev) => ({ ...prev, runningTask: flow })),
-    [runQueue],
-  )
+  const addToQueue = useCallback((newFlows: any[]) => {
+    setRunnerState((prev) => ({
+      ...prev,
+      runQueue: [
+        ...prev.runQueue,
+        ...newFlows.filter(
+          (flow) => !prev.runQueue.some((queuedFlow) => queuedFlow.id === flow.id),
+        ),
+      ],
+    }))
+  }, [])
 
-  const addToQueue = useCallback(
-    (newFlows: any[]) => {
-      setRunnerState((prev) => ({
-        ...prev,
-        runQueue: [
-          ...prev.runQueue,
-          ...newFlows.filter(
-            (flow) => !prev.runQueue.some((queuedFlow) => queuedFlow.id === flow.id),
-          ),
-        ],
-      }))
-    },
-    [runQueue],
-  )
+  const removeFromQueue = useCallback((taskId: string) => {
+    setRunnerState((prev) => ({
+      ...prev,
+      runQueue: prev.runQueue.filter(({ id }) => id !== taskId),
+      runningTask: prev.runningTask?.id === taskId ? null : prev.runningTask,
+    }))
+  }, [])
 
-  const removeFromQueue = useCallback(
-    (taskId: string) => {
-      setRunnerState((prev) => ({
-        ...prev,
-        runQueue: prev.runQueue.filter(({ id }) => id !== taskId),
-        runningTask: prev.runningTask?.id === taskId ? null : prev.runningTask,
-      }))
-    },
-    [runQueue],
-  )
-
-  const processQueue = useCallback(async () => {
+  // When the queue updates, process the first task
+  useEffect(() => {
     if (runQueue?.length === 0) {
       resetRunnerState()
       return
@@ -58,27 +48,25 @@ export const useRunnerService = () => {
 
     if (!runningTask) {
       const runningTask = runQueue[0]
-      setrunningTask(runningTask)
+      setRunnerState((prev) => ({ ...prev, runningTask }))
       setTaskRetries(0)
-      return
     }
   }, [runQueue])
-
-  // When the queue updates, process the queue
-  useEffect(() => {
-    if (runQueue.length > 0) {
-      processQueue()
-    }
-  }, [runQueue])
-
-  console.log(1111, taskRetries, runQueue, runningTask)
 
   useEffect(() => {
     if (!runningTask) return
 
     const executeFlowTasks = async () => {
-      const { task, query, ...flow } = runningTask
-      if (!task || !flow) return
+      const { task, query, flow, id: taskId } = runningTask
+      console.log(111, taskRetries)
+
+      if (taskRetries >= 3) {
+        console.log(3333, 'failed')
+
+        await endTask(task, 'failed')
+        removeFromQueue(taskId)
+        return
+      }
 
       try {
         await executeTask({
@@ -90,12 +78,6 @@ export const useRunnerService = () => {
         })
       } catch (error) {
         setTaskRetries(taskRetries + 1)
-
-        if (taskRetries >= 1) {
-          console.log(3333, 'failed')
-          await endTask(task, 'failed')
-          removeFromQueue(flow?.id)
-        }
         return
       }
 
@@ -104,7 +86,7 @@ export const useRunnerService = () => {
 
       if (lastLog && lastLog.status === 'ended') {
         await endTask(task)
-        removeFromQueue(flow?.id)
+        removeFromQueue(taskId)
       }
     }
 

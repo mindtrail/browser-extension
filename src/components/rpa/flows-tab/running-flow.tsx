@@ -21,7 +21,10 @@ export function RunningFlow({ runningTask, flows, eventsCompleted }: RunningFlow
     return null
   }
 
-  const { events: runningTaskEvents, name, description } = runningTask
+  const {
+    events: runningTaskEvents,
+    flow: { name, description },
+  } = runningTask
 
   return (
     <div className='flex flex-col flex-1 gap-6'>
