@@ -23,7 +23,7 @@ export const useFlowService = () => {
   const updateFlow = useCallback(async (flowId: string, payload: any) => {
     await updateFlowDBCall(flowId, payload)
     setFlows((prev) =>
-      prev.map((flow) => (flow.id === flowId ? { ...flow, ...payload } : flow))
+      prev.map((flow) => (flow.id === flowId ? { ...flow, ...payload } : flow)),
     )
   }, [])
 

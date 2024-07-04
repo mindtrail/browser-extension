@@ -2,6 +2,9 @@ import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
+import { createNewTask, endTask } from '~lib/utils/runner/execution/task-utils'
+import { executeTask } from '~lib/utils/runner/execution/execute-task'
+import { useEventManager } from './use-event-manager'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
@@ -9,8 +12,12 @@ const RUNNER_CONFIG = {
 }
 
 export const useRunnerService = () => {
-  const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
+  const [runnerState, setRunnerState] = useStorage(
+    RUNNER_CONFIG,
+    () => DEFAULT_RUNNER_STATE,
+  )
 
+  const { onEventStart, onEventEnd } = useEventManager()
   const [flowsQueue, setFlowQueue] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -36,13 +43,43 @@ export const useRunnerService = () => {
     setFlowQueue((prevQueue) => prevQueue.filter((flow) => flow.id !== flowId))
   }, [])
 
-  const startProcessing = useCallback(() => {
-    setIsProcessing(true)
-  }, [])
+  const processQueue = useCallback(async () => {
+    if (flowsQueue.length === 0) {
+      setIsProcessing(false)
+      return
+    }
 
-  const stopProcessing = useCallback(() => {
-    setIsProcessing(false)
-  }, [])
+    setIsProcessing(true)
+    const flowToRun = flowsQueue[0]
+
+    await startFlowsRun(flowToRun)
+    let task = await createNewTask(flowToRun.flowId)
+
+    try {
+      await executeTask({
+        flowToRun,
+        task,
+        query: runnerState.query,
+        onEventStart,
+        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
+      })
+    } finally {
+      await endTask(task.id)
+      removeFromQueue(flowToRun?.flowId)
+
+      setTimeout(() => {
+        resetRunnerState()
+        processQueue()
+      }, 2000)
+    }
+  }, [flowsQueue])
+
+  // when the queue updates, process the queue
+  useEffect(() => {
+    if (flowsQueue.length > 0 && !isProcessing) {
+      processQueue()
+    }
+  }, [flowsQueue, isProcessing])
 
   return {
     runnerState,
@@ -53,7 +90,6 @@ export const useRunnerService = () => {
     isProcessing,
     addToQueue,
     removeFromQueue,
-    startProcessing,
-    stopProcessing,
+    processQueue,
   }
 }
