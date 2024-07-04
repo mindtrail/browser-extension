@@ -133,12 +133,7 @@ export const DEFAULT_RUNNER_STATE: RunnerState & any = {
   query: '',
   task: null,
   eventsCompleted: [],
-  runningFlow: {
-    flow: null,
-    query: '',
-    task: null,
-    eventsCompleted: [],
-  },
+  runningTask: null,
   runQueue: [],
 }
 

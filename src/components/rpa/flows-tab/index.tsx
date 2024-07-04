@@ -9,14 +9,14 @@ import { RunningFlow } from './running-flow'
 
 export function FlowsTab() {
   const { isRecording, isPaused, isSaving, toggleRecording } = useRecorderState()
-  const { flows, runningFlow, eventsCompleted, runFlow, updateFlow, deleteFlow } =
+  const { flows, runningTask, eventsCompleted, runFlow, updateFlow, deleteFlow } =
     useRunnerState()
 
   const runnerContainerRef = useRef(null)
-  if (runningFlow?.flow) {
+  if (runningTask) {
     return (
       <RunningFlow
-        runningFlow={runningFlow}
+        runningTask={runningTask}
         flows={flows}
         eventsCompleted={eventsCompleted}
       />

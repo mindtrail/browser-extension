@@ -18,10 +18,10 @@ export const useRunnerState = () => {
       const task = await createNewTask(flowToRun.id)
 
       const runItem = {
-        ...flowToRun,
+        id: task.id,
+        task,
         flow: flowToRun,
         query,
-        task,
         flowId: flowToRun.id,
         eventIds: flowToRun.events.map((event: any) => event.id),
         eventsCompleted: [],

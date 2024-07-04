@@ -1,8 +1,8 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
-import { endTask, markTaskRetry } from '~lib/utils/runner/execution/task-utils'
+import { endTask } from '~lib/utils/runner/execution/task-utils'
 import { executeTask } from '~lib/utils/runner/execution/execute-task'
 import { useEventManager } from './use-event-manager'
 
@@ -13,13 +13,14 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const { runQueue, runningFlow } = runnerState
+  const { runQueue, runningTask } = runnerState
   const { onEventStart, onEventEnd } = useEventManager()
+  const [taskRetries, setTaskRetries] = useState(0)
 
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
 
-  const setRunningFlow = useCallback(
-    (flow) => setRunnerState((prev) => ({ ...prev, runningFlow: flow })),
+  const setrunningTask = useCallback(
+    (flow) => setRunnerState((prev) => ({ ...prev, runningTask: flow })),
     [runQueue],
   )
 
@@ -39,10 +40,11 @@ export const useRunnerService = () => {
   )
 
   const removeFromQueue = useCallback(
-    (flowId: string) => {
+    (taskId: string) => {
       setRunnerState((prev) => ({
         ...prev,
-        runQueue: prev.runQueue.filter((flow) => flow.id !== flowId),
+        runQueue: prev.runQueue.filter(({ id }) => id !== taskId),
+        runningTask: prev.runningTask?.id === taskId ? null : prev.runningTask,
       }))
     },
     [runQueue],
@@ -54,33 +56,49 @@ export const useRunnerService = () => {
       return
     }
 
-    const runningFlow = runQueue[0]
-    setRunningFlow(runningFlow)
+    if (!runningTask) {
+      const runningTask = runQueue[0]
+      setrunningTask(runningTask)
+      setTaskRetries(0)
+      return
+    }
+  }, [runQueue])
 
-    const { task, query, ...flow } = runningFlow
-    if (!task || !flow) return
+  // When the queue updates, process the queue
+  useEffect(() => {
+    if (runQueue.length > 0) {
+      processQueue()
+    }
+  }, [runQueue])
 
-    let taskRetries = task?.state?.retries || 0
-    console.log(1111, task, query, flow, taskRetries)
+  console.log(1111, taskRetries, runQueue, runningTask)
 
-    try {
-      await executeTask({
-        task,
-        query,
-        flow,
-        onEventStart,
-        onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
-      })
-    } catch (error) {
-      taskRetries += 1
-      markTaskRetry(task, taskRetries)
+  useEffect(() => {
+    if (!runningTask) return
 
-      // task.state.retries = taskRetries
-      setRunningFlow({
-        ...runningFlow,
-        task: { ...task, state: { ...task.state, retries: taskRetries } },
-      })
-    } finally {
+    const executeFlowTasks = async () => {
+      const { task, query, ...flow } = runningTask
+      if (!task || !flow) return
+
+      try {
+        await executeTask({
+          task,
+          query,
+          flow,
+          onEventStart,
+          onEventEnd: (props) => onEventEnd({ ...props, setRunnerState }),
+        })
+      } catch (error) {
+        setTaskRetries(taskRetries + 1)
+
+        if (taskRetries >= 1) {
+          console.log(3333, 'failed')
+          await endTask(task, 'failed')
+          removeFromQueue(flow?.id)
+        }
+        return
+      }
+
       const { logs = [] } = task
       const lastLog = logs[logs.length - 1]
 
@@ -88,25 +106,10 @@ export const useRunnerService = () => {
         await endTask(task)
         removeFromQueue(flow?.id)
       }
-
-      if (taskRetries >= 3) {
-        await endTask(task, 'failed')
-        removeFromQueue(flow?.id)
-      }
-
-      setTimeout(() => {
-        resetRunnerState()
-        processQueue()
-      }, 1000)
     }
-  }, [runQueue, runningFlow])
 
-  // when the queue updates, process the queue
-  useEffect(() => {
-    if (runQueue.length > 0) {
-      processQueue()
-    }
-  }, [runQueue])
+    executeFlowTasks()
+  }, [runningTask, taskRetries])
 
   return {
     runnerState,
@@ -114,6 +117,5 @@ export const useRunnerService = () => {
     resetRunnerState,
     addToQueue,
     removeFromQueue,
-    processQueue,
   }
 }
