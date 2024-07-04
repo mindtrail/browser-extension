@@ -5,7 +5,7 @@ import { extractComponent } from './components/extract'
 import { navigationComponent } from './components/navigation'
 import { googleSheetsComponent } from './components/google-sheets'
 
-const components = {
+const ACTION_COMPONENTS = {
   input: inputComponent,
   click: clickComponent,
   loop: loopComponent,
@@ -16,7 +16,7 @@ const components = {
 
 export async function runEvents(props: RunnerEventProps) {
   const { flowId, task, events, data, onEventStart, onEventEnd } = props
-
+  console.log(props)
   const clonedTask = structuredClone(task)
   const clonedEvents = structuredClone(events)
 
@@ -26,10 +26,10 @@ export async function runEvents(props: RunnerEventProps) {
     if (task.logs.find((log) => log.eventId === event.id && log.status === 'ended')) {
       continue
     }
-    const component = components[event.type]
-    if (!component) break
+    const triggerAction = ACTION_COMPONENTS[event.type]
+    if (!triggerAction) break
 
-    await component({
+    await triggerAction({
       flowId,
       task: clonedTask,
       events: clonedEvents,

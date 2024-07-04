@@ -4,7 +4,8 @@ import { useStorage } from '@plasmohq/storage/hook'
 
 import { STORAGE_AREA, DEFAULT_RUNNER_STATE } from '~/lib/constants'
 import { endTask } from '~lib/utils/runner/execution/task-utils'
-import { executeTask } from '~lib/utils/runner/execution/execute-task'
+import { runEvents } from '~lib/utils/runner/execution/run-events'
+import { buildFormData } from '~lib/utils/runner/build-form-data'
 import { handleEventStart, handleEventEnd } from '~/lib/utils/runner/execution/task-utils'
 
 const RUNNER_CONFIG = {
@@ -81,7 +82,7 @@ export const useRunnerService = () => {
     if (!runningTask) return
 
     const executeFlowTasks = async () => {
-      const { task, query, flow, id: taskId, retries = 0 } = runningTask
+      const { task, id: taskId, flow, retries = 0 } = runningTask
 
       if (retries >= 3) {
         console.log(3333, 'failed')
@@ -93,14 +94,19 @@ export const useRunnerService = () => {
 
       try {
         console.log(222, 'executeTask')
-        await executeTask({
+        const { events, if: flowId } = flow
+        const data = await buildFormData({ variables: task.state.variables, events })
+
+        await runEvents({
           task,
-          query,
-          flow,
+          events,
+          flowId,
+          data,
           onEventStart: handleEventStart,
           onEventEnd,
         })
       } catch (error) {
+        console.log(222, error)
         incrementTaskRetries()
         return
       }
