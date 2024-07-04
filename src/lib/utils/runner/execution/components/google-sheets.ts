@@ -2,8 +2,7 @@ import { getTask } from '~/lib/supabase'
 import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
 
 export async function googleSheetsComponent(props: RunnerComponentProps) {
-  const { flowId, event, onEventStart, onEventEnd, task } = props
-  await onEventStart({ flowId, event, taskId: task.id })
+  const { event, task } = props
 
   try {
     const latestTask = await getTask(task.id)
@@ -30,8 +29,6 @@ export async function googleSheetsComponent(props: RunnerComponentProps) {
     if (!urlMatch) {
       window.location.href = event.baseURI
     }
-
-    await onEventEnd({ event, taskId: task.id })
   } catch (error) {
     console.error('Error syncing to Google Sheet:', error)
     throw error

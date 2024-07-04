@@ -1,7 +1,7 @@
 import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
 import { waitForElement } from '~/lib/utils/runner/wait-for-element'
 
-async function triggerClickEvent(event, callback) {
+export async function clickComponent({ event }: RunnerComponentProps) {
   try {
     if (event.baseURI) {
       const urlMatch = await waitForUrl(event.baseURI)
@@ -12,14 +12,12 @@ async function triggerClickEvent(event, callback) {
 
     const element: any = await waitForElement(event.selector)
     if (!element) {
-      await callback()
       if (event.href) {
         window.location.href = event.href
       }
       return
     }
 
-    await callback()
     element.click()
     // const clickEvent = new MouseEvent('click', { bubbles: true, composed: true })
     // element.dispatchEvent(clickEvent)
@@ -27,11 +25,4 @@ async function triggerClickEvent(event, callback) {
     console.error('Error triggering click event:', error)
     throw error
   }
-}
-
-export async function clickComponent(props: RunnerComponentProps) {
-  const { flowId, event, onEventStart, onEventEnd, task } = props
-
-  await onEventStart({ flowId, event, taskId: task.id })
-  await triggerClickEvent(event, () => onEventEnd({ event, taskId: task.id }))
 }

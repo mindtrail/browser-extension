@@ -4,9 +4,8 @@ import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
 import { waitForElement } from '~/lib/utils/runner/wait-for-element'
 
 export async function extractComponent(props: RunnerComponentProps) {
-  const { flowId, event, onEventStart, onEventEnd, task } = props
+  const { event, task } = props
 
-  await onEventStart({ flowId, event, taskId: task.id })
   if (event.baseURI) {
     const urlMatch = await waitForUrl(event.baseURI)
     if (!urlMatch) {
@@ -33,6 +32,4 @@ export async function extractComponent(props: RunnerComponentProps) {
       },
     },
   })
-
-  await onEventEnd({ event, taskId: task.id })
 }

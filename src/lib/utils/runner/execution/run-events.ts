@@ -16,7 +16,6 @@ const ACTION_COMPONENTS = {
 
 export async function runEvents(props: RunnerEventProps) {
   const { flowId, task, events, data, onEventStart, onEventEnd } = props
-  console.log(props)
   const clonedTask = structuredClone(task)
   const clonedEvents = structuredClone(events)
 
@@ -29,15 +28,27 @@ export async function runEvents(props: RunnerEventProps) {
     const triggerAction = ACTION_COMPONENTS[event.type]
     if (!triggerAction) break
 
-    await triggerAction({
-      flowId,
-      task: clonedTask,
-      events: clonedEvents,
-      event,
-      data,
-      onEventStart,
-      onEventEnd,
-      runEvents,
-    })
+    if (event.type !== 'loop') {
+      await onEventStart({ flowId, event, taskId: task.id })
+    }
+
+    try {
+      await triggerAction({
+        flowId,
+        task: clonedTask,
+        events: clonedEvents,
+        event,
+        data,
+        onEventStart,
+        onEventEnd,
+        runEvents,
+      })
+    } catch (error) {
+      console.error(error)
+    }
+
+    if (event.type !== 'loop') {
+      await onEventEnd({ event, taskId: task.id })
+    }
   }
 }
