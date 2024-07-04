@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 
 import { getTasksToRun } from '~/lib/supabase'
-import { createNewTask } from '~lib/utils/runner/execution/task-utils'
+import { createNewTask, endTask } from '~lib/utils/runner/execution/task-utils'
 import { useRunnerService } from './use-runner-service'
 import { useFlowService } from './use-flows-service'
 
@@ -29,6 +29,11 @@ export const useRunnerState = () => {
     },
     [flows, query],
   )
+
+  const stopFlowRun = useCallback(() => {
+    endTask(runnerState.runningTask?.task)
+    resetRunnerState()
+  }, [])
 
   useEffect(() => {
     const retreshQueue = async () => {
@@ -74,5 +79,6 @@ export const useRunnerState = () => {
     runFlow,
     updateFlow,
     deleteFlow,
+    stopFlowRun,
   }
 }

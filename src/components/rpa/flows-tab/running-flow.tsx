@@ -13,9 +13,16 @@ import { EventsList } from '../events-list'
 interface RunningFlowProps {
   runningTask: any
   eventsCompleted: any[]
+  onStop: () => void
+  onPause?: () => void
 }
 
-export function RunningFlow({ runningTask, eventsCompleted }: RunningFlowProps) {
+export function RunningFlow({
+  runningTask,
+  eventsCompleted,
+  onStop,
+  onPause,
+}: RunningFlowProps) {
   if (!runningTask) {
     return null
   }
@@ -40,7 +47,7 @@ export function RunningFlow({ runningTask, eventsCompleted }: RunningFlowProps) 
           </Typography>
         </div>
         <div className='flex justify-between gap-4'>
-          <Button variant='ghost' className='flex items-center gap-2'>
+          <Button onClick={onStop} variant='ghost' className='flex items-center gap-2'>
             <CircleStopIcon className='w-5 h-5' />
             Stop
           </Button>

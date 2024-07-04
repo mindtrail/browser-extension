@@ -18,10 +18,15 @@ export async function createNewTask(flowId: string) {
 }
 
 export async function endTask(task: any, status: 'ended' | 'failed' = 'ended') {
-  return updateTask(task.id, {
-    ...task,
+  if (!task) return
+
+  const taskRes = await getTask(task.id)
+  const updatedTask = taskRes.data
+
+  return updateTask(updatedTask.id, {
+    ...updatedTask,
     state: {
-      ...task.state,
+      ...updatedTask.state,
       status,
     },
   })
