@@ -1,14 +1,6 @@
 import { finder } from '@medv/finder'
 
-export function getSelector(
-  element,
-  options = {
-    seedMinLength: 5,
-    optimizedMinLength: 2,
-    threshold: 3000,
-    timeoutMs: 1000,
-  },
-) {
+export function getSelector(element) {
   const selector = finder(element, {
     tagName: () => true,
     className: (value) => {
@@ -21,7 +13,10 @@ export function getSelector(
       if (whitelist.includes(name)) return true
       return false
     },
-    ...options,
+    seedMinLength: 5,
+    optimizedMinLength: 2,
+    threshold: 3000,
+    timeoutMs: 1000,
   })
 
   return selector
