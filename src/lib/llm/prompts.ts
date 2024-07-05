@@ -211,6 +211,48 @@ export const generateActionsPrompt = (html) => [
   },
 ]
 
+export const generateActionsPromptV2 = (html) => [
+  {
+    role: 'assistant',
+    content: [
+      {
+        type: 'text',
+        text: `
+          [
+            {
+              "type": "input",
+              "label": "The closest and most relevant description of the input field",
+              "selector": "The CSS selector (ex: '[data-test-key='name'] input[type='text']')"
+            },
+            {
+              "type": "click",
+              "label": "The closest and most relevant description of the button or link",
+              "selector": "The CSS selector (ex: '[data-test-key='name'] button[type='submit']')"
+            }
+          ]
+        `,
+      },
+      {
+        type: 'text',
+        text: `Use the above action types to extract all meaningful and relevant actions from the given HTML.
+        1. Group actions by sections (ex: forms, navigation, etc.) 
+        2. Add a description for each section.
+        3. Filter out actions with a description that doesn't make sense or is to generic.
+        4. Use JSON format`,
+      },
+    ],
+  },
+  {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: html,
+      },
+    ],
+  },
+]
+
 export const updateFormDataPrompt = ({ form, variables }) => [
   {
     role: 'system',
@@ -232,5 +274,34 @@ export const updateFormDataPrompt = ({ form, variables }) => [
       Old values should not be used !
       ${JSON.stringify(form)}
     `,
+  },
+]
+
+export const generateSelectorPrompt = ({ html, type }) => [
+  {
+    role: 'system',
+    content: `You are a tool that identifies an ${type} in a given HTML and generates a unique CSS selector ID for it.
+        You will generate a unique CSS selector ID for the ${type} you identify in the given HTML.
+        The selector must by all means point to only one element. Selectors that can be applied to multiple elements will not be accepted !!!
+        Example of wrong selector: "div.cui5-input__box > input[type='text']" (this is not ok because it's too broad)
+        Example of correct selector: "[data-test-key='name'] input[type='text']" (this is ok because it's specific)
+        Response should always be a just a JSON object in this format: {"selector": "string"}`,
+  },
+  {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: `
+        "HTML": ${JSON.stringify(html)}
+        `,
+      },
+      {
+        type: 'text',
+        text: `
+        "Target Type": ${JSON.stringify(type)}
+        `,
+      },
+    ],
   },
 ]

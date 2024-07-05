@@ -64,7 +64,8 @@
       "unlimitedStorage",
       "tabs",
       "windows",
-      "webNavigation"
+      "webNavigation",
+      "history"
     ],
     "content_scripts": [
       {
