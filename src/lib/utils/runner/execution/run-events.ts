@@ -15,7 +15,7 @@ const ACTION_COMPONENTS = {
 }
 
 export async function runEvents(props: RunnerEventProps) {
-  const { flowId, task, events, data, onEventStart, onEventEnd } = props
+  const { task, events } = props
   const clonedTask = structuredClone(task)
   const clonedEvents = structuredClone(events)
 
@@ -27,26 +27,12 @@ export async function runEvents(props: RunnerEventProps) {
       throw new Error(`No action component found for event type: ${event.type}`)
     }
 
-    if (event.type === 'loop') {
-      return await loopComponent({ ...props, event, task: clonedTask, runEvents })
-    }
-
-    await onEventStart({ flowId, event, taskId: task.id })
-    // if (event.type === 'navigation') {
-    //   await onEventEnd({ event, taskId: task.id })
-    // }
-
     await triggerAction({
-      flowId,
+      ...props,
+      event,
       task: clonedTask,
       events: clonedEvents,
-      event,
-      data,
     })
-
-    await onEventEnd({ event, taskId: task.id })
-    // if (event.type !== 'navigation') {
-    // }
   }
 }
 
