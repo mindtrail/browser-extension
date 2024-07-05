@@ -6,34 +6,26 @@ import { useRunnerService } from './use-runner-service'
 import { useFlowService } from './use-flows-service'
 
 export const useRunnerState = () => {
-  const { runnerState, setRunnerState, resetRunnerState, addToQueue } = useRunnerService()
-
-  const { query } = runnerState
+  const { runnerState, resetRunnerState, addToQueue, endTaskRun } = useRunnerService()
   const { flows, updateFlow, deleteFlow } = useFlowService()
 
   const runFlow = useCallback(
-    async (flowToRun: any) => {
+    async (flowToRun: any, query: string = '') => {
       if (!flowToRun) return
 
       const task = await createNewTask(flowToRun.id)
       if (!task) return
 
       const taskToRun = {
-        id: task.id,
         task,
-        query,
+        query, // @TODO: the query should come from where the run function is called
         flow: flowToRun,
       }
 
       addToQueue([taskToRun])
     },
-    [flows, query],
+    [flows],
   )
-
-  const stopFlowRun = useCallback(() => {
-    endTask(runnerState.runningTask?.task)
-    resetRunnerState()
-  }, [])
 
   useEffect(() => {
     const refreshQueue = async () => {
@@ -42,7 +34,7 @@ export const useRunnerState = () => {
       const { data: tasksToRun = [] } = res
 
       if (!tasksToRun) {
-        resetRunnerState()
+        resetRunnerState(true)
         return
       }
 
@@ -54,7 +46,7 @@ export const useRunnerState = () => {
         const taskToRun = {
           id: task.id,
           task,
-          query,
+          query: '', // @TODO: check if the query needs to come from the Task this time
           flow: flowToRun,
         }
 
@@ -62,7 +54,7 @@ export const useRunnerState = () => {
       }
 
       if (!tasksToResume.length) {
-        resetRunnerState()
+        resetRunnerState(true)
         return
       }
 
@@ -75,10 +67,9 @@ export const useRunnerState = () => {
   return {
     ...runnerState,
     flows,
-    setRunnerState,
     runFlow,
     updateFlow,
     deleteFlow,
-    stopFlowRun,
+    endTaskRun,
   }
 }

@@ -128,10 +128,13 @@ export const ACTION_TYPE = {
   EXTRACT: 'extract',
 }
 
-export const DEFAULT_RUNNER_STATE: RunnerState & any = {
+export const DEFAULT_RUNNER_STATE: RunnerState = {
   runningTask: null,
-  runQueue: [],
+  runningFlow: null,
+  runningQuery: '',
+  retries: 0,
   eventsCompleted: [],
+  runQueue: [],
 }
 
 export const SUPABASE_CHANNELS = {

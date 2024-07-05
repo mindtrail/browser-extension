@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
@@ -15,29 +15,35 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const { runQueue, runningTask } = runnerState
+  const { runQueue, runningTask, runningFlow, runningQuery, retries, eventsCompleted } =
+    runnerState
 
-  const { task } = runningTask
+  // Reset everything to default state, but keep the runQueue if neede
+  const resetRunnerState = useCallback(
+    (resetQueue = false) =>
+      setRunnerState(({ runQueue }) => ({
+        ...DEFAULT_RUNNER_STATE,
+        runQueue: resetQueue ? [] : runQueue,
+      })),
+    [],
+  )
 
-  const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
-
-  const addToQueue = useCallback((newFlows: any[]) => {
-    setRunnerState((prev) => ({
-      ...prev,
+  const addToQueue = useCallback((newTasks: any[]) => {
+    setRunnerState(({ runQueue, ...rest }) => ({
+      ...rest,
       runQueue: [
-        ...prev.runQueue,
-        ...newFlows.filter(
-          (flow) => !prev.runQueue.some((queuedFlow) => queuedFlow.id === flow.id),
+        ...runQueue,
+        ...newTasks.filter(
+          (newTask) => !runQueue.some(({ task }) => task.id === newTask.id),
         ),
       ],
     }))
   }, [])
 
   const removeFromQueue = useCallback((taskId: string) => {
-    setRunnerState((prev) => ({
-      ...prev,
-      runQueue: prev.runQueue.filter(({ id }) => id !== taskId),
-      runningTask: prev.runningTask?.id === taskId ? null : prev.runningTask,
+    setRunnerState(({ runQueue, ...rest }) => ({
+      ...rest,
+      runQueue: runQueue.filter(({ task }) => task.id !== taskId),
     }))
   }, [])
 
@@ -45,14 +51,14 @@ export const useRunnerService = () => {
     const updatedTask = await handleEventEnd(props)
     if (!updatedTask) return
 
-    console.log(1234, updatedTask)
     const { logs } = updatedTask
 
-    setRunnerState((prev) => {
+    setRunnerState(({ eventsCompleted, ...rest }) => {
       // const eventAlreadyMarked = prev?.eventsCompleted?.some((e) => e.id === newEvent.id)
       // if (eventAlreadyMarked) return prev
+      // @TODO -> check when running after a refresh
       return {
-        ...prev,
+        ...rest,
         eventsCompleted: [...logs],
       }
     })
@@ -60,13 +66,20 @@ export const useRunnerService = () => {
 
   const incrementTaskRetries = useCallback(
     () =>
-      setRunnerState((prev) => ({
-        ...prev,
-        runningTask: prev.runningTask
-          ? { ...prev.runningTask, retries: (prev.runningTask.retries || 0) + 1 }
-          : null,
+      setRunnerState(({ retries, ...rest }) => ({
+        ...rest,
+        retries: (retries || 0) + 1,
       })),
     [],
+  )
+
+  const endTaskRun = useCallback(
+    async (status: 'ended' | 'failed' = 'ended') => {
+      await endTask(runningTask, status)
+      removeFromQueue(runningTask.id)
+      resetRunnerState()
+    },
+    [runningTask],
   )
 
   // When the queue updates, process the first task
@@ -77,8 +90,18 @@ export const useRunnerService = () => {
     }
 
     if (!runningTask) {
-      const runningTask = runQueue[0]
-      setRunnerState((prev) => ({ ...prev, runningTask }))
+      const { task, flow, query } = runQueue[0]
+
+      // To manage the state + local storage more easily, everything is at the top level
+      const taskToRun = {
+        runningTask: task,
+        runningFlow: flow,
+        runningQuery: query,
+        retries: 0,
+        eventsCompleted: [],
+      }
+
+      setRunnerState((prev) => ({ ...prev, ...taskToRun }))
     }
   }, [runQueue])
 
@@ -88,26 +111,25 @@ export const useRunnerService = () => {
     // @TODO: if running & in progress... in step 1.2... etc
 
     const executeTaskEvents = async () => {
-      const { task, id: taskId, flow, retries = 0 } = runningTask
-
+      console.log(111, retries)
       if (retries >= 3) {
         console.log(3333, 'failed')
-
-        await endTask(task, 'failed')
-        removeFromQueue(taskId)
+        await endTaskRun('failed')
         return
       }
 
       try {
         // @TODO: Events from flow ... -> migrate to events from TASK with up to date state...
-        const { events, if: flowId } = flow
-        const data = await buildFormData({ variables: task.state.variables, events })
+        const data = await buildFormData({
+          variables: runningTask?.state?.variables,
+          events: runningFlow.events,
+        })
 
         await runEvents({
-          task,
-          events,
-          flowId,
-          data,
+          task: runningTask,
+          flowId: runningFlow.id,
+          events: runningFlow.events,
+          data, // @TODO -> we need a better name for this
           onEventStart: handleEventStart,
           onEventEnd,
         })
@@ -118,10 +140,8 @@ export const useRunnerService = () => {
       }
 
       // @TODO: make a check ... eventsCompleted === events length
-
       setTimeout(async () => {
-        await endTask(task)
-        removeFromQueue(taskId)
+        await endTaskRun()
       }, 2000)
     }
 
@@ -130,8 +150,8 @@ export const useRunnerService = () => {
 
   return {
     runnerState,
-    setRunnerState,
     resetRunnerState,
+    endTaskRun,
     addToQueue,
     removeFromQueue,
   }

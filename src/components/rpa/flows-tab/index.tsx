@@ -17,7 +17,7 @@ export function FlowsTab() {
     runFlow,
     updateFlow,
     deleteFlow,
-    stopFlowRun,
+    endTaskRun,
   } = useRunnerState()
 
   if (runningTask) {
@@ -25,7 +25,7 @@ export function FlowsTab() {
       <RunningFlow
         runningTask={runningTask}
         eventsCompleted={eventsCompleted}
-        onStop={stopFlowRun}
+        onStop={endTaskRun}
         onPause={() => {}}
       />
     )
