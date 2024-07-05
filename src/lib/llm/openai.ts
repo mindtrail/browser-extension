@@ -12,6 +12,8 @@ import {
   mergeEventsPrompt,
   generateActionsPrompt,
   updateFormDataPrompt,
+  generateSelectorPrompt,
+  generateActionsPromptV2,
 } from './prompts'
 
 const openai = new OpenAI({
@@ -172,6 +174,19 @@ export async function generateActions(html) {
   return JSON.parse(result).actions
 }
 
+export async function generateActionsV2(html) {
+  const completion = await openai.chat.completions.create({
+    messages: generateActionsPromptV2(
+      html,
+    ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
+  return JSON.parse(result)
+}
+
 export async function updateFormData({ form, variables }) {
   const completion = await openai.chat.completions.create({
     messages: updateFormDataPrompt({
@@ -184,4 +199,18 @@ export async function updateFormData({ form, variables }) {
   })
   const result = completion.choices[0].message.content
   return JSON.parse(result)
+}
+
+export async function generateSelector({ html, type }) {
+  const completion = await openai.chat.completions.create({
+    messages: generateSelectorPrompt({
+      html,
+      type,
+    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    model: 'gpt-4o',
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+  })
+  const result = completion.choices[0].message.content
+  console.log(result)
 }

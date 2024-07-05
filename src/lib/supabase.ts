@@ -71,6 +71,31 @@ export async function updateTask(id: string, task: any) {
 
 // Action Groups
 
+export function onActionGroupsChange(
+  onChange: (payload: any) => void,
+  channelName = SUPABASE_CHANNELS.ACTION_GROUPS,
+) {
+  const channel = supabase
+    .channel(channelName)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'action_groups' },
+      onChange,
+    )
+    .subscribe()
+  return () => {
+    channel.unsubscribe()
+  }
+}
+
+export async function getActionGroups() {
+  const res = await supabase
+    .from('action_groups')
+    .select('*')
+    .order('created_at', { ascending: true })
+  return res.data || []
+}
+
 export async function getActionGroupsByKeys(keys: string[]) {
   const res = await supabase.from('action_groups').select('key,actions').in('key', keys)
   return res.data || []
