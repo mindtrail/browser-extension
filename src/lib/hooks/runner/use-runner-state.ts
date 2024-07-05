@@ -18,14 +18,14 @@ export const useRunnerState = () => {
       const task = await createNewTask(flowToRun.id)
       if (!task) return
 
-      const queueItem = {
+      const taskToRun = {
         id: task.id,
         task,
-        flow: flowToRun,
         query,
+        flow: flowToRun,
       }
 
-      addToQueue([queueItem])
+      addToQueue([taskToRun])
     },
     [flows, query],
   )
@@ -36,7 +36,7 @@ export const useRunnerState = () => {
   }, [])
 
   useEffect(() => {
-    const retreshQueue = async () => {
+    const refreshQueue = async () => {
       const res = await getTasksToRun()
 
       const { data: tasksToRun = [] } = res
@@ -51,14 +51,14 @@ export const useRunnerState = () => {
         const flowToRun = flows.find((flow) => flow.id === task?.state?.flowId)
         if (!flowToRun) continue
 
-        const queuedItem = {
+        const taskToRun = {
           id: task.id,
           task,
-          flow: flowToRun,
           query,
+          flow: flowToRun,
         }
 
-        flowsToResume.push(queuedItem)
+        flowsToResume.push(taskToRun)
       }
 
       if (!flowsToResume.length) {
@@ -69,7 +69,7 @@ export const useRunnerState = () => {
       addToQueue(flowsToResume)
     }
 
-    retreshQueue()
+    refreshQueue()
   }, [flows])
 
   return {

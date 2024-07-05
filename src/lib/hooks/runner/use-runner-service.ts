@@ -40,14 +40,18 @@ export const useRunnerService = () => {
   }, [])
 
   const onEventEnd = useCallback(async (props: OnEventEndProps) => {
-    const eventLogs = await handleEventEnd(props)
+    const updatedTask = await handleEventEnd(props)
+    if (!updatedTask) return
+
+    console.log(1234, updatedTask)
+    const { logs } = updatedTask
 
     setRunnerState((prev) => {
       // const eventAlreadyMarked = prev?.eventsCompleted?.some((e) => e.id === newEvent.id)
       // if (eventAlreadyMarked) return prev
       return {
         ...prev,
-        eventsCompleted: [...eventLogs],
+        eventsCompleted: [...logs],
       }
     })
   }, [])

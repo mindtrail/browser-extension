@@ -27,14 +27,8 @@ export function RunningFlow({
     return null
   }
 
-  console.log(runningTask)
-  console.log(eventsCompleted)
-
-  const eventsList = runningTask?.flow?.events
-
   const {
-    events: runningTaskEvents,
-    flow: { name, description },
+    flow: { name, description, events: eventsList },
   } = runningTask
 
   return (
@@ -51,7 +45,7 @@ export function RunningFlow({
             <CircleStopIcon className='w-5 h-5' />
             Stop
           </Button>
-          <Button variant='ghost' className='flex items-center gap-2'>
+          <Button onClick={onPause} variant='ghost' className='flex items-center gap-2'>
             <CirclePauseIcon className='w-5 h-5' />
             Pause
           </Button>
