@@ -20,47 +20,38 @@ export async function runEvents(props: RunnerEventProps) {
   const clonedEvents = structuredClone(events)
 
   for (const event of clonedEvents) {
-    // skip event if already found in task.logs and status = 'ended'
-    // @TODO: test this in a flow with x events and refresh mid through running
-    if (task.logs.find((log) => log.eventId === event.id && log.status === 'ended')) {
-      continue
-    }
+    if (isEventCompleted(task, event)) continue
+
     const triggerAction = ACTION_COMPONENTS[event.type]
-    if (!triggerAction) break
+    if (!triggerAction) {
+      throw new Error(`No action component found for event type: ${event.type}`)
+    }
 
     if (event.type === 'loop') {
-      return await triggerAction({
-        flowId,
-        task: clonedTask,
-        events: clonedEvents,
-        event,
-        data,
-        onEventStart,
-        onEventEnd,
-        runEvents,
-      })
+      return await loopComponent({ ...props, event, task: clonedTask, runEvents })
     }
 
     await onEventStart({ flowId, event, taskId: task.id })
+    // if (event.type === 'navigation') {
+    //   await onEventEnd({ event, taskId: task.id })
+    // }
 
-    if (event.type === 'navigation') {
-      await onEventEnd({ event, taskId: task.id })
-    }
+    await triggerAction({
+      flowId,
+      task: clonedTask,
+      events: clonedEvents,
+      event,
+      data,
+    })
 
-    try {
-      await triggerAction({
-        flowId,
-        task: clonedTask,
-        events: clonedEvents,
-        event,
-        data,
-      })
-    } catch (error) {
-      console.error(error)
-    }
-
-    if (event.type !== 'navigation') {
-      await onEventEnd({ event, taskId: task.id })
-    }
+    await onEventEnd({ event, taskId: task.id })
+    // if (event.type !== 'navigation') {
+    // }
   }
+}
+
+// skip event if already found in task.logs and status = 'ended'
+// @TODO: test this in a flow with x events and refresh mid through running
+function isEventCompleted(task, event) {
+  return task.logs.some((log) => log.eventId === event.id && log.status === 'ended')
 }

@@ -46,7 +46,7 @@ export const useRunnerState = () => {
         return
       }
 
-      const flowsToResume = []
+      const tasksToResume = []
       for (const task of tasksToRun) {
         const flowToRun = flows.find((flow) => flow.id === task?.state?.flowId)
         if (!flowToRun) continue
@@ -58,15 +58,15 @@ export const useRunnerState = () => {
           flow: flowToRun,
         }
 
-        flowsToResume.push(taskToRun)
+        tasksToResume.push(taskToRun)
       }
 
-      if (!flowsToResume.length) {
+      if (!tasksToResume.length) {
         resetRunnerState()
         return
       }
 
-      addToQueue(flowsToResume)
+      addToQueue(tasksToResume)
     }
 
     refreshQueue()

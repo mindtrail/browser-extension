@@ -17,6 +17,8 @@ export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
   const { runQueue, runningTask } = runnerState
 
+  const { task } = runningTask
+
   const resetRunnerState = useCallback(() => setRunnerState(DEFAULT_RUNNER_STATE), [])
 
   const addToQueue = useCallback((newFlows: any[]) => {
@@ -83,7 +85,9 @@ export const useRunnerService = () => {
   useEffect(() => {
     if (!runningTask) return
 
-    const executeFlowTasks = async () => {
+    // @TODO: if running & in progress... in step 1.2... etc
+
+    const executeTaskEvents = async () => {
       const { task, id: taskId, flow, retries = 0 } = runningTask
 
       if (retries >= 3) {
@@ -95,6 +99,7 @@ export const useRunnerService = () => {
       }
 
       try {
+        // @TODO: Events from flow ... -> migrate to events from TASK with up to date state...
         const { events, if: flowId } = flow
         const data = await buildFormData({ variables: task.state.variables, events })
 
@@ -112,14 +117,15 @@ export const useRunnerService = () => {
         return
       }
 
-      // @TODO: make a check ...
+      // @TODO: make a check ... eventsCompleted === events length
+
       setTimeout(async () => {
         await endTask(task)
         removeFromQueue(taskId)
       }, 2000)
     }
 
-    executeFlowTasks()
+    executeTaskEvents()
   }, [runningTask])
 
   return {
