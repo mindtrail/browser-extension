@@ -1,6 +1,7 @@
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
-import { generateMetadata } from '~/lib/llm/openai'
+import { generateMetadata, mergeEvents } from '~/lib/llm/openai'
+import { setActionGroup, getActionGroupsByKeys } from '~lib/utils/recorder/action-groups'
 
 export const updateRecordedEvents = async (event, setRecorderState) => {
   // @TODO: reimplement this
@@ -45,6 +46,7 @@ export const toggleRecording = async (props) => {
   const { isRecording, eventsList, setRecorderState, resetRecorderState } = props
 
   if (!isRecording) {
+    setActionGroup(window.location.href)
     setRecorderState((prevState) => ({
       ...prevState,
       isRecording: true,
@@ -65,7 +67,7 @@ export const toggleRecording = async (props) => {
   const eventsRecorded = Array.from(eventsList.values())
     .flat()
     .map((event: any) => {
-      // delete event.eventKey // clean unnecessary property
+      delete event.eventKey // clean unnecessary property
       return event
     })
 
@@ -78,6 +80,17 @@ export const toggleRecording = async (props) => {
       event_description: flow.events[index]?.event_description,
     }
   })
+
+  // Get possible actions for each unique actionGroup key
+  const actionGroupKeys: string[] = Array.from(
+    new Set(flow.events.map((event: any) => event.baseURI)),
+  )
+  const actionGroups = await getActionGroupsByKeys(actionGroupKeys)
+  console.log('actionGroups', actionGroups)
+
+  // Update events selectors via possible actions
+  flow.events = await mergeEvents({ events: flow.events, actionGroups })
+  console.log('mergedEvents', flow.events)
 
   setRecorderState((prevState) => ({
     ...prevState,
