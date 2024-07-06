@@ -7,6 +7,7 @@ import { endTask } from '~lib/utils/runner/execution/task-utils'
 import { runEvents } from '~lib/utils/runner/execution/run-events'
 import { buildFormData } from '~lib/utils/runner/build-form-data'
 import { handleEventStart, handleEventEnd } from '~/lib/utils/runner/execution/task-utils'
+import { TASK_STATUS } from '~/lib/constants'
 
 const RUNNER_CONFIG = {
   key: STORAGE_AREA.RUNNER,
@@ -68,7 +69,7 @@ export const useRunnerService = () => {
   )
 
   const endTaskRun = useCallback(
-    async (status: 'ended' | 'failed' = 'ended') => {
+    async (status: TASK_STATUS = TASK_STATUS.COMPLETED) => {
       await endTask(runningTask, status)
       removeFromQueue(runningTask.id)
       resetRunnerState()
@@ -92,7 +93,6 @@ export const useRunnerService = () => {
         runningFlow: flow,
         runningQuery: query,
         retries: 0,
-        // get the events from the task logs if already there
         eventsCompleted: task?.logs || [],
       }
 
@@ -107,7 +107,7 @@ export const useRunnerService = () => {
     const executeTaskEvents = async () => {
       console.log(111, retries, eventsCompleted)
       if (retries >= 3) {
-        await endTaskRun('failed')
+        await endTaskRun(TASK_STATUS.FAILED)
         return
       }
 
@@ -138,7 +138,7 @@ export const useRunnerService = () => {
     }
 
     executeTaskEvents()
-  }, [runningTask])
+  }, [runningTask, retries])
 
   return {
     runnerState,

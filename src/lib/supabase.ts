@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { SUPABASE_CHANNELS } from '~/lib/constants'
+import { TASK_STATUS } from '~/lib/constants'
 
 const supabaseUrl = process.env.PLASMO_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.PLASMO_PUBLIC_SUPABASE_KEY
@@ -57,8 +58,8 @@ export async function getTasksToRun() {
   return supabase
     .from('tasks')
     .select('*')
-    .neq('state->>status', 'ended')
-    .neq('state->>status', 'failed')
+    .neq('state->>status', TASK_STATUS.COMPLETED)
+    .neq('state->>status', TASK_STATUS.FAILED)
     .order('created_at', { ascending: true })
 }
 

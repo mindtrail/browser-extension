@@ -6,7 +6,8 @@ import {
 } from 'lucide-react'
 
 import { Typography } from '~/components/typography'
-import { Button } from '~components/ui/button'
+import { Button } from '~/components/ui/button'
+import { TASK_STATUS } from '~/lib/constants'
 
 import { EventsList } from '../events-list'
 
@@ -23,6 +24,10 @@ export function RunningFlow(props: RunningFlowProps) {
   if (!runningTask || !runningFlow) return null
 
   const { name, description, events: eventsList } = runningFlow
+
+  const allEventsCompleted =
+    eventsCompleted?.length === eventsList?.length &&
+    eventsCompleted[eventsCompleted.length - 1]?.status === TASK_STATUS.COMPLETED
 
   return (
     <div className='flex flex-col flex-1 gap-6'>
@@ -50,7 +55,7 @@ export function RunningFlow(props: RunningFlowProps) {
       <div className='flex flex-col flex-1 gap-4'>
         <EventsList eventsList={eventsList} readOnly={true} />
 
-        {eventsCompleted?.length === eventsList?.length && (
+        {allEventsCompleted && (
           <Typography
             variant='small-semi'
             className='flex items-center gap-2 px-6 text-primary'

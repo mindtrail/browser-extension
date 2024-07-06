@@ -1,3 +1,5 @@
+import { TASK_STATUS } from '~/lib/constants'
+
 import { inputComponent } from './components/input'
 import { clickComponent } from './components/click'
 import { loopComponent } from './components/loop'
@@ -39,5 +41,7 @@ export async function runEvents(props: RunnerEventProps) {
 // skip event if already found in task.logs and status = 'ended'
 // @TODO: test this in a flow with x events and refresh mid through running
 function isEventCompleted(task, event) {
-  return task.logs.some((log) => log.eventId === event.id && log.status === 'ended')
+  return task.logs.some(
+    (log) => log.eventId === event.id && log.status === TASK_STATUS.COMPLETED,
+  )
 }

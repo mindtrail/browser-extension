@@ -1,4 +1,5 @@
 import { createTask, getTask, updateTask, getLastThread } from '~/lib/supabase'
+import { TASK_STATUS } from '~/lib/constants'
 
 export async function createNewTask(flowId: string) {
   if (!flowId) {
@@ -17,7 +18,7 @@ export async function createNewTask(flowId: string) {
   return newTaskRes.data
 }
 
-export async function endTask(task: any, status: 'ended' | 'failed' = 'ended') {
+export async function endTask(task: any, status: TASK_STATUS = TASK_STATUS.COMPLETED) {
   if (!task) return
 
   const taskRes = await getTask(task.id)
@@ -53,22 +54,21 @@ export async function handleEventStart({ flowId, event, taskId }: OnEventStartPr
   if (!eventExists) {
     await updateTask(task.id, {
       ...task,
-      state: { ...task.state, status: 'running' },
-      logs: [...task.logs, { flowId, eventId: event.id, status: 'running' }],
+      state: { ...task.state, status: TASK_STATUS.RUNNING },
+      logs: [...task.logs, { flowId, eventId: event.id, status: TASK_STATUS.RUNNING }],
     })
   }
 }
 
-export async function handleEventEnd({ event, taskId }: OnEventEndProps) {
+export async function handleEventEnd(props: OnEventEndProps) {
+  const { event, taskId, status = TASK_STATUS.COMPLETED } = props
   const result = await getTask(taskId)
   const task = result.data
   if (!task) return
 
   const updatedTask = {
     ...task,
-    logs: task.logs.map((log) =>
-      log.eventId === event.id ? { ...log, status: 'ended' } : log,
-    ),
+    logs: task.logs.map((log) => (log.eventId === event.id ? { ...log, status } : log)),
   }
 
   const updateRes = await updateTask(task.id, updatedTask)

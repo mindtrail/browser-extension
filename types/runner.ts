@@ -1,4 +1,4 @@
-export default {}
+import { TASK_STATUS } from '~/lib/constants'
 
 declare global {
   type OnEventStartProps = {
@@ -10,6 +10,7 @@ declare global {
   type OnEventEndProps = {
     event: any
     taskId: string
+    status: TASK_STATUS
   }
 
   interface BaseRunnerProps {
