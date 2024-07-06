@@ -13,6 +13,7 @@ export function FlowsTab() {
   const {
     flows,
     runningTask,
+    runningFlow,
     eventsCompleted,
     runFlow,
     updateFlow,
@@ -23,6 +24,7 @@ export function FlowsTab() {
   if (runningTask) {
     return (
       <RunningFlow
+        runningFlow={runningFlow}
         runningTask={runningTask}
         eventsCompleted={eventsCompleted}
         onStop={endTaskRun}

@@ -44,11 +44,12 @@ export async function markTaskRetry(task: any, retries: number = 0) {
 }
 
 export async function handleEventStart({ flowId, event, taskId }: OnEventStartProps) {
-  const taskRes = await getTask(taskId)
-  const task = taskRes.data
+  const result = await getTask(taskId)
+  const task = result.data
+  if (!task) return
 
-  // Check if the eventId already exists in the logs
-  const eventExists = task.logs.some((log) => log.eventId === event.id)
+  // We skip events already running. Events ended are skipped from run-events
+  const eventExists = task?.logs?.some((log) => log.eventId === event.id)
   if (!eventExists) {
     await updateTask(task.id, {
       ...task,
@@ -59,8 +60,9 @@ export async function handleEventStart({ flowId, event, taskId }: OnEventStartPr
 }
 
 export async function handleEventEnd({ event, taskId }: OnEventEndProps) {
-  const taskRes = await getTask(taskId)
-  const task = taskRes.data
+  const result = await getTask(taskId)
+  const task = result.data
+  if (!task) return
 
   const updatedTask = {
     ...task,

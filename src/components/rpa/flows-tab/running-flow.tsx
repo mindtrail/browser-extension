@@ -12,24 +12,17 @@ import { EventsList } from '../events-list'
 
 interface RunningFlowProps {
   runningTask: any
+  runningFlow: any
   eventsCompleted: any[]
   onStop: () => void
   onPause?: () => void
 }
 
-export function RunningFlow({
-  runningTask,
-  eventsCompleted,
-  onStop,
-  onPause,
-}: RunningFlowProps) {
-  if (!runningTask) {
-    return null
-  }
+export function RunningFlow(props: RunningFlowProps) {
+  const { runningFlow, runningTask, eventsCompleted, onStop, onPause } = props
+  if (!runningTask || !runningFlow) return null
 
-  const {
-    flow: { name, description, events: eventsList },
-  } = runningTask
+  const { name, description, events: eventsList } = runningFlow
 
   return (
     <div className='flex flex-col flex-1 gap-6'>

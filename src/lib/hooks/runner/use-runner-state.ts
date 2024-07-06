@@ -44,7 +44,6 @@ export const useRunnerState = () => {
         if (!flowToRun) continue
 
         const taskToRun = {
-          id: task.id,
           task,
           query: '', // @TODO: check if the query needs to come from the Task this time
           flow: flowToRun,
