@@ -29,9 +29,8 @@ export const useRunnerState = () => {
 
   useEffect(() => {
     const refreshQueue = async () => {
-      const res = await getTasksToRun()
-
-      const { data: tasksToRun = [] } = res
+      const result = await getTasksToRun()
+      const { data: tasksToRun = [] } = result
 
       if (!tasksToRun) {
         resetRunnerState(true)

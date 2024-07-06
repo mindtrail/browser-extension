@@ -92,7 +92,8 @@ export const useRunnerService = () => {
         runningFlow: flow,
         runningQuery: query,
         retries: 0,
-        eventsCompleted: [],
+        // get the events from the task logs if already there
+        eventsCompleted: task?.logs || [],
       }
 
       setRunnerState((prev) => ({ ...prev, ...taskToRun }))
