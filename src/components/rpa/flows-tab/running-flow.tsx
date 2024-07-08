@@ -9,7 +9,7 @@ import { Typography } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { TASK_STATUS } from '~/lib/constants'
 
-import { EventsList } from '../events-list'
+import { RunningEventsList } from '../events-list'
 
 interface RunningFlowProps {
   runningTask: any
@@ -54,7 +54,7 @@ export function RunningFlow(props: RunningFlowProps) {
       <Typography variant='small-semi'>{description}</Typography>
 
       <div className='flex flex-col flex-1 gap-4'>
-        <EventsList eventsList={eventsList} readOnly={true} />
+        <RunningEventsList eventsList={eventsList} />
 
         {!!allEventsCompleted && (
           <Typography

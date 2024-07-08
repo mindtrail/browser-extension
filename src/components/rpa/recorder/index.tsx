@@ -4,7 +4,7 @@ import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 import { useAudioRecorder } from '~/lib/hooks/use-audio-recorder'
 
 import { RecordButton } from './record-button'
-import { EventsList } from '../events-list'
+import { RecordingEventsList } from '../events-list'
 import { CancelRecordingButton } from './cancel-button'
 import { PauseRecordingButton } from './pause-button'
 import { RestartRecordingButton } from './restart-button'
@@ -48,7 +48,7 @@ function FlowRecorder() {
 
         {!!eventsList?.length && (
           <div className='flex flex-col flex-1 justify-between h-full overflow-auto'>
-            <EventsList eventsList={eventsList} deleteEvent={deleteEvent} />
+            <RecordingEventsList eventsList={eventsList} deleteEvent={deleteEvent} />
           </div>
         )}
       </div>
