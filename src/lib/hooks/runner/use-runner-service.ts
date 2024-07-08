@@ -15,7 +15,7 @@ const RUNNER_CONFIG = {
 }
 
 export const useRunnerService = () => {
-  const abortControllerRef = useRef<AbortController | null>(null)
+  const taskAbortRef = useRef({ wasStopped: false })
 
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
   const { tasksQueue, runningTask, runningFlow, retries, eventsCompleted } = runnerState
@@ -48,6 +48,7 @@ export const useRunnerService = () => {
       const updatedTask = await handleEventEnd(props)
       if (!updatedTask?.logs) return
 
+      console.log(1233333, updatedTask)
       setRunnerState(({ eventsCompleted, ...rest }) => {
         return {
           ...rest,
@@ -78,17 +79,19 @@ export const useRunnerService = () => {
       eventsCompleted: task?.logs || [],
     }
 
+    taskAbortRef.current.wasStopped = false
     setRunnerState(() => ({ tasksQueue, ...currentTask }))
   }, [tasksQueue])
 
   const endTaskRun = useCallback(
     async (status: TASK_STATUS = TASK_STATUS.COMPLETED) => {
       if (status === TASK_STATUS.STOPPED) {
-        abortControllerRef.current?.abort()
+        taskAbortRef.current.wasStopped = true
       }
 
       await endTask(runningTask, status)
       removeFromQueueAndResetRunner(runningTask.id)
+      taskAbortRef.current.wasStopped = false
     },
     [runningTask, eventsCompleted],
   )
@@ -98,8 +101,6 @@ export const useRunnerService = () => {
       await endTaskRun(TASK_STATUS.FAILED)
       return
     }
-
-    abortControllerRef.current = new AbortController()
 
     try {
       const data = await buildFormData({
@@ -112,7 +113,7 @@ export const useRunnerService = () => {
         flowId: runningFlow.id,
         events: runningFlow.events,
         data, // @TODO -> we need a better name for this
-        abortSignal: abortControllerRef.current.signal,
+        abortSignal: taskAbortRef.current,
         onEventStart: handleEventStart,
         onEventEnd,
       })

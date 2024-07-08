@@ -22,7 +22,7 @@ export async function runEvents(props: RunnerEventProps) {
   const clonedEvents = structuredClone(events)
 
   for (const event of clonedEvents) {
-    if (abortSignal?.aborted) {
+    if (abortSignal?.wasStopped) {
       break
     }
 

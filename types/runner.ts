@@ -1,3 +1,4 @@
+import { type MutableRefObject } from 'react'
 import { TASK_STATUS } from '~/lib/constants'
 
 declare global {
@@ -28,7 +29,8 @@ declare global {
   interface RunnerEventProps extends BaseRunnerProps {
     events: any[]
     data: any
-    abortSignal?: AbortSignal
+    // abortSignal?: MutableRefObject<any>
+    abortSignal?: { wasStopped: boolean }
   }
 
   interface RunnerComponentProps extends RunnerEventProps {
