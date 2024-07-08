@@ -2,6 +2,7 @@ import { CirclePlayIcon, CircleStopIcon, CirclePauseIcon } from 'lucide-react'
 
 import { Typography } from '~/components/typography'
 import { Button } from '~/components/ui/button'
+import { TASK_STATUS } from '~/lib/constants'
 
 import { RunningEventsList } from '../events-list'
 
@@ -9,7 +10,7 @@ interface RunningTaskProps {
   runningTask: any
   runningFlow: any
   eventsCompleted: any[]
-  onStop: () => void
+  onStop: (status: TASK_STATUS) => void
   onPause?: () => void
 }
 
@@ -30,7 +31,7 @@ export function RunningTask(props: RunningTaskProps) {
         </div>
         <div className='flex justify-between gap-4'>
           <Button
-            onClick={() => onStop()}
+            onClick={() => onStop(TASK_STATUS.STOPPED)}
             variant='ghost'
             className='flex items-center gap-2'
           >

@@ -60,6 +60,7 @@ export async function getTasksToRun() {
     .select('*')
     .neq('state->>status', TASK_STATUS.COMPLETED)
     .neq('state->>status', TASK_STATUS.FAILED)
+    .neq('state->>status', TASK_STATUS.STOPPED)
     .order('created_at', { ascending: true })
 }
 

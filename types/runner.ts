@@ -28,6 +28,7 @@ declare global {
   interface RunnerEventProps extends BaseRunnerProps {
     events: any[]
     data: any
+    abortSignal?: AbortSignal
   }
 
   interface RunnerComponentProps extends RunnerEventProps {

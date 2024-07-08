@@ -23,14 +23,9 @@ export async function endTask(task: any, status: TASK_STATUS = TASK_STATUS.COMPL
 
   const taskRes = await getTask(task.id)
   const updatedTask = taskRes.data
+  const payload = { ...updatedTask, state: { ...updatedTask.state, status } }
 
-  return updateTask(updatedTask.id, {
-    ...updatedTask,
-    state: {
-      ...updatedTask.state,
-      status,
-    },
-  })
+  return updateTask(updatedTask.id, payload)
 }
 
 export async function markTaskRetry(task: any, retries: number = 0) {
@@ -65,6 +60,8 @@ export async function handleEventEnd(props: OnEventEndProps) {
   const result = await getTask(taskId)
   const task = result.data
   if (!task) return
+
+  console.log('end', task)
 
   const updatedTask = {
     ...task,

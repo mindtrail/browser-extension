@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { Storage } from '@plasmohq/storage'
 import { useStorage } from '@plasmohq/storage/hook'
 
@@ -15,6 +15,8 @@ const RUNNER_CONFIG = {
 }
 
 export const useRunnerService = () => {
+  const abortControllerRef = useRef<AbortController | null>(null)
+
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
   const { tasksQueue, runningTask, runningFlow, retries, eventsCompleted } = runnerState
 
@@ -41,17 +43,20 @@ export const useRunnerService = () => {
     })
   }, [])
 
-  const onEventEnd = useCallback(async (props: OnEventEndProps) => {
-    const updatedTask = await handleEventEnd(props)
-    if (!updatedTask?.logs) return
+  const onEventEnd = useCallback(
+    async (props: OnEventEndProps) => {
+      const updatedTask = await handleEventEnd(props)
+      if (!updatedTask?.logs) return
 
-    setRunnerState(({ eventsCompleted, ...rest }) => {
-      return {
-        ...rest,
-        eventsCompleted: [...updatedTask?.logs],
-      }
-    })
-  }, [])
+      setRunnerState(({ eventsCompleted, ...rest }) => {
+        return {
+          ...rest,
+          eventsCompleted: [...updatedTask?.logs],
+        }
+      })
+    },
+    [runningTask],
+  )
 
   const incrementTaskRetries = useCallback(
     () =>
@@ -78,6 +83,10 @@ export const useRunnerService = () => {
 
   const endTaskRun = useCallback(
     async (status: TASK_STATUS = TASK_STATUS.COMPLETED) => {
+      if (status === TASK_STATUS.STOPPED) {
+        abortControllerRef.current?.abort()
+      }
+
       await endTask(runningTask, status)
       removeFromQueueAndResetRunner(runningTask.id)
     },
@@ -90,6 +99,8 @@ export const useRunnerService = () => {
       return
     }
 
+    abortControllerRef.current = new AbortController()
+
     try {
       const data = await buildFormData({
         variables: runningTask?.state?.variables,
@@ -101,6 +112,7 @@ export const useRunnerService = () => {
         flowId: runningFlow.id,
         events: runningFlow.events,
         data, // @TODO -> we need a better name for this
+        abortSignal: abortControllerRef.current.signal,
         onEventStart: handleEventStart,
         onEventEnd,
       })
@@ -108,7 +120,7 @@ export const useRunnerService = () => {
       console.log(222, error)
       incrementTaskRetries()
     }
-  }, [runningFlow, retries, eventsCompleted, endTaskRun])
+  }, [runningFlow, retries, eventsCompleted])
 
   useEffect(() => {
     if (!tasksQueue?.length || runningTask) return
@@ -127,6 +139,7 @@ export const useRunnerService = () => {
       eventsCompleted?.length === runningFlow?.events?.length &&
       eventsCompleted[eventsCompleted.length - 1]?.status === TASK_STATUS.COMPLETED
     ) {
+      console.log(1234, runningTask)
       setTimeout(async () => {
         endTaskRun()
       }, 1500)

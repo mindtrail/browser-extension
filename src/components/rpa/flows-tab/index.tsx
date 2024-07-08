@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 
 import { FlowListItem } from './flow-list-item'
-import { useRunnerState } from '~lib/hooks/runner/use-runner-state'
+import { useRunnerState } from '~/lib/hooks/runner/use-runner-state'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 
 import { RecordButton } from '~/components/rpa/recorder'

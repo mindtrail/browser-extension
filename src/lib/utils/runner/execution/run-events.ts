@@ -17,11 +17,15 @@ const ACTION_COMPONENTS = {
 }
 
 export async function runEvents(props: RunnerEventProps) {
-  const { task, events } = props
+  const { task, events, abortSignal } = props
   const clonedTask = structuredClone(task)
   const clonedEvents = structuredClone(events)
 
   for (const event of clonedEvents) {
+    if (abortSignal?.aborted) {
+      break
+    }
+
     if (isEventCompleted(task, event)) continue
 
     const triggerAction = ACTION_COMPONENTS[event.type]
