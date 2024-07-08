@@ -81,7 +81,7 @@ export const useRunnerService = () => {
       await endTask(runningTask, status)
       removeFromQueueAndResetRunner(runningTask.id)
     },
-    [runningTask],
+    [runningTask, eventsCompleted],
   )
 
   const executeTaskEvents = useCallback(async () => {
@@ -107,14 +107,8 @@ export const useRunnerService = () => {
     } catch (error) {
       console.log(222, error)
       incrementTaskRetries()
-      return
     }
-
-    // @TODO: make a check ... eventsCompleted === events length
-    setTimeout(async () => {
-      await endTaskRun()
-    }, 1500)
-  }, [runningFlow, retries, eventsCompleted])
+  }, [runningFlow, retries, eventsCompleted, endTaskRun])
 
   useEffect(() => {
     if (!tasksQueue?.length || runningTask) return
@@ -125,6 +119,19 @@ export const useRunnerService = () => {
     if (!runningTask) return
     executeTaskEvents()
   }, [runningTask, retries])
+
+  useEffect(() => {
+    if (
+      eventsCompleted?.length &&
+      runningFlow?.events &&
+      eventsCompleted?.length === runningFlow?.events?.length &&
+      eventsCompleted[eventsCompleted.length - 1]?.status === TASK_STATUS.COMPLETED
+    ) {
+      setTimeout(async () => {
+        endTaskRun()
+      }, 1500)
+    }
+  }, [eventsCompleted, runningFlow])
 
   return {
     runnerState,
