@@ -1,13 +1,7 @@
-import {
-  CheckCheckIcon,
-  CirclePlayIcon,
-  CircleStopIcon,
-  CirclePauseIcon,
-} from 'lucide-react'
+import { CirclePlayIcon, CircleStopIcon, CirclePauseIcon } from 'lucide-react'
 
 import { Typography } from '~/components/typography'
 import { Button } from '~/components/ui/button'
-import { TASK_STATUS } from '~/lib/constants'
 
 import { RunningEventsList } from '../events-list'
 
@@ -24,11 +18,6 @@ export function RunningFlow(props: RunningFlowProps) {
   if (!runningTask || !runningFlow) return null
 
   const { name, description, events: eventsList } = runningFlow
-
-  const allEventsCompleted =
-    eventsCompleted?.length &&
-    eventsCompleted?.length === eventsList?.length &&
-    eventsCompleted[eventsCompleted.length - 1]?.status === TASK_STATUS.COMPLETED
 
   return (
     <div className='flex flex-col flex-1 gap-6'>
@@ -53,19 +42,7 @@ export function RunningFlow(props: RunningFlowProps) {
 
       <Typography variant='small-semi'>{description}</Typography>
 
-      <div className='flex flex-col flex-1 gap-4'>
-        <RunningEventsList eventsList={eventsList} />
-
-        {!!allEventsCompleted && (
-          <Typography
-            variant='small-semi'
-            className='flex items-center gap-2 px-6 text-primary'
-          >
-            <CheckCheckIcon className='w-5 h-5' />
-            Run complete
-          </Typography>
-        )}
-      </div>
+      <RunningEventsList eventsList={eventsList} eventsCompleted={eventsCompleted} />
     </div>
   )
 }

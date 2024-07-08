@@ -1,5 +1,13 @@
-import { MousePointerClickIcon, GlobeIcon, PenLineIcon, TextSelectIcon } from 'lucide-react'
-import { ACTION_TYPE } from '~lib/constants'
+import {
+  CheckCheckIcon,
+  MousePointerClickIcon,
+  GlobeIcon,
+  PenLineIcon,
+  TextSelectIcon,
+} from 'lucide-react'
+
+import { ACTION_TYPE, TASK_STATUS } from '~lib/constants'
+import { Typography } from '~/components/typography'
 import { Event } from './event'
 
 const EVENT_ICONS = {
@@ -12,31 +20,47 @@ const EVENT_ICONS = {
 
 interface RunningEventsListProps {
   eventsList: any[]
-  eventsCompleted: number
-  debugMode?: boolean
+  eventsCompleted: any[]
 }
 
-export function RunningEventsList({ eventsList, eventsCompleted, debugMode = false }: RunningEventsListProps) {
+export function RunningEventsList(props: RunningEventsListProps) {
+  const { eventsList = [], eventsCompleted = [] } = props
   if (!eventsList?.length) return null
+
+  const allEventsCompleted =
+    eventsCompleted?.length &&
+    eventsCompleted?.length === eventsList?.length &&
+    eventsCompleted[eventsCompleted.length - 1]?.status === TASK_STATUS.COMPLETED
 
   const eventsToDisplay = eventsList.map((event, index) => ({
     ...event,
-    value: debugMode ? `${event.selector}: ${event.value}` : event.value,
+    value: event.value,
     icon: EVENT_ICONS[event.type] || EVENT_ICONS.default,
-    completed: index < eventsCompleted
+    completed: index < eventsCompleted?.length,
   }))
 
   return (
-    <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
-      {eventsToDisplay.map((event, index) => (
-        <Event
-          key={index}
-          event={event}
-          readOnly={true}
-          index={index}
-          deleteEvent={undefined}
-        />
-      ))}
+    <div className='flex flex-col flex-1 gap-4'>
+      <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
+        {eventsToDisplay.map((event, index) => (
+          <Event
+            key={index}
+            event={event}
+            readOnly={true}
+            index={index}
+            deleteEvent={undefined}
+          />
+        ))}
+      </div>
+      {!!allEventsCompleted && (
+        <Typography
+          variant='small-semi'
+          className='flex items-center gap-2 px-6 text-primary'
+        >
+          <CheckCheckIcon className='w-5 h-5' />
+          Run complete
+        </Typography>
+      )}
     </div>
   )
 }
