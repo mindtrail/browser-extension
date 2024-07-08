@@ -36,14 +36,14 @@ export function RunningEventsList(props: RunningEventsListProps) {
     ...event,
     value: event.value,
     icon: EVENT_ICONS[event.type] || EVENT_ICONS.default,
-    completed: index < eventsCompleted?.length,
+    inProgress: index === eventsCompleted?.length,
   }))
 
   return (
     <div className='flex flex-col flex-1 gap-4'>
       <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
         {eventsToDisplay.map((event, index) => (
-          <RunningEvent key={index} index={index} event={event} deleteEvent={undefined} />
+          <RunningEvent key={index} event={event} />
         ))}
       </div>
       {!!allEventsCompleted && (

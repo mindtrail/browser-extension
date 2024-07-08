@@ -51,6 +51,7 @@ export const useRunnerService = () => {
     const updatedTask = await handleEventEnd(props)
     if (!updatedTask?.logs) return
 
+    // console.log(111, updatedTask?.logs)
     setRunnerState(({ eventsCompleted, ...rest }) => {
       return {
         ...rest,
@@ -131,6 +132,7 @@ export const useRunnerService = () => {
       }
 
       // @TODO: make a check ... eventsCompleted === events length
+      // console.log(333, retries, eventsCompleted)
       setTimeout(async () => {
         await endTaskRun()
       }, 2000)
