@@ -29,7 +29,11 @@ export function RunningTask(props: RunningTaskProps) {
           </Typography>
         </div>
         <div className='flex justify-between gap-4'>
-          <Button onClick={onStop} variant='ghost' className='flex items-center gap-2'>
+          <Button
+            onClick={() => onStop()}
+            variant='ghost'
+            className='flex items-center gap-2'
+          >
             <CircleStopIcon className='w-5 h-5' />
             Stop
           </Button>

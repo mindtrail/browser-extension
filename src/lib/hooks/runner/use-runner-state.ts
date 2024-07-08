@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 
 import { getTasksToRun } from '~/lib/supabase'
-import { createNewTask, endTask } from '~lib/utils/runner/execution/task-utils'
+import { createNewTask } from '~lib/utils/runner/execution/task-utils'
 import { useRunnerService } from './use-runner-service'
 import { useFlowService } from './use-flows-service'
 
