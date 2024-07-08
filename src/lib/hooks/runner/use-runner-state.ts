@@ -26,14 +26,13 @@ export const useRunnerState = () => {
     },
     [flows],
   )
-
   useEffect(() => {
     const refreshQueue = async () => {
       const result = await getTasksToRun()
       const { data: tasksToRun = [] } = result
 
       if (!tasksToRun) {
-        resetRunnerState(true)
+        resetRunnerState()
         return
       }
 
@@ -52,7 +51,7 @@ export const useRunnerState = () => {
       }
 
       if (!tasksToResume.length) {
-        resetRunnerState(true)
+        resetRunnerState()
         return
       }
 

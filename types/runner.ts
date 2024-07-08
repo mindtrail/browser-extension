@@ -57,10 +57,10 @@ declare global {
 
   type RunnerState = {
     runningTask: any
-    runningFlow: Flow
+    runningFlow: Flow | null
     runningQuery: string
     retries?: number
     eventsCompleted?: any[]
-    runQueue: QueuedItem[]
+    tasksQueue: QueuedItem[]
   }
 }

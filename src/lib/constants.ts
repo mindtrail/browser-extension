@@ -134,7 +134,7 @@ export const DEFAULT_RUNNER_STATE: RunnerState = {
   runningQuery: '',
   retries: 0,
   eventsCompleted: [],
-  runQueue: [],
+  tasksQueue: [],
 }
 
 export const SUPABASE_CHANNELS = {

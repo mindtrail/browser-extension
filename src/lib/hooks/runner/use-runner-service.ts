@@ -16,35 +16,29 @@ const RUNNER_CONFIG = {
 
 export const useRunnerService = () => {
   const [runnerState, setRunnerState] = useStorage(RUNNER_CONFIG, DEFAULT_RUNNER_STATE)
-  const { runQueue, runningTask, runningFlow, retries, eventsCompleted } = runnerState
+  const { tasksQueue, runningTask, runningFlow, retries, eventsCompleted } = runnerState
 
-  // Reset everything to default state, but keep the runQueue if neede
-  const resetRunnerState = useCallback(
-    (resetQueue = false) =>
-      setRunnerState(({ runQueue }) => ({
-        ...DEFAULT_RUNNER_STATE,
-        runQueue: resetQueue ? [] : runQueue,
-      })),
-    [],
-  )
+  const resetRunnerState = () => setRunnerState(() => ({ ...DEFAULT_RUNNER_STATE }))
 
   const addToQueue = useCallback((newTasks: any[]) => {
-    setRunnerState(({ runQueue, ...rest }) => ({
-      ...rest,
-      runQueue: [
-        ...runQueue,
+    setRunnerState(({ tasksQueue, ...prevState }) => ({
+      ...prevState,
+      tasksQueue: [
+        ...tasksQueue,
         ...newTasks.filter(
-          (newTask) => !runQueue.some(({ task }) => task.id === newTask.id),
+          (newTask) => !tasksQueue.some(({ task }) => task.id === newTask.id),
         ),
       ],
     }))
   }, [])
 
-  const removeFromQueue = useCallback((taskId: string) => {
-    setRunnerState(({ runQueue, ...rest }) => ({
-      ...rest,
-      runQueue: runQueue.filter(({ task }) => task.id !== taskId),
-    }))
+  const removeFromQueueAndResetRunner = useCallback((taskId: string) => {
+    setRunnerState(({ tasksQueue }) => {
+      return {
+        ...DEFAULT_RUNNER_STATE,
+        tasksQueue: [...tasksQueue.filter(({ task }) => task.id !== taskId)],
+      }
+    })
   }, [])
 
   const onEventEnd = useCallback(async (props: OnEventEndProps) => {
@@ -69,83 +63,83 @@ export const useRunnerService = () => {
     [],
   )
 
+  const startTaskRun = useCallback(() => {
+    const { task, flow, query } = tasksQueue[0]
+    // To manage the state + local storage more easily, everything is at the top level
+    const currentTask = {
+      runningTask: task,
+      runningFlow: flow,
+      runningQuery: query,
+      retries: 0,
+      eventsCompleted: task?.logs || [],
+    }
+
+    setRunnerState(() => ({ tasksQueue, ...currentTask }))
+  }, [tasksQueue])
+
   const endTaskRun = useCallback(
     async (status: TASK_STATUS = TASK_STATUS.COMPLETED) => {
       await endTask(runningTask, status)
-      removeFromQueue(runningTask.id)
-      resetRunnerState()
+      removeFromQueueAndResetRunner(runningTask.id)
     },
     [runningTask],
   )
 
-  // When the queue updates, process the first task
-  useEffect(() => {
-    if (runQueue?.length === 0) {
-      resetRunnerState()
+  const executeTaskEvents = useCallback(async () => {
+    if (retries >= 3) {
+      await endTaskRun(TASK_STATUS.FAILED)
       return
     }
 
-    if (!runningTask) {
-      const { task, flow, query } = runQueue[0]
+    try {
+      const data = await buildFormData({
+        variables: runningTask?.state?.variables,
+        events: runningFlow.events,
+      })
 
-      // To manage the state + local storage more easily, everything is at the top level
-      const taskToRun = {
-        runningTask: task,
-        runningFlow: flow,
-        runningQuery: query,
-        retries: 0,
-        eventsCompleted: task?.logs || [],
-      }
-
-      setRunnerState((prev) => ({ ...prev, ...taskToRun }))
+      await runEvents({
+        task: runningTask,
+        flowId: runningFlow.id,
+        events: runningFlow.events,
+        data, // @TODO -> we need a better name for this
+        onEventStart: handleEventStart,
+        onEventEnd,
+      })
+    } catch (error) {
+      console.log(222, error)
+      incrementTaskRetries()
+      return
     }
-  }, [runQueue])
+
+    // @TODO: make a check ... eventsCompleted === events length
+    // console.log(333, retries, eventsCompleted)
+    setTimeout(async () => {
+      console.log(1234, runningTask)
+      await endTaskRun()
+    }, 2000)
+  }, [runningFlow, eventsCompleted])
+
+  // When the queue updates, process the first task
+  useEffect(() => {
+    // This should be triggered when removing from queue, but it does not
+    console.log(4444, tasksQueue)
+    if (!tasksQueue?.length || runningTask) return
+
+    startTaskRun()
+  }, [tasksQueue])
 
   useEffect(() => {
     if (!runningTask) return
 
-    // @TODO: if running & in progress... in step 1.2... etc
-    const executeTaskEvents = async () => {
-      if (retries >= 3) {
-        await endTaskRun(TASK_STATUS.FAILED)
-        return
-      }
-
-      try {
-        const data = await buildFormData({
-          variables: runningTask?.state?.variables,
-          events: runningFlow.events,
-        })
-
-        await runEvents({
-          task: runningTask,
-          flowId: runningFlow.id,
-          events: runningFlow.events,
-          data, // @TODO -> we need a better name for this
-          onEventStart: handleEventStart,
-          onEventEnd,
-        })
-      } catch (error) {
-        console.log(222, error)
-        incrementTaskRetries()
-        return
-      }
-
-      // @TODO: make a check ... eventsCompleted === events length
-      // console.log(333, retries, eventsCompleted)
-      setTimeout(async () => {
-        await endTaskRun()
-      }, 2000)
-    }
-
     executeTaskEvents()
-  }, [runningTask, retries])
+  }, [runningTask])
+
+  // console.log(666, tasksQueue, runnerState.runningTask)
 
   return {
     runnerState,
     resetRunnerState,
     endTaskRun,
     addToQueue,
-    removeFromQueue,
   }
 }
