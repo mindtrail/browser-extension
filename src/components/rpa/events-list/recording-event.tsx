@@ -12,19 +12,19 @@ interface Event {
 
 interface EventProps {
   event: Event
-  readOnly: boolean
   index: number
   deleteEvent: (index: number) => void
 }
 
-export function Event({ event, readOnly, index, deleteEvent }: EventProps) {
+export function RecordingEvent(props: EventProps) {
+  const { event, index, deleteEvent } = props
   const { type, value, icon: Icon, count } = event
 
   return (
     <div
       className={`flex items-center gap-4 px-4 py-2 w-full relative
         rounded-lg overflow-hidden border border-transparent group/row
-        ${index % 2 === 0 ? 'bg-white' : ''}`}
+        ${index % 2 === 0 ? 'bg-slate-50' : ''}`}
     >
       <Icon className='h-5 w-5 shrink-0 text-foreground/50 group-hover/row:text-foreground' />
       <div className='flex flex-col flex-1 gap-1'>
@@ -42,15 +42,14 @@ export function Event({ event, readOnly, index, deleteEvent }: EventProps) {
           {count > 1 && <span className='text-foreground/50'> ({count})</span>}
         </Typography>
       </div>
-      {!readOnly && (
-        <Button
-          variant='secondary'
-          className={`invisible group-hover/row:visible absolute right-0`}
-          onClick={() => deleteEvent(index)}
-        >
-          <Trash2Icon className='w-4 h-4' />
-        </Button>
-      )}
+
+      <Button
+        variant='secondary'
+        className={`invisible group-hover/row:visible absolute right-0`}
+        onClick={() => deleteEvent(index)}
+      >
+        <Trash2Icon className='w-4 h-4' />
+      </Button>
     </div>
   )
 }

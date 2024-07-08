@@ -5,7 +5,7 @@ import { Button } from '~/components/ui/button'
 
 import { RunningEventsList } from '../events-list'
 
-interface RunningFlowProps {
+interface RunningTaskProps {
   runningTask: any
   runningFlow: any
   eventsCompleted: any[]
@@ -13,7 +13,7 @@ interface RunningFlowProps {
   onPause?: () => void
 }
 
-export function RunningFlow(props: RunningFlowProps) {
+export function RunningTask(props: RunningTaskProps) {
   const { runningFlow, runningTask, eventsCompleted, onStop, onPause } = props
   if (!runningTask || !runningFlow) return null
 

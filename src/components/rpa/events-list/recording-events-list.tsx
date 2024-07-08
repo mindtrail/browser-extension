@@ -9,7 +9,7 @@ import {
 import { ACTION_TYPE } from '~lib/constants'
 import { Switch } from '~components/ui/switch'
 import { Label } from '~components/ui/label'
-import { Event } from './event'
+import { RecordingEvent } from './recording-event'
 
 const EVENT_ICONS = {
   [ACTION_TYPE.INPUT]: PenLineIcon,
@@ -53,11 +53,10 @@ export function RecordingEventsList(props: EventsListProps) {
         </div>
       )}
       {eventsToDisplay.map((event, index) => (
-        <Event
+        <RecordingEvent
           key={index}
-          event={event}
-          readOnly={false}
           index={index}
+          event={event}
           deleteEvent={deleteEvent}
         />
       ))}

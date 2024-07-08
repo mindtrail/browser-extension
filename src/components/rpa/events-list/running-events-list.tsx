@@ -8,7 +8,7 @@ import {
 
 import { ACTION_TYPE, TASK_STATUS } from '~lib/constants'
 import { Typography } from '~/components/typography'
-import { Event } from './event'
+import { RunningEvent } from './running-event'
 
 const EVENT_ICONS = {
   [ACTION_TYPE.INPUT]: PenLineIcon,
@@ -43,13 +43,7 @@ export function RunningEventsList(props: RunningEventsListProps) {
     <div className='flex flex-col flex-1 gap-4'>
       <div className='flex flex-col shrink-0 w-full cursor-default overflow-auto'>
         {eventsToDisplay.map((event, index) => (
-          <Event
-            key={index}
-            event={event}
-            readOnly={true}
-            index={index}
-            deleteEvent={undefined}
-          />
+          <RunningEvent key={index} index={index} event={event} deleteEvent={undefined} />
         ))}
       </div>
       {!!allEventsCompleted && (

@@ -5,7 +5,7 @@ import { useRunnerState } from '~lib/hooks/runner/use-runner-state'
 import { useRecorderState } from '~/lib/hooks/use-recorder-state'
 
 import { RecordButton } from '~/components/rpa/recorder'
-import { RunningFlow } from './running-flow'
+import { RunningTask } from './running-task'
 
 export function FlowsTab() {
   const runnerContainerRef = useRef(null)
@@ -23,9 +23,9 @@ export function FlowsTab() {
 
   if (runningTask) {
     return (
-      <RunningFlow
-        runningFlow={runningFlow}
+      <RunningTask
         runningTask={runningTask}
+        runningFlow={runningFlow}
         eventsCompleted={eventsCompleted}
         onStop={endTaskRun}
         onPause={() => {}}
