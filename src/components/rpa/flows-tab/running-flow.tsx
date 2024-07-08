@@ -26,6 +26,7 @@ export function RunningFlow(props: RunningFlowProps) {
   const { name, description, events: eventsList } = runningFlow
 
   const allEventsCompleted =
+    eventsCompleted?.length &&
     eventsCompleted?.length === eventsList?.length &&
     eventsCompleted[eventsCompleted.length - 1]?.status === TASK_STATUS.COMPLETED
 
@@ -55,7 +56,7 @@ export function RunningFlow(props: RunningFlowProps) {
       <div className='flex flex-col flex-1 gap-4'>
         <EventsList eventsList={eventsList} readOnly={true} />
 
-        {allEventsCompleted && (
+        {!!allEventsCompleted && (
           <Typography
             variant='small-semi'
             className='flex items-center gap-2 px-6 text-primary'

@@ -105,7 +105,6 @@ export const useRunnerService = () => {
 
     // @TODO: if running & in progress... in step 1.2... etc
     const executeTaskEvents = async () => {
-      console.log(111, retries, eventsCompleted)
       if (retries >= 3) {
         await endTaskRun(TASK_STATUS.FAILED)
         return
