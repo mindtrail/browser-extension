@@ -45,7 +45,6 @@ export const useRunnerService = () => {
     const updatedTask = await handleEventEnd(props)
     if (!updatedTask?.logs) return
 
-    // console.log(111, updatedTask?.logs)
     setRunnerState(({ eventsCompleted, ...rest }) => {
       return {
         ...rest,
@@ -112,29 +111,20 @@ export const useRunnerService = () => {
     }
 
     // @TODO: make a check ... eventsCompleted === events length
-    // console.log(333, retries, eventsCompleted)
     setTimeout(async () => {
-      console.log(1234, runningTask)
       await endTaskRun()
-    }, 2000)
+    }, 1500)
   }, [runningFlow, eventsCompleted])
 
-  // When the queue updates, process the first task
   useEffect(() => {
-    // This should be triggered when removing from queue, but it does not
-    console.log(4444, tasksQueue)
     if (!tasksQueue?.length || runningTask) return
-
     startTaskRun()
   }, [tasksQueue])
 
   useEffect(() => {
     if (!runningTask) return
-
     executeTaskEvents()
   }, [runningTask])
-
-  // console.log(666, tasksQueue, runnerState.runningTask)
 
   return {
     runnerState,
