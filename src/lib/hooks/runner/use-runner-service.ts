@@ -114,7 +114,7 @@ export const useRunnerService = () => {
     setTimeout(async () => {
       await endTaskRun()
     }, 1500)
-  }, [runningFlow, eventsCompleted])
+  }, [runningFlow, retries, eventsCompleted])
 
   useEffect(() => {
     if (!tasksQueue?.length || runningTask) return
@@ -124,7 +124,7 @@ export const useRunnerService = () => {
   useEffect(() => {
     if (!runningTask) return
     executeTaskEvents()
-  }, [runningTask])
+  }, [runningTask, retries])
 
   return {
     runnerState,
