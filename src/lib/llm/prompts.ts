@@ -125,7 +125,7 @@ export const generateMetadataPrompt = (query) => [
   },
 ]
 
-export const mergeEventsPrompt = ({ events, actionStore }) => [
+export const generateEventsPrompt = ({ events, actionsStore }) => [
   {
     role: 'system',
     content: `Role: You are a tool that updates selectors from withing a given JSON array of events.
@@ -144,7 +144,7 @@ export const mergeEventsPrompt = ({ events, actionStore }) => [
       {
         type: 'text',
         text: `
-        "Possible Actions": ${JSON.stringify(actionStore)}
+        "Possible Actions": ${JSON.stringify(actionsStore)}
         `,
       },
     ],

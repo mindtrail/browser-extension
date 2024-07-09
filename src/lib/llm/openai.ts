@@ -9,7 +9,7 @@ import {
   extractPropertiesPrompt,
   splitNQLPrompt,
   extractListEntitiesPrompt,
-  mergeEventsPrompt,
+  generateEventsPrompt,
   updateFormDataPrompt,
   generateActionsPrompt,
 } from './prompts'
@@ -144,12 +144,11 @@ export async function generateMetadata(query) {
   return JSON.parse(result)
 }
 
-export async function mergeEvents({ events, actionsStore }) {
-  const messages = mergeEventsPrompt({
+export async function generateEvents({ events, actionsStore }) {
+  const messages = generateEventsPrompt({
     events,
     actionsStore,
   }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[]
-  console.log('mergeEvents prompt', messages)
   const completion = await openai.chat.completions.create({
     messages,
     model: 'gpt-4o',

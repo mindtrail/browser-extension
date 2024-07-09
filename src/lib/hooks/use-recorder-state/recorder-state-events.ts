@@ -1,6 +1,6 @@
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
 import { MESSAGES, MESSAGE_AREAS } from '~/lib/constants'
-import { generateMetadata, mergeEvents } from '~/lib/llm/openai'
+import { generateMetadata, generateEvents } from '~/lib/llm/openai'
 import { setActionsStore, getActionsStoreByKeys } from '~lib/utils/recorder/actions-store'
 
 export const updateRecordedEvents = async (event, setRecorderState) => {
@@ -88,7 +88,7 @@ export const toggleRecording = async (props) => {
   const actionsStore = await getActionsStoreByKeys(actionsStoreKeys)
 
   // Update events selectors via possible actions
-  const aiGeneratedEvents = await mergeEvents({ events: flow.events, actionsStore })
+  const aiGeneratedEvents = await generateEvents({ events: flow.events, actionsStore })
   flow.events = aiGeneratedEvents.map((event, index) => {
     return {
       ...event,
