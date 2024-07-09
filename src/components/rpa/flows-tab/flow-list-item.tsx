@@ -1,11 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { EllipsisVerticalIcon, CirclePlayIcon, SaveIcon } from 'lucide-react'
 
-import {
-  EllipsisVerticalIcon,
-  CirclePlayIcon,
-  CheckCheckIcon,
-  SaveIcon,
-} from 'lucide-react'
 import { Button } from '~components/ui/button'
 import { Typography } from '~components/typography'
 import { Input } from '~/components/ui/input'
@@ -17,30 +12,18 @@ import {
   DropdownMenuPortal,
 } from '~/components/ui/dropdown-menu'
 
-import { EventsList } from '../events-list'
-
-interface RunItemProps {
+interface FlowItemProps {
   flow: any
-  flowsRunning: string[]
   runnerContainerRef: React.RefObject<HTMLDivElement>
-  runFlow: (flowId: string, task?: any) => Promise<void>
+  runFlow: (flow: any, task?: any) => Promise<void>
   removeFlow: (flowId: string) => void
   updateFlowName: (flowId: string, flow: any) => any
-  eventsList: any[]
 }
 
-export function RunItem(props: RunItemProps) {
-  const {
-    flow,
-    flowsRunning,
-    runnerContainerRef,
-    eventsList,
-    runFlow,
-    removeFlow,
-    updateFlowName,
-  } = props
+export function FlowListItem(props: FlowItemProps) {
+  const { flow, runnerContainerRef, runFlow, removeFlow, updateFlowName } = props
 
-  const { id: flowId, name: initialName, events } = flow
+  const { id: flowId, name: initialName } = flow
   const [isRenaming, setIsRenaming] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [flowName, setFlowName] = useState(initialName)
@@ -59,15 +42,17 @@ export function RunItem(props: RunItemProps) {
       ) {
         setIsRenaming(false)
         setFlowName(initialName)
+        event.stopPropagation()
+        event.preventDefault()
       }
     }
 
-    window.addEventListener('keydown', handleClickOutsideOrEscape)
+    window.addEventListener('keydown', handleClickOutsideOrEscape, true)
     window.addEventListener('click', handleClickOutsideOrEscape)
     shadowRoot.addEventListener('click', handleClickOutsideOrEscape)
 
     return () => {
-      window.removeEventListener('keydown', handleClickOutsideOrEscape)
+      window.removeEventListener('keydown', handleClickOutsideOrEscape, true)
       window.removeEventListener('click', handleClickOutsideOrEscape)
       shadowRoot.removeEventListener('click', handleClickOutsideOrEscape)
     }
@@ -92,9 +77,7 @@ export function RunItem(props: RunItemProps) {
           <Typography
             variant='small'
             className={`w-full line-clamp-2 h-auto justify-start text-left
-            px-4 py-4 cursor-default border rounded
-            ${flowsRunning?.includes(flowId) ? 'text-primary' : 'text-foreground/70'}
-          `}
+            px-4 py-4 cursor-default border rounded`}
           >
             {flowName}
           </Typography>
@@ -128,7 +111,7 @@ export function RunItem(props: RunItemProps) {
               variant='default'
               size='sm'
               className='flex gap-2'
-              onClick={() => runFlow(flowId)}
+              onClick={() => runFlow(flow)}
             >
               <CirclePlayIcon className='w-4 h-4' />
               Run
@@ -165,31 +148,6 @@ export function RunItem(props: RunItemProps) {
           </div>
         )}
       </div>
-      {flowsRunning?.includes(flowId) && (
-        <>
-          <EventsList eventsList={eventsList} readOnly={true} />
-
-          {eventsList?.length === events?.length && (
-            <Typography
-              variant='small-semi'
-              className='flex items-center gap-2 px-6 text-primary'
-            >
-              <CheckCheckIcon className='w-5 h-5' />
-              Run complete
-            </Typography>
-          )}
-        </>
-      )}
     </div>
   )
 }
-
-// const mock_event = {
-//   id: Date.now(),
-//   delay: 0,
-//   name: '',
-//   selector: 'label > button',
-//   textContent: 'BUTTON',
-//   type: 'click',
-//   value: undefined,
-// }

@@ -25,7 +25,6 @@ const initDeepgram = async (setTranscript) => {
     })
 
     connection.on(LiveTranscriptionEvents.Transcript, (data) => {
-      console.log(111, data.channel.alternatives[0].transcript)
       setTranscript((prev) => prev + ' ' + data.channel.alternatives[0].transcript)
     })
 

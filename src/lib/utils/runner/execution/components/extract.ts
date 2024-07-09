@@ -3,14 +3,10 @@ import { updateTask, getTask } from '~/lib/supabase'
 import { waitForUrl } from '~/lib/utils/runner/wait-for-url'
 import { waitForElement } from '~/lib/utils/runner/wait-for-element'
 
-export async function extractComponent({
-  flowId,
-  task,
-  event,
-  onEventStart,
-  onEventEnd,
-}) {
-  await onEventStart(flowId, event)
+export async function extractComponent(props: RunnerComponentProps) {
+  const { flowId, event, onEventStart, onEventEnd, task } = props
+
+  await onEventStart({ flowId, event, taskId: task.id })
   if (event.baseURI) {
     const urlMatch = await waitForUrl(event.baseURI)
     if (!urlMatch) {
@@ -24,10 +20,11 @@ export async function extractComponent({
   await new Promise((resolve) => setTimeout(resolve, 2000))
   const entities = await extractTable(event.selector)
 
-  const taskRes = await getTask(task.id)
-  task = taskRes.data
+  const latestTask = await getTask(task.id)
+  const updatedTask = latestTask.data || task
+
   await updateTask(task.id, {
-    ...task,
+    ...updatedTask,
     state: {
       ...task.state,
       variables: {
@@ -36,5 +33,6 @@ export async function extractComponent({
       },
     },
   })
-  await onEventEnd(flowId, event)
+
+  await onEventEnd({ event, taskId: task.id })
 }

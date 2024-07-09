@@ -5,7 +5,6 @@ import { TrashIcon } from 'lucide-react'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { Button } from '~/components/ui/button'
-
 import { IconSpinner } from '~components/icons/spinner'
 
 import { sendMessageToBg } from '~lib/utils/bg-messaging'
@@ -151,7 +150,7 @@ export const DeleteClipping = ({ clippingList, onDelete }: DeleteClippingProps) 
           <TrashIcon width={22} height={22} />
           {loading && (
             <span className='absolute flex bg-slate-100/50 w-full h-full justify-center items-center rounded-full'>
-              <IconSpinner />
+              <IconSpinner className='animate-spin' />
             </span>
           )}
         </Button>
