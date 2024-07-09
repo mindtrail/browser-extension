@@ -80,17 +80,17 @@ export async function updateTask(id: string, task: any) {
   return supabase.from('tasks').update(task).match({ id })
 }
 
-// Action Groups
+// Actions Store
 
-export function onActionGroupsChange(
+export function onActionsStoreChange(
   onChange: (payload: any) => void,
-  channelName = SUPABASE_CHANNELS.ACTION_GROUPS,
+  channelName = SUPABASE_CHANNELS.ACTIONS_STORE,
 ) {
   const channel = supabase
     .channel(channelName)
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'action_groups' },
+      { event: '*', schema: 'public', table: 'actions_store' },
       onChange,
     )
     .subscribe()
@@ -99,33 +99,33 @@ export function onActionGroupsChange(
   }
 }
 
-export async function getActionGroups() {
+export async function getActionsStore() {
   const res = await supabase
-    .from('action_groups')
+    .from('actions_store')
     .select('*')
     .order('created_at', { ascending: true })
   return res.data || []
 }
 
-export async function getActionGroupsByKeys(keys: string[]) {
-  const res = await supabase.from('action_groups').select('key,actions').in('key', keys)
+export async function getActionsStoreByKeys(keys: string[]) {
+  const res = await supabase.from('actions_store').select('key,actions').in('key', keys)
   return res.data || []
 }
 
-export async function getActionGroup(id: string) {
-  return supabase.from('action_groups').select('*').match({ id }).single()
+export async function getActionsStoreById(id: string) {
+  return supabase.from('actions_store').select('*').match({ id }).single()
 }
 
-export async function createActionGroup(actionGroup: any) {
-  return supabase.from('action_groups').insert([actionGroup]).select().single()
+export async function createActionsStore(actionsStore: any) {
+  return supabase.from('actions_store').insert([actionsStore]).select().single()
 }
 
-export async function deleteActionGroup(id: string) {
-  return supabase.from('action_groups').delete().match({ id })
+export async function deleteActionsStore(id: string) {
+  return supabase.from('actions_store').delete().match({ id })
 }
 
-export async function updateActionGroup(id: string, actionGroup: any) {
-  return supabase.from('action_groups').update(actionGroup).match({ id })
+export async function updateActionsStore(id: string, actionsStore: any) {
+  return supabase.from('actions_store').update(actionsStore).match({ id })
 }
 
 // Assistants

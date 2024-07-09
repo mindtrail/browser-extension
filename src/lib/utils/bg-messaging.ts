@@ -12,5 +12,5 @@ export const sendMessageToBg = async ({ name, body }: Message) =>
   await sendToBackground({
     name,
     body, // @TODO: test if the extensionId is actually needed.
-    extensionId: 'iklcfefmepaoighpffiniigiehfcdihk',
+    extensionId: 'afabdljpachkpmcghgkkkpopnhdpiaig',
   })

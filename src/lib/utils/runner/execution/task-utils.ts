@@ -11,7 +11,7 @@ export async function createNewTask(flowId: string) {
     state: {
       status: 'started',
       flowId,
-      variables: thread.data,
+      variables: thread?.data || [],
     },
     logs: [],
   })

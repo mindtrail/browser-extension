@@ -125,7 +125,7 @@ export const generateMetadataPrompt = (query) => [
   },
 ]
 
-export const mergeEventsPrompt = ({ events, actionGroups }) => [
+export const mergeEventsPrompt = ({ events, actionsStore }) => [
   {
     role: 'system',
     content: `Role: You are a tool that updates selectors from withing a given JSON array of events.
@@ -144,74 +144,14 @@ export const mergeEventsPrompt = ({ events, actionGroups }) => [
       {
         type: 'text',
         text: `
-        "Possible Actions": ${JSON.stringify(actionGroups)}
+        "Possible Actions": ${JSON.stringify(actionsStore)}
         `,
       },
     ],
   },
 ]
 
-export const generateActionsPrompt = (html) => [
-  {
-    role: 'assistant',
-    content: [
-      {
-        type: 'text',
-        text: `
-          [
-            {
-              "type": "input",
-              "description": "Input text into a field on a webpage",
-              "properties": {
-                "label": {
-                  "required": true,
-                  "type": "string",
-                  "description": "The label of the input field"
-                },
-                "selector": {
-                  "required": true,
-                  "type": "string",
-                  "description": "The CSS selector for the input field"
-                }
-              }
-            },
-            {
-              "type": "click",
-              "description": "Click a button or link on a webpage",
-              "properties": {
-                "label": {
-                  "required": true,
-                  "type": "string",
-                  "description": "The label of the button or link"
-                },
-                "selector": {
-                  "required": true,
-                  "type": "string",
-                  "description": "The CSS selector for the button or link"
-                }
-              }
-            }
-          ]
-        `,
-      },
-      {
-        type: 'text',
-        text: `Use the above action types to extract all the possible actions from the given HTML. Use JSON format.`,
-      },
-    ],
-  },
-  {
-    role: 'user',
-    content: [
-      {
-        type: 'text',
-        text: html,
-      },
-    ],
-  },
-]
-
-export const generateActionsPromptV2 = (html) => [
+export const generateActionsPrompt = (html, selectors) => [
   {
     role: 'assistant',
     content: [
@@ -234,7 +174,7 @@ export const generateActionsPromptV2 = (html) => [
       },
       {
         type: 'text',
-        text: `Use the above action types to extract all meaningful and relevant actions from the given HTML.
+        text: `Use the above action types + example selectors to extract all meaningful and relevant actions from the given HTML.
         1. Group actions by sections (ex: forms, navigation, etc.) 
         2. Add a description for each section.
         3. Filter out actions with a description that doesn't make sense or is to generic.
@@ -248,6 +188,10 @@ export const generateActionsPromptV2 = (html) => [
       {
         type: 'text',
         text: html,
+      },
+      {
+        type: 'text',
+        text: `Example selectors: ${JSON.stringify(selectors)}`,
       },
     ],
   },
@@ -274,34 +218,5 @@ export const updateFormDataPrompt = ({ form, variables }) => [
       Old values should not be used !
       ${JSON.stringify(form)}
     `,
-  },
-]
-
-export const generateSelectorPrompt = ({ html, type }) => [
-  {
-    role: 'system',
-    content: `You are a tool that identifies an ${type} in a given HTML and generates a unique CSS selector ID for it.
-        You will generate a unique CSS selector ID for the ${type} you identify in the given HTML.
-        The selector must by all means point to only one element. Selectors that can be applied to multiple elements will not be accepted !!!
-        Example of wrong selector: "div.cui5-input__box > input[type='text']" (this is not ok because it's too broad)
-        Example of correct selector: "[data-test-key='name'] input[type='text']" (this is ok because it's specific)
-        Response should always be a just a JSON object in this format: {"selector": "string"}`,
-  },
-  {
-    role: 'user',
-    content: [
-      {
-        type: 'text',
-        text: `
-        "HTML": ${JSON.stringify(html)}
-        `,
-      },
-      {
-        type: 'text',
-        text: `
-        "Target Type": ${JSON.stringify(type)}
-        `,
-      },
-    ],
   },
 ]
