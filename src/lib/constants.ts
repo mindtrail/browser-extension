@@ -128,11 +128,13 @@ export const ACTION_TYPE = {
   EXTRACT: 'extract',
 }
 
-export const DEFAULT_RUNNER_STATE = {
-  query: '',
-  flows: [],
-  flowsRunning: [],
-  eventsList: [],
+export const DEFAULT_RUNNER_STATE: RunnerState = {
+  runningTask: null,
+  runningFlow: null,
+  runningQuery: '',
+  retries: 0,
+  eventsCompleted: [],
+  tasksQueue: [],
 }
 
 export const SUPABASE_CHANNELS = {
@@ -141,3 +143,14 @@ export const SUPABASE_CHANNELS = {
   ACTION_GROUPS: 'action-groups-channel',
   THREADS: 'threads-channel',
 }
+
+export enum TASK_STATUS {
+  PENDING = 'pending',
+  RUNNING = 'running',
+  ERROR = 'error',
+  FAILED = 'failed',
+  COMPLETED = 'completed',
+  STOPPED = 'stopped',
+}
+
+export { TASK_STATUS as EVENT_STATUS }

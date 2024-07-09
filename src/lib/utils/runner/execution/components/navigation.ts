@@ -1,5 +1,7 @@
-export async function navigationComponent({ flowId, event, onEventStart, onEventEnd }) {
-  await onEventStart(flowId, event)
-  await onEventEnd(flowId, event)
+export async function navigationComponent(props: RunnerComponentProps) {
+  const { flowId, task, event, onEventStart, onEventEnd } = props
+
+  await onEventStart({ flowId, event, taskId: task.id })
+  await onEventEnd({ event, taskId: task.id })
   window.location.href = event.value
 }

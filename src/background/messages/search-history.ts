@@ -15,7 +15,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     res.send('no data...')
     return
   }
-  console.log(111, payload)
+
   const websites = await api.searchHistoryAPICall(payload?.searchQuery)
   res.send(websites)
 }
