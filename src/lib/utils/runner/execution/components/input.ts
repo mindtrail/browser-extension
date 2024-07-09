@@ -22,6 +22,10 @@ async function triggerInputEvent(event) {
         nativeInputValueSetter.call(element, event.value)
         element.dispatchEvent(new Event('input', { bubbles: true }))
       }
+    } else {
+      element.focus()
+      element.textContent = event.value
+      element.dispatchEvent(new Event('input', { bubbles: true }))
     }
   } catch (error) {
     console.error('Error triggering input event:', error)
