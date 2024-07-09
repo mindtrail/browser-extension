@@ -11,11 +11,11 @@ export const updateRecordedEvents = async (event, setRecorderState) => {
 
   setRecorderState((prevState) => {
     const eventAlreadyInList = prevState?.eventsList.find(
-      (e) => e.selector === event.selector,
+      (e) => e.selector.default === event.selector.default,
     )
     const updatedEventsList = eventAlreadyInList
       ? prevState?.eventsList.map((e) => {
-          if (e.selector === event.selector) {
+          if (e.selector.default === event.selector.default) {
             return {
               ...event,
               count: e.count + 1,
@@ -88,7 +88,16 @@ export const toggleRecording = async (props) => {
   const actionsStore = await getActionsStoreByKeys(actionsStoreKeys)
 
   // Update events selectors via possible actions
-  flow.events = await mergeEvents({ events: flow.events, actionsStore })
+  const aiGeneratedEvents = await mergeEvents({ events: flow.events, actionsStore })
+  flow.events = aiGeneratedEvents.map((event, index) => {
+    return {
+      ...event,
+      selector: {
+        default: flow.events[index].selector.default,
+        llm: event.selector.default, // ai generated selector
+      },
+    }
+  })
 
   setRecorderState((prevState) => ({
     ...prevState,

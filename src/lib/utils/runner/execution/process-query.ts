@@ -25,18 +25,18 @@ export async function processQuery({
   // Update selector for first event to use the entity selector
   const entityEvents = filteredEntities.map((entity) => {
     return events.map((event, index) => {
-      if (index === 0 && event.selector.includes('table')) {
+      if (index === 0 && event.selector.default.includes('table')) {
         console.log(
           'prev Selector',
-          event.selector,
-          document.querySelector(event.selector),
+          event.selector.default,
+          document.querySelector(event.selector.default),
         )
         console.log(
           'new Selector',
-          entity.selector,
-          document.querySelector(entity.selector),
+          entity.selector.default,
+          document.querySelector(entity.selector.default),
         )
-        return { ...event, selector: entity.selector }
+        return { ...event, selector: entity.selector.default }
       }
       return event
     })

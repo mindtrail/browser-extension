@@ -125,11 +125,11 @@ export const generateMetadataPrompt = (query) => [
   },
 ]
 
-export const mergeEventsPrompt = ({ events, actionsStore }) => [
+export const mergeEventsPrompt = ({ events, actionStore }) => [
   {
     role: 'system',
     content: `Role: You are a tool that updates selectors from withing a given JSON array of events.
-        Tasks: You will update selectors (only update selectors!) from the given "RPA_flow" using a list of "Possible Actions" that contains more accurate selector paterns.
+        Tasks: You will update selectors (only update selectors!) from the given "RPA_flow" using a list of "Possible Actions" that contains alternative selector paterns.
         Output: Response should always be a just a JSON array !`,
   },
   {
@@ -144,7 +144,7 @@ export const mergeEventsPrompt = ({ events, actionsStore }) => [
       {
         type: 'text',
         text: `
-        "Possible Actions": ${JSON.stringify(actionsStore)}
+        "Possible Actions": ${JSON.stringify(actionStore)}
         `,
       },
     ],

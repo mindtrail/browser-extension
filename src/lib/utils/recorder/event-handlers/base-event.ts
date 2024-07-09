@@ -3,7 +3,7 @@ import { ACTION_TYPE } from '~/lib/constants'
 
 interface BaseEventProps {
   event: any
-  selector?: string
+  selector?: { default: string; llm?: string }
   type: string
 }
 
@@ -12,7 +12,7 @@ export function createBaseEvent({ event = {}, selector, type }: BaseEventProps) 
 
   const timeStamp = Date.now()
 
-  const eventIdentifier = type === ACTION_TYPE.NAV ? url : selector
+  const eventIdentifier = type === ACTION_TYPE.NAV ? url : selector.default
   const eventKey = `${type}-${eventIdentifier}`
 
   const value = type === ACTION_TYPE.NAV ? url : getValue({ type, target })
