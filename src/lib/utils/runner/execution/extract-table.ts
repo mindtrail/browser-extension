@@ -1,5 +1,5 @@
-export async function extractTable(selector: string) {
-  const table = document.querySelector(selector)
+export async function extractTable(selector) {
+  const table: HTMLElement = document.querySelector(selector.default)
 
   // Check for thead and use it if available
   const thead = table.querySelector('thead')

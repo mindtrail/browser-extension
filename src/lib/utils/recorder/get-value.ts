@@ -6,8 +6,10 @@ export function getValue({ type, target }) {
   }
 
   if (type === ACTION_TYPE.INPUT) {
-    return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement
-      ? target.value
-      : null
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+      return target.value
+    } else {
+      return target.textContent || target.innerText
+    }
   }
 }

@@ -9,11 +9,9 @@ import {
   extractPropertiesPrompt,
   splitNQLPrompt,
   extractListEntitiesPrompt,
-  mergeEventsPrompt,
-  generateActionsPrompt,
+  generateEventsPrompt,
   updateFormDataPrompt,
-  generateSelectorPrompt,
-  generateActionsPromptV2,
+  generateActionsPrompt,
 } from './prompts'
 
 const openai = new OpenAI({
@@ -146,12 +144,13 @@ export async function generateMetadata(query) {
   return JSON.parse(result)
 }
 
-export async function mergeEvents({ events, actionGroups }) {
+export async function generateEvents({ events, actionsStore }) {
+  const messages = generateEventsPrompt({
+    events,
+    actionsStore,
+  }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[]
   const completion = await openai.chat.completions.create({
-    messages: mergeEventsPrompt({
-      events,
-      actionGroups,
-    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+    messages,
     model: 'gpt-4o',
     temperature: 0.1,
     response_format: { type: 'json_object' },
@@ -161,23 +160,11 @@ export async function mergeEvents({ events, actionGroups }) {
   return JSON.parse(result)['RPA_flow']
 }
 
-export async function generateActions(html) {
+export async function generateActions(html, selectors) {
   const completion = await openai.chat.completions.create({
     messages: generateActionsPrompt(
       html,
-    ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4o',
-    temperature: 0.1,
-    response_format: { type: 'json_object' },
-  })
-  const result = completion.choices[0].message.content
-  return JSON.parse(result).actions
-}
-
-export async function generateActionsV2(html) {
-  const completion = await openai.chat.completions.create({
-    messages: generateActionsPromptV2(
-      html,
+      selectors,
     ) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     model: 'gpt-4o',
     temperature: 0.1,
@@ -199,18 +186,4 @@ export async function updateFormData({ form, variables }) {
   })
   const result = completion.choices[0].message.content
   return JSON.parse(result)
-}
-
-export async function generateSelector({ html, type }) {
-  const completion = await openai.chat.completions.create({
-    messages: generateSelectorPrompt({
-      html,
-      type,
-    }) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-    model: 'gpt-4o',
-    temperature: 0.1,
-    response_format: { type: 'json_object' },
-  })
-  const result = completion.choices[0].message.content
-  console.log(result)
 }

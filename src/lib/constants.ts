@@ -140,7 +140,7 @@ export const DEFAULT_RUNNER_STATE: RunnerState = {
 export const SUPABASE_CHANNELS = {
   FLOWS: 'flows-channel',
   TASKS: 'tasks-channel',
-  ACTION_GROUPS: 'action-groups-channel',
+  ACTIONS_STORE: 'actions-store-channel',
   THREADS: 'threads-channel',
 }
 

@@ -12,9 +12,11 @@ export async function handleClickEvent(event: MouseEvent, callback) {
   const { altKey } = event
   const target = event?.target as HTMLElement
 
-  let selector = getSelector(target)
+  let selector = {
+    default: getSelector(target),
+  }
 
-  if (!target || (selector && selector.includes('plasmo-csui'))) {
+  if (!target || (selector.default && selector.default.includes('plasmo-csui'))) {
     return
   }
   if (target.nodeName === 'INPUT' || target.nodeName === 'TEXTAREA') {

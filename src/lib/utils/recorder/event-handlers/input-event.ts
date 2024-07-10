@@ -8,9 +8,11 @@ const { INPUT } = ACTION_TYPE
 
 export async function handleInputEvent(event, callback) {
   const { target } = event
-  let selector = getSelector(target)
+  let selector = {
+    default: getSelector(target),
+  }
 
-  if (!target || (selector && selector.includes('plasmo-csui'))) {
+  if (!target || (selector.default && selector.default.includes('plasmo-csui'))) {
     return
   }
 

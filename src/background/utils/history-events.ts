@@ -1,5 +1,5 @@
 import { getRecorderState } from './storage/recorder'
-import { setActionGroup } from '~lib/utils/recorder/action-groups'
+import { setActionsStore } from '~lib/utils/recorder/actions-store'
 
 let listenersAdded = false
 export function listenForHistoryEvents() {
@@ -15,7 +15,7 @@ export function listenForHistoryEvents() {
     }
 
     debounceTimeout = setTimeout(async () => {
-      setActionGroup(url)
+      setActionsStore(url)
     }, 500)
   })
 
